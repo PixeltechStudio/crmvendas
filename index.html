@@ -721,6 +721,48 @@ tbody tr{transition:background 0.15s}
   #main-content{margin:0}
   .page{display:flex!important;padding:0}
 }
+
+/* ── SHOPEE INTEGRATION ── */
+.shopee-header {
+  background: linear-gradient(135deg, rgba(238,77,45,0.15) 0%, rgba(238,77,45,0.05) 100%);
+  border: 1px solid rgba(238,77,45,0.25);
+  border-radius: var(--radius2);
+  padding: 20px 24px;
+}
+.shopee-logo { display:flex; align-items:center; gap:12px; }
+.shopee-logo-icon {
+  width:44px;height:44px;border-radius:12px;
+  background: linear-gradient(135deg,#ee4d2d,#ff7337);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(238,77,45,0.4);
+  font-size:1.3rem;
+}
+.shopee-status-dot { width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px; }
+.shopee-status-dot.connected { background:var(--green2);box-shadow:0 0 6px rgba(16,185,129,0.6); }
+.shopee-status-dot.disconnected { background:var(--text3); }
+.shopee-status-dot.syncing { background:var(--yellow2);animation:pulse-dot 1s infinite; }
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.4}}
+.sync-log-item {
+  padding:10px 14px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--border);
+  font-size:0.81rem;display:flex;align-items:flex-start;gap:10px;
+}
+.sync-log-icon { font-size:1rem;min-width:20px;margin-top:1px; }
+.sync-log-time { font-size:0.72rem;color:var(--text3);white-space:nowrap;margin-top:2px; }
+.shopee-config-section {
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius2);padding:20px 24px;
+}
+.shopee-config-section h3 { font-family:var(--font-display);font-size:0.95rem;font-weight:700;margin-bottom:14px; }
+.btn-shopee {
+  background:linear-gradient(135deg,#ee4d2d,#ff7337);
+  color:#fff;border:none;
+  box-shadow:0 4px 16px rgba(238,77,45,0.35);
+}
+.btn-shopee:hover { background:linear-gradient(135deg,#d63d1e,#ee4d2d);box-shadow:0 4px 24px rgba(238,77,45,0.5);transform:translateY(-1px); }
+.shopee-stat { padding:14px 18px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border); }
+.shopee-stat-val { font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--shopee); }
+.shopee-stat-lbl { font-size:0.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-top:3px; }
 </style>
 </head>
 <body>
@@ -890,6 +932,12 @@ tbody tr{transition:background 0.15s}
       <div class="nav-item" onclick="navigate('logs')" data-page="logs">
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
         <span class="nav-item-label">Logs</span>
+      </div>
+      <div class="nav-section-title">Integrações</div>
+      <div class="nav-item" onclick="navigate('shopee')" data-page="shopee">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61H19a2 2 0 001.99-1.73l1.38-9H6"/></svg>
+        <span class="nav-item-label">Shopee Sync</span>
+        <span class="nav-badge hidden" id="badge-shopee" style="background:rgba(238,77,45,0.2);color:#ff6b47">0</span>
       </div>
       <div class="nav-section-title">Sistema</div>
       <div class="nav-item" onclick="navigate('avisos')" data-page="avisos">
@@ -1749,6 +1797,230 @@ tbody tr{transition:background 0.15s}
   <div class="pagination" id="logs-pagination"></div>
 </section>
 
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SHOPEE SYNC PAGE                                    -->
+<!-- ══════════════════════════════════════════════════ -->
+<section class="page" id="page-shopee">
+  <div class="page-header">
+    <div>
+      <div class="page-title" style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:1.5rem">🛍️</span> Shopee Sync
+      </div>
+      <div class="page-sub">Integração com Shopee Open Platform via Backendless Cloud Code</div>
+    </div>
+    <div class="page-actions">
+      <button class="btn btn-secondary btn-sm" onclick="navigate('shopee-config')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+        Configurações
+      </button>
+      <button class="btn btn-shopee" id="btn-sync-shopee" onclick="syncShopee()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+        Sincronizar Shopee
+      </button>
+    </div>
+  </div>
+
+  <!-- Status Card -->
+  <div class="shopee-header">
+    <div class="flex items-center justify-between flex-wrap gap-3">
+      <div class="shopee-logo">
+        <div class="shopee-logo-icon">🛍️</div>
+        <div>
+          <div class="font-semibold" style="font-size:1rem">Shopee Open Platform</div>
+          <div class="text-sm" id="shopee-conn-status" style="color:var(--text2)">
+            <span class="shopee-status-dot disconnected" id="shopee-status-dot"></span>
+            Verificando conexão...
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <div class="shopee-stat">
+          <div class="shopee-stat-val" id="sh-stat-pedidos">--</div>
+          <div class="shopee-stat-lbl">Pedidos Sincronizados</div>
+        </div>
+        <div class="shopee-stat">
+          <div class="shopee-stat-val" id="sh-stat-produtos">--</div>
+          <div class="shopee-stat-lbl">Produtos</div>
+        </div>
+        <div class="shopee-stat">
+          <div class="shopee-stat-val" id="sh-stat-ultima">--</div>
+          <div class="shopee-stat-lbl">Última Sincronização</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Cards -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+    <div class="card p-3" style="cursor:pointer;transition:var(--transition)" onclick="syncOrders()">
+      <div style="font-size:1.4rem;margin-bottom:8px">📦</div>
+      <div class="font-semibold" style="font-size:0.9rem">Importar Pedidos</div>
+      <div class="text-xs text-muted mt-1">Busca novos pedidos da Shopee e salva no CRM</div>
+    </div>
+    <div class="card p-3" style="cursor:pointer;transition:var(--transition)" onclick="syncProducts()">
+      <div style="font-size:1.4rem;margin-bottom:8px">🏷️</div>
+      <div class="font-semibold" style="font-size:0.9rem">Sincronizar Produtos</div>
+      <div class="text-xs text-muted mt-1">Atualiza catálogo e estoque com dados da Shopee</div>
+    </div>
+    <div class="card p-3" style="cursor:pointer;transition:var(--transition)" onclick="syncStock()">
+      <div style="font-size:1.4rem;margin-bottom:8px">📊</div>
+      <div class="font-semibold" style="font-size:0.9rem">Atualizar Estoque</div>
+      <div class="text-xs text-muted mt-1">Envia estoque do CRM para a Shopee</div>
+    </div>
+    <div class="card p-3" style="cursor:pointer;transition:var(--transition)" onclick="checkToken()">
+      <div style="font-size:1.4rem;margin-bottom:8px">🔑</div>
+      <div class="font-semibold" style="font-size:0.9rem">Verificar Token</div>
+      <div class="text-xs text-muted mt-1">Checa validade do token e renova se necessário</div>
+    </div>
+  </div>
+
+  <!-- Sync Progress -->
+  <div class="card p-4 hidden" id="shopee-progress-card">
+    <div class="font-semibold mb-2" id="shopee-progress-title">Sincronizando...</div>
+    <div class="progress-bar mb-2"><div class="progress-fill" id="shopee-progress-fill" style="width:0%;background:var(--shopee)"></div></div>
+    <div class="text-sm text-muted" id="shopee-progress-label">Iniciando...</div>
+  </div>
+
+  <!-- Sync Log -->
+  <div class="card p-4">
+    <div class="flex items-center justify-between mb-3">
+      <div class="font-semibold">Log de Sincronização</div>
+      <button class="btn btn-secondary btn-sm" onclick="clearSyncLogs()">Limpar</button>
+    </div>
+    <div class="flex flex-col gap-2" id="shopee-sync-log" style="max-height:300px;overflow-y:auto">
+      <div class="empty-state" style="padding:20px 0">
+        <div class="text-sm text-muted">Nenhuma sincronização realizada ainda.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Shopee Orders -->
+  <div class="card p-4">
+    <div class="flex items-center justify-between mb-3">
+      <div class="font-semibold">Pedidos Shopee Recentes</div>
+      <button class="btn btn-secondary btn-sm" onclick="syncOrders()">Atualizar</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Pedido</th><th>Produto</th><th>Cliente</th><th>Valor</th><th>Status</th><th>Data</th></tr></thead>
+        <tbody id="shopee-orders-tbody">
+          <tr><td colspan="6" style="padding:24px;text-align:center;color:var(--text3)">Sincronize para ver pedidos</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SHOPEE CONFIG PAGE -->
+<section class="page" id="page-shopee-config">
+  <div class="page-header">
+    <div>
+      <div class="page-title">⚙️ Configuração Shopee</div>
+      <div class="page-sub">Configure a integração com Shopee Open Platform (OAuth)</div>
+    </div>
+    <div class="page-actions">
+      <button class="btn btn-secondary btn-sm" onclick="navigate('shopee')">
+        ← Voltar
+      </button>
+    </div>
+  </div>
+
+  <!-- OAuth Status -->
+  <div class="shopee-config-section">
+    <h3>🔐 Status da Autorização OAuth</h3>
+    <div class="flex items-center gap-3 flex-wrap">
+      <div id="oauth-status-badge" class="badge badge-gray" style="padding:8px 16px;font-size:0.84rem">
+        <span class="shopee-status-dot disconnected" id="oauth-dot"></span>
+        Não autorizado
+      </div>
+      <button class="btn btn-shopee" onclick="startOAuth()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Autorizar via Shopee OAuth
+      </button>
+      <button class="btn btn-secondary" onclick="refreshToken()">
+        🔄 Renovar Token
+      </button>
+      <button class="btn btn-danger btn-sm" onclick="revokeToken()">
+        Revogar Acesso
+      </button>
+    </div>
+    <div class="mt-3 card p-3" id="token-info-card" style="display:none">
+      <div class="flex flex-col gap-1">
+        <div class="text-sm"><strong>Shop ID:</strong> <span id="cfg-shop-id">--</span></div>
+        <div class="text-sm"><strong>Token expira em:</strong> <span id="cfg-token-expiry" style="color:var(--yellow2)">--</span></div>
+        <div class="text-sm"><strong>Refresh Token expira em:</strong> <span id="cfg-refresh-expiry">--</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backendless Cloud Code Config -->
+  <div class="shopee-config-section">
+    <h3>☁️ Backendless Cloud Code</h3>
+    <div class="card p-3" style="background:rgba(99,102,241,0.06);border-color:rgba(99,102,241,0.2)">
+      <div class="text-sm" style="color:var(--accent3)">
+        ℹ️ As credenciais da Shopee (Partner Key, Secret) são armazenadas <strong>somente no Backendless Cloud Code</strong>, nunca no navegador. O front-end chama apenas as funções seguras do Backendless.
+      </div>
+    </div>
+    <div class="form-grid mt-3">
+      <div class="input-group">
+        <label class="label">Backendless API URL (Cloud Code)</label>
+        <input type="text" class="input" id="cfg-bl-url" placeholder="https://api.backendless.com/APP_ID/API_KEY/services/shopee"/>
+      </div>
+      <div class="input-group">
+        <label class="label">Sincronização Automática</label>
+        <select class="input" id="cfg-auto-sync">
+          <option value="off">Desligada</option>
+          <option value="15">A cada 15 minutos</option>
+          <option value="30">A cada 30 minutos</option>
+          <option value="60">A cada hora</option>
+          <option value="360">A cada 6 horas</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label class="label">Dias retroativos para buscar pedidos</label>
+        <input type="number" class="input" id="cfg-days-back" value="7" min="1" max="90"/>
+      </div>
+      <div class="input-group">
+        <label class="label">Status de pedidos a sincronizar</label>
+        <select class="input" id="cfg-order-status">
+          <option value="READY_TO_SHIP,SHIPPED,COMPLETED">Prontos + Enviados + Concluídos</option>
+          <option value="COMPLETED">Apenas Concluídos</option>
+          <option value="ALL">Todos</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex gap-2 mt-3">
+      <button class="btn btn-primary" onclick="saveShopeeConfig()">💾 Salvar Configurações</button>
+      <button class="btn btn-secondary" onclick="testConnection()">🧪 Testar Conexão</button>
+    </div>
+  </div>
+
+  <!-- Tabelas Necessárias -->
+  <div class="shopee-config-section">
+    <h3>🗄️ Tabelas Backendless Necessárias</h3>
+    <div class="text-sm text-muted mb-3">Estas tabelas devem existir no seu Backendless para a integração funcionar:</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+      <div class="card p-3">
+        <div class="font-semibold text-sm">📋 ShopeePedidos</div>
+        <div class="text-xs text-muted mt-1">orderId, status, total, buyerName, buyerPhone, items, createdAt, syncedAt</div>
+      </div>
+      <div class="card p-3">
+        <div class="font-semibold text-sm">📦 ShopeeProdutos</div>
+        <div class="text-xs text-muted mt-1">itemId, shopSku, name, price, stock, status, syncedAt</div>
+      </div>
+      <div class="card p-3">
+        <div class="font-semibold text-sm">🔐 ShopeeConfig</div>
+        <div class="text-xs text-muted mt-1">shopId, accessToken, refreshToken, expiresAt, refreshExpiresAt</div>
+      </div>
+      <div class="card p-3">
+        <div class="font-semibold text-sm">📝 ShopeeSyncLogs</div>
+        <div class="text-xs text-muted mt-1">tipo, status, mensagem, detalhes, criadoEm</div>
+      </div>
+    </div>
+    <button class="btn btn-secondary btn-sm mt-3" onclick="checkTables()">✅ Verificar Tabelas</button>
+    <div id="tables-check-result" class="mt-2"></div>
+  </div>
+</section>
 
     </main>
   </div>
@@ -4215,6 +4487,588 @@ function filterProdutos() {
   _renderProdutos();
 }
 function renderProdutos() { filtProdutos=[...allProdutos]; _renderProdutos(); }
+
+// ══════════════════════════════════════════════════
+//  SHOPEE INTEGRATION — SECURE via Backendless Cloud Code
+//  O front-end NUNCA guarda Partner Key nem Secret.
+//  Todas as chamadas à API da Shopee passam pelo Cloud Code.
+// ══════════════════════════════════════════════════
+
+// ── Estado Shopee ──
+let shopeeConfig = {
+  blServiceUrl: '', // ex: https://api.backendless.com/APP/KEY/services/shopee
+  autoSyncInterval: null,
+  autoSyncMinutes: 0,
+  daysBack: 7,
+  orderStatus: 'READY_TO_SHIP,SHIPPED,COMPLETED',
+};
+let shopeeSyncLogs = [];
+let shopeeConnected = false;
+let shopeeAutoTimer = null;
+
+// ── Helpers: chamar Cloud Code do Backendless ──
+async function blService(method, params = {}) {
+  const url = shopeeConfig.blServiceUrl || localStorage.getItem('shopee_bl_url');
+  if (!url) throw new Error('URL do serviço Backendless não configurada. Vá em Configurações.');
+  const res = await fetch(`${url}/${method}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(authToken ? { 'user-token': authToken } : {}) },
+    body: JSON.stringify(params),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg = data.message || `Erro HTTP ${res.status}`;
+    // Tratamento de token expirado
+    if (msg.includes('token') && (msg.includes('expired') || msg.includes('invalid'))) {
+      await handleTokenExpired();
+      throw new Error('Token Shopee expirado — renovação iniciada. Tente novamente.');
+    }
+    throw new Error(msg);
+  }
+  return data;
+}
+
+// ── Token expirado: tenta renovar automaticamente ──
+async function handleTokenExpired() {
+  addSyncLog('⚠️', 'Token Shopee expirado. Tentando renovar...', 'warning');
+  try {
+    const result = await blService('refreshToken', {});
+    if (result.success) {
+      addSyncLog('✅', 'Token renovado com sucesso!', 'success');
+      toast('Token Shopee renovado automaticamente!', 'success');
+      await updateOAuthStatus();
+    } else {
+      addSyncLog('❌', 'Falha na renovação do token. Reautorize manualmente.', 'error');
+      toast('Token Shopee expirado. Reautorize em Configurações → Shopee.', 'error', 8000);
+      const dot = document.getElementById('shopee-status-dot');
+      if (dot) { dot.className = 'shopee-status-dot disconnected'; }
+      document.getElementById('shopee-conn-status').innerHTML =
+        '<span class="shopee-status-dot disconnected"></span> Token expirado — reautorize';
+      shopeeConnected = false;
+    }
+  } catch (e) {
+    addSyncLog('❌', 'Erro ao renovar token: ' + e.message, 'error');
+  }
+}
+
+// ── Iniciar OAuth Shopee (abre popup/redirect do Backendless) ──
+async function startOAuth() {
+  const url = shopeeConfig.blServiceUrl || localStorage.getItem('shopee_bl_url');
+  if (!url) { toast('Configure a URL do serviço Backendless primeiro.', 'warning'); return; }
+  try {
+    const result = await blService('getOAuthUrl', {});
+    if (result.authUrl) {
+      const w = window.open(result.authUrl, 'shopee_oauth',
+        'width=600,height=700,scrollbars=yes,resizable=yes');
+      // Escuta mensagem de retorno do popup
+      const handler = async (event) => {
+        if (event.data && event.data.type === 'SHOPEE_AUTH_SUCCESS') {
+          window.removeEventListener('message', handler);
+          if (w) w.close();
+          addSyncLog('✅', 'Autorização Shopee concluída!', 'success');
+          toast('Shopee autorizado com sucesso!', 'success');
+          await updateOAuthStatus();
+          if (document.getElementById('page-shopee-config')?.classList.contains('active')) {
+            renderShopeeConfig();
+          }
+        }
+      };
+      window.addEventListener('message', handler);
+      toast('Janela de autorização Shopee aberta. Faça login e autorize.', 'info', 8000);
+    } else {
+      throw new Error('URL de autorização não retornada pelo servidor.');
+    }
+  } catch (e) {
+    toast('Erro ao iniciar OAuth: ' + e.message, 'error');
+    addSyncLog('❌', 'Erro OAuth: ' + e.message, 'error');
+  }
+}
+
+// ── Verificar status do token ──
+async function checkToken() {
+  addSyncLog('🔑', 'Verificando token Shopee...', 'info');
+  try {
+    const result = await blService('checkToken', {});
+    if (result.valid) {
+      const expDate = new Date(result.expiresAt * 1000).toLocaleString('pt-BR');
+      addSyncLog('✅', `Token válido. Expira em: ${expDate}`, 'success');
+      toast(`Token Shopee válido até ${expDate}`, 'success');
+      shopeeConnected = true;
+      updateShopeeStatusUI(true);
+    } else {
+      addSyncLog('⚠️', 'Token inválido ou expirado.', 'warning');
+      await handleTokenExpired();
+    }
+  } catch (e) {
+    addSyncLog('❌', 'Erro ao verificar token: ' + e.message, 'error');
+    toast('Erro ao verificar token: ' + e.message, 'error');
+  }
+}
+
+// ── Renovar token manualmente ──
+async function refreshToken() {
+  toast('Renovando token...', 'info');
+  try {
+    const result = await blService('refreshToken', {});
+    if (result.success) {
+      toast('Token renovado com sucesso!', 'success');
+      addSyncLog('✅', 'Token renovado manualmente.', 'success');
+      await updateOAuthStatus();
+    } else {
+      throw new Error(result.message || 'Falha na renovação');
+    }
+  } catch (e) {
+    toast('Erro ao renovar: ' + e.message, 'error');
+    addSyncLog('❌', 'Erro ao renovar token: ' + e.message, 'error');
+  }
+}
+
+// ── Revogar acesso ──
+async function revokeToken() {
+  confirm2('Revogar Acesso Shopee', 'Isso desconectará sua loja Shopee. Você precisará reautorizar.', async () => {
+    try {
+      await blService('revokeToken', {});
+      shopeeConnected = false;
+      updateShopeeStatusUI(false);
+      toast('Acesso Shopee revogado.', 'success');
+      addSyncLog('⚠️', 'Acesso Shopee revogado pelo usuário.', 'warning');
+      await logAction('UPDATE', 'Shopee', 'Token revogado');
+    } catch (e) {
+      toast('Erro ao revogar: ' + e.message, 'error');
+    }
+  });
+}
+
+// ── Sincronização COMPLETA (pedidos + produtos + estoque) ──
+async function syncShopee() {
+  const btn = document.getElementById('btn-sync-shopee');
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Sincronizando...'; }
+  showSyncProgress(true, 'Sincronização Completa', 0);
+  addSyncLog('🔄', 'Iniciando sincronização completa...', 'info');
+  try {
+    showSyncProgress(true, 'Buscando pedidos...', 20);
+    await syncOrders(true);
+    showSyncProgress(true, 'Sincronizando produtos...', 55);
+    await syncProducts(true);
+    showSyncProgress(true, 'Atualizando estoque...', 80);
+    await syncStock(true);
+    showSyncProgress(true, 'Concluído!', 100);
+    addSyncLog('✅', 'Sincronização completa finalizada com sucesso!', 'success');
+    toast('Sincronização Shopee concluída!', 'success');
+    await logAction('UPDATE', 'Shopee', 'Sincronização completa realizada');
+    await saveSyncLog('sync_completo', 'success', 'Sincronização completa OK');
+    updateShopeeStat('sh-stat-ultima', new Date().toLocaleTimeString('pt-BR'));
+  } catch (e) {
+    addSyncLog('❌', 'Erro na sincronização: ' + e.message, 'error');
+    toast('Erro na sincronização: ' + e.message, 'error');
+    await saveSyncLog('sync_completo', 'error', e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> Sincronizar Shopee'; }
+    setTimeout(() => showSyncProgress(false), 3000);
+  }
+}
+
+// ── Importar Pedidos da Shopee ──
+async function syncOrders(silent = false) {
+  if (!silent) { showSyncProgress(true, 'Importando pedidos...', 10); }
+  addSyncLog('📦', 'Buscando pedidos na Shopee...', 'info');
+  try {
+    const params = {
+      daysBack: shopeeConfig.daysBack || 7,
+      orderStatus: shopeeConfig.orderStatus || 'READY_TO_SHIP,SHIPPED,COMPLETED',
+    };
+    const result = await blService('getOrders', params);
+    const orders = result.orders || [];
+    let created = 0, updated = 0;
+
+    for (const order of orders) {
+      // Salva em ShopeePedidos
+      const existing = await blGet('ShopeePedidos', `orderId = '${order.order_sn}'`, '', 1).catch(() => []);
+      const shopeeObj = {
+        orderId: order.order_sn,
+        status: order.order_status,
+        total: order.total_amount,
+        buyerName: order.buyer_username,
+        buyerPhone: order.recipient_address?.phone || '',
+        items: JSON.stringify(order.item_list || []),
+        createdAt: new Date(order.create_time * 1000).toISOString(),
+        syncedAt: new Date().toISOString(),
+      };
+      if (existing.length) {
+        await blUpdate('ShopeePedidos', existing[0].objectId, shopeeObj);
+        updated++;
+      } else {
+        await blCreate('ShopeePedidos', shopeeObj);
+        created++;
+      }
+
+      // Sincroniza com tabela Vendas do CRM
+      if (order.order_status === 'COMPLETED') {
+        for (const item of (order.item_list || [])) {
+          const vendaExisting = await blGet('Vendas', `codigoPedido = '${order.order_sn}-${item.item_id}'`, '', 1).catch(() => []);
+          if (!vendaExisting.length) {
+            const venda = {
+              codigoPedido: `${order.order_sn}-${item.item_id}`,
+              produto: item.item_name,
+              sku: item.item_sku || '',
+              quantidade: item.model_quantity_purchased || 1,
+              valorVenda: item.model_discounted_price || item.model_original_price || 0,
+              cliente: order.buyer_username,
+              marketplace: 'Shopee',
+              statusPedido: 'Entregue',
+              dataVenda: new Date(order.create_time * 1000).toISOString().split('T')[0],
+              shopeeOrderId: order.order_sn,
+            };
+            const novaVenda = await blCreate('Vendas', venda);
+            allVendas.unshift(novaVenda);
+            // Atualiza estoque após venda
+            await decrementarEstoqueShopee(item.item_sku, item.model_quantity_purchased || 1);
+          }
+        }
+      }
+    }
+
+    addSyncLog('✅', `Pedidos importados: ${created} novos, ${updated} atualizados`, 'success');
+    updateShopeeStat('sh-stat-pedidos', allVendas.filter(v => v.marketplace === 'Shopee').length);
+    renderShopeeOrders(orders.slice(0, 20));
+    if (!silent) { toast(`Pedidos: ${created} novos, ${updated} atualizados`, 'success'); showSyncProgress(false); }
+    await saveSyncLog('pedidos', 'success', `${created} criados, ${updated} atualizados`);
+  } catch (e) {
+    addSyncLog('❌', 'Erro ao importar pedidos: ' + e.message, 'error');
+    if (!silent) toast('Erro: ' + e.message, 'error');
+    await saveSyncLog('pedidos', 'error', e.message);
+    throw e;
+  }
+}
+
+// ── Sincronizar Produtos da Shopee ──
+async function syncProducts(silent = false) {
+  if (!silent) showSyncProgress(true, 'Sincronizando produtos...', 10);
+  addSyncLog('🏷️', 'Buscando produtos na Shopee...', 'info');
+  try {
+    const result = await blService('getProducts', {});
+    const items = result.items || [];
+    let synced = 0;
+    for (const item of items) {
+      const shopeeObj = {
+        itemId: String(item.item_id),
+        shopSku: item.item_sku || '',
+        name: item.item_name,
+        price: item.price_info?.[0]?.current_price || 0,
+        stock: item.stock_info?.[0]?.current_stock || 0,
+        status: item.item_status,
+        syncedAt: new Date().toISOString(),
+      };
+      const existing = await blGet('ShopeeProdutos', `itemId = '${item.item_id}'`, '', 1).catch(() => []);
+      if (existing.length) await blUpdate('ShopeeProdutos', existing[0].objectId, shopeeObj);
+      else await blCreate('ShopeeProdutos', shopeeObj);
+
+      // Atualiza produto no CRM se SKU bater
+      if (item.item_sku) {
+        const crmProd = allProdutos.find(p => (p.sku || '').toLowerCase() === item.item_sku.toLowerCase());
+        if (crmProd) {
+          await blUpdate('Produtos', crmProd.objectId, {
+            estoqueAtual: item.stock_info?.[0]?.current_stock ?? crmProd.estoqueAtual,
+            precoVenda: item.price_info?.[0]?.current_price ?? crmProd.precoVenda,
+          });
+          crmProd.estoqueAtual = item.stock_info?.[0]?.current_stock ?? crmProd.estoqueAtual;
+          crmProd.precoVenda = item.price_info?.[0]?.current_price ?? crmProd.precoVenda;
+        }
+      }
+      synced++;
+    }
+    addSyncLog('✅', `${synced} produtos sincronizados`, 'success');
+    updateShopeeStat('sh-stat-produtos', synced);
+    if (!silent) { toast(`${synced} produtos sincronizados!`, 'success'); showSyncProgress(false); }
+    await saveSyncLog('produtos', 'success', `${synced} produtos sincronizados`);
+  } catch (e) {
+    addSyncLog('❌', 'Erro ao sincronizar produtos: ' + e.message, 'error');
+    if (!silent) toast('Erro: ' + e.message, 'error');
+    await saveSyncLog('produtos', 'error', e.message);
+    throw e;
+  }
+}
+
+// ── Enviar estoque CRM → Shopee ──
+async function syncStock(silent = false) {
+  if (!silent) showSyncProgress(true, 'Enviando estoque para Shopee...', 10);
+  addSyncLog('📊', 'Atualizando estoque na Shopee...', 'info');
+  try {
+    const shopeeProds = await blGet('ShopeeProdutos', '', '', 500).catch(() => []);
+    let updated = 0, errors = 0;
+    for (const sp of shopeeProds) {
+      const crmProd = allProdutos.find(p => (p.sku || '').toLowerCase() === (sp.shopSku || '').toLowerCase());
+      if (!crmProd) continue;
+      try {
+        await blService('updateStock', { itemId: sp.itemId, stock: crmProd.estoqueAtual || 0 });
+        updated++;
+      } catch { errors++; }
+    }
+    addSyncLog('✅', `Estoque: ${updated} atualizados${errors ? ', ' + errors + ' erros' : ''}`, 'success');
+    if (!silent) { toast(`Estoque: ${updated} produtos atualizados na Shopee`, 'success'); showSyncProgress(false); }
+    await saveSyncLog('estoque', 'success', `${updated} atualizados`);
+  } catch (e) {
+    addSyncLog('❌', 'Erro ao atualizar estoque: ' + e.message, 'error');
+    if (!silent) toast('Erro: ' + e.message, 'error');
+    await saveSyncLog('estoque', 'error', e.message);
+    throw e;
+  }
+}
+
+// ── Decrementa estoque no CRM após venda Shopee ──
+async function decrementarEstoqueShopee(sku, qty) {
+  if (!sku) return;
+  const prod = allProdutos.find(p => (p.sku || '').toLowerCase() === sku.toLowerCase());
+  if (!prod) return;
+  const novoEst = Math.max(0, (prod.estoqueAtual || 0) - qty);
+  await blUpdate('Produtos', prod.objectId, { estoqueAtual: novoEst });
+  prod.estoqueAtual = novoEst;
+  await blCreate('EstoqueMovimentacoes', {
+    produto: prod.nome, sku: prod.sku,
+    tipoMovimentacao: 'Saída', quantidade: qty,
+    motivo: 'Venda Shopee (sync automático)',
+    data: new Date().toISOString(),
+    usuario: 'Sistema Shopee',
+  });
+}
+
+// ── Salvar log de sync no Backendless ──
+async function saveSyncLog(tipo, status, mensagem) {
+  try {
+    await blCreate('ShopeeSyncLogs', {
+      tipo, status, mensagem,
+      usuario: currentUser?.name || currentUser?.email || 'Sistema',
+      criadoEm: new Date().toISOString(),
+    });
+  } catch { /* log falho não deve quebrar o fluxo */ }
+}
+
+// ── Log visual no painel ──
+function addSyncLog(icon, msg, type = 'info') {
+  shopeeSyncLogs.unshift({ icon, msg, type, time: new Date() });
+  if (shopeeSyncLogs.length > 50) shopeeSyncLogs.pop();
+  renderSyncLogs();
+}
+
+function renderSyncLogs() {
+  const el = document.getElementById('shopee-sync-log'); if (!el) return;
+  if (!shopeeSyncLogs.length) {
+    el.innerHTML = '<div class="empty-state" style="padding:20px 0"><div class="text-sm text-muted">Nenhuma sincronização realizada ainda.</div></div>';
+    return;
+  }
+  const typeColors = { success:'var(--green2)', error:'var(--red2)', warning:'var(--yellow2)', info:'var(--accent2)' };
+  el.innerHTML = shopeeSyncLogs.map(l => `
+    <div class="sync-log-item">
+      <div class="sync-log-icon">${l.icon}</div>
+      <div style="flex:1"><div style="color:${typeColors[l.type]||'var(--text2)'};font-weight:500">${l.msg}</div></div>
+      <div class="sync-log-time">${l.time.toLocaleTimeString('pt-BR')}</div>
+    </div>`).join('');
+}
+
+function clearSyncLogs() { shopeeSyncLogs = []; renderSyncLogs(); }
+
+// ── Renderiza pedidos recentes no painel ──
+function renderShopeeOrders(orders) {
+  const tb = document.getElementById('shopee-orders-tbody'); if (!tb) return;
+  if (!orders || !orders.length) {
+    tb.innerHTML = '<tr><td colspan="6" style="padding:24px;text-align:center;color:var(--text3)">Nenhum pedido encontrado</td></tr>';
+    return;
+  }
+  const statusBadge = s => {
+    const map = { COMPLETED:'badge-green', READY_TO_SHIP:'badge-blue', SHIPPED:'badge-yellow', CANCELLED:'badge-red', UNPAID:'badge-gray' };
+    return `<span class="badge ${map[s]||'badge-gray'}">${s}</span>`;
+  };
+  tb.innerHTML = orders.map(o => {
+    const first = (o.item_list || [])[0];
+    return `<tr>
+      <td class="text-sm font-medium text-accent">${o.order_sn}</td>
+      <td class="text-sm">${first?.item_name || '--'}</td>
+      <td class="text-sm">${o.buyer_username || '--'}</td>
+      <td class="font-semibold text-sm">R$ ${(o.total_amount || 0).toFixed(2)}</td>
+      <td>${statusBadge(o.order_status)}</td>
+      <td class="text-sm text-muted">${o.create_time ? new Date(o.create_time * 1000).toLocaleDateString('pt-BR') : '--'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Status visual da conexão ──
+function updateShopeeStatusUI(connected) {
+  shopeeConnected = connected;
+  const dot = document.getElementById('shopee-status-dot');
+  const label = document.getElementById('shopee-conn-status');
+  if (dot) dot.className = 'shopee-status-dot ' + (connected ? 'connected' : 'disconnected');
+  if (label) {
+    label.innerHTML = connected
+      ? '<span class="shopee-status-dot connected"></span> Conectado e autorizado'
+      : '<span class="shopee-status-dot disconnected"></span> Não conectado — configure em Configurações';
+  }
+  const oauthDot = document.getElementById('oauth-dot');
+  const oauthBadge = document.getElementById('oauth-status-badge');
+  if (oauthDot) oauthDot.className = 'shopee-status-dot ' + (connected ? 'connected' : 'disconnected');
+  if (oauthBadge) {
+    oauthBadge.className = 'badge ' + (connected ? 'badge-green' : 'badge-gray');
+    oauthBadge.innerHTML = `<span class="shopee-status-dot ${connected?'connected':'disconnected'}"></span> ${connected ? 'Autorizado' : 'Não autorizado'}`;
+  }
+}
+
+async function updateOAuthStatus() {
+  try {
+    const cfg = await blGet('ShopeeConfig', '', '', 1).catch(() => []);
+    if (cfg.length && cfg[0].accessToken) {
+      updateShopeeStatusUI(true);
+      const expiry = cfg[0].expiresAt ? new Date(cfg[0].expiresAt * 1000).toLocaleString('pt-BR') : '--';
+      const refExpiry = cfg[0].refreshExpiresAt ? new Date(cfg[0].refreshExpiresAt * 1000).toLocaleString('pt-BR') : '--';
+      setText('cfg-shop-id', cfg[0].shopId || '--');
+      setText('cfg-token-expiry', expiry);
+      setText('cfg-refresh-expiry', refExpiry);
+      const card = document.getElementById('token-info-card');
+      if (card) card.style.display = '';
+    } else {
+      updateShopeeStatusUI(false);
+    }
+  } catch { updateShopeeStatusUI(false); }
+}
+
+// ── Sincronização Automática ──
+function setupAutoSync(minutes) {
+  if (shopeeAutoTimer) clearInterval(shopeeAutoTimer);
+  shopeeConfig.autoSyncMinutes = minutes;
+  if (minutes > 0) {
+    shopeeAutoTimer = setInterval(async () => {
+      if (!shopeeConnected) return;
+      addSyncLog('🤖', `Sync automático (a cada ${minutes}min)...`, 'info');
+      await syncShopee();
+    }, minutes * 60 * 1000);
+    toast(`Sync automático ativado a cada ${minutes} minuto(s)!`, 'success');
+  }
+}
+
+// ── Salvar config ──
+async function saveShopeeConfig() {
+  const url = document.getElementById('cfg-bl-url')?.value?.trim();
+  if (!url) { toast('Informe a URL do serviço Backendless.', 'warning'); return; }
+  shopeeConfig.blServiceUrl = url;
+  shopeeConfig.daysBack = parseInt(document.getElementById('cfg-days-back')?.value) || 7;
+  shopeeConfig.orderStatus = document.getElementById('cfg-order-status')?.value || 'READY_TO_SHIP,SHIPPED,COMPLETED';
+  const autoMin = parseInt(document.getElementById('cfg-auto-sync')?.value) || 0;
+
+  localStorage.setItem('shopee_bl_url', url);
+  localStorage.setItem('shopee_config', JSON.stringify({ daysBack: shopeeConfig.daysBack, orderStatus: shopeeConfig.orderStatus, autoSyncMinutes: autoMin }));
+
+  setupAutoSync(autoMin);
+  await logAction('UPDATE', 'Shopee Config', 'Configurações salvas');
+  toast('Configurações Shopee salvas!', 'success');
+  addSyncLog('💾', 'Configurações salvas.', 'success');
+}
+
+// ── Testar Conexão ──
+async function testConnection() {
+  toast('Testando conexão...', 'info');
+  addSyncLog('🧪', 'Testando conexão com Cloud Code...', 'info');
+  try {
+    const result = await blService('ping', {});
+    if (result.pong || result.ok || result.status === 'ok') {
+      addSyncLog('✅', 'Cloud Code respondeu! Conexão OK.', 'success');
+      toast('Conexão com Cloud Code OK!', 'success');
+      await updateOAuthStatus();
+    } else {
+      throw new Error('Resposta inesperada: ' + JSON.stringify(result));
+    }
+  } catch (e) {
+    addSyncLog('❌', 'Falha na conexão: ' + e.message, 'error');
+    toast('Falha na conexão: ' + e.message, 'error');
+  }
+}
+
+// ── Verificar tabelas ──
+async function checkTables() {
+  const needed = ['ShopeePedidos', 'ShopeeProdutos', 'ShopeeConfig', 'ShopeeSyncLogs'];
+  const resultEl = document.getElementById('tables-check-result'); if (!resultEl) return;
+  resultEl.innerHTML = '<div class="text-sm text-muted">Verificando...</div>';
+  const checks = await Promise.all(needed.map(async t => {
+    try { await blGet(t, '', '', 1); return { table: t, ok: true }; }
+    catch { return { table: t, ok: false }; }
+  }));
+  resultEl.innerHTML = checks.map(c =>
+    `<div class="flex items-center gap-2 text-sm mt-1">
+      <span>${c.ok ? '✅' : '❌'}</span>
+      <span style="color:${c.ok?'var(--green2)':'var(--red2)'}">${c.table}</span>
+      <span class="text-muted">${c.ok ? 'OK' : '— Criar no Backendless'}</span>
+    </div>`
+  ).join('');
+}
+
+// ── Atualiza stat no painel ──
+function updateShopeeStat(id, val) {
+  const el = document.getElementById(id); if (el) el.textContent = val;
+}
+
+// ── Progresso visual ──
+function showSyncProgress(show, title = '', pct = 0) {
+  const card = document.getElementById('shopee-progress-card'); if (!card) return;
+  card.classList.toggle('hidden', !show);
+  if (show) {
+    setText('shopee-progress-title', title);
+    setText('shopee-progress-label', pct >= 100 ? 'Concluído!' : `${pct}%`);
+    const fill = document.getElementById('shopee-progress-fill');
+    if (fill) fill.style.width = pct + '%';
+  }
+}
+
+// ── Inicializar config salva ──
+function initShopeeConfig() {
+  const url = localStorage.getItem('shopee_bl_url') || '';
+  const saved = JSON.parse(localStorage.getItem('shopee_config') || '{}');
+  if (url) shopeeConfig.blServiceUrl = url;
+  if (saved.daysBack) shopeeConfig.daysBack = saved.daysBack;
+  if (saved.orderStatus) shopeeConfig.orderStatus = saved.orderStatus;
+  if (saved.autoSyncMinutes > 0) setupAutoSync(saved.autoSyncMinutes);
+  const urlEl = document.getElementById('cfg-bl-url');
+  if (urlEl && url) urlEl.value = url;
+  const daysEl = document.getElementById('cfg-days-back');
+  if (daysEl && saved.daysBack) daysEl.value = saved.daysBack;
+  const autoEl = document.getElementById('cfg-auto-sync');
+  if (autoEl && saved.autoSyncMinutes) autoEl.value = saved.autoSyncMinutes;
+  const orderEl = document.getElementById('cfg-order-status');
+  if (orderEl && saved.orderStatus) orderEl.value = saved.orderStatus;
+}
+
+function renderShopeeConfig() {
+  initShopeeConfig();
+  updateOAuthStatus();
+}
+
+// ── Estende navigate() para a página Shopee ──
+const _pagesMeta2Shopee = {
+  shopee: { title: 'Shopee Sync', sub: 'Sincronização com Shopee Open Platform' },
+  'shopee-config': { title: 'Configuração Shopee', sub: 'OAuth e parâmetros de integração' },
+};
+const _origNavigateShopee = navigate;
+function navigate(page) {
+  _origNavigateShopee(page);
+  if (!_pagesMeta2Shopee[page]) return;
+  document.getElementById('topbar-title').textContent = _pagesMeta2Shopee[page].title;
+  document.getElementById('topbar-sub').textContent = _pagesMeta2Shopee[page].sub;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page)?.classList.add('active');
+  document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
+  closeMobileMenu();
+  if (page === 'shopee') {
+    initShopeeConfig();
+    updateOAuthStatus();
+    updateShopeeStat('sh-stat-pedidos', allVendas.filter(v => v.marketplace === 'Shopee').length);
+    updateShopeeStat('sh-stat-produtos', allProdutos.filter(p => p.marketplace === 'Shopee').length);
+    renderSyncLogs();
+  }
+  if (page === 'shopee-config') renderShopeeConfig();
+}
+
+// ── Inicializa ao carregar ──
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initShopeeConfig, 500);
+});
+
 </script>
 </body>
 </html>

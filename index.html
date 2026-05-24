@@ -2531,8 +2531,21 @@ async function blGet(table, where='', props='', pageSize=100, offset=0) {
   let q = `/data/${table}?pageSize=${pageSize}&offset=${offset}`;
   if (where) q += `&where=${encodeURIComponent(where)}`;
   if (props) q += `&props=${encodeURIComponent(props)}`;
-  q += '&sortBy=created%20desc';
-  return blFetch(q);
+  // Tenta com ordenação; se falhar (campo não disponível), tenta sem
+  try {
+    const data = await blFetch(q + '&sortBy=created%20desc');
+    // Backendless pode retornar objeto de erro com code mesmo com status 200
+    if (Array.isArray(data)) return data;
+    if (data && data.code) throw new Error(data.message || 'Erro Backendless');
+    return Array.isArray(data) ? data : (data.data || data.rows || []);
+  } catch(e) {
+    // Se o erro for de ordenação, tenta sem sortBy
+    if (e.message && (e.message.includes('sort') || e.message.includes('column') || e.message.includes('1008'))) {
+      const data = await blFetch(q);
+      return Array.isArray(data) ? data : (data.data || data.rows || []);
+    }
+    throw e;
+  }
 }
 
 async function blCreate(table, obj) { return blFetch(`/data/${table}`, 'POST', obj); }
@@ -3936,21 +3949,36 @@ const _origLoadAllData = loadAllData;
 async function loadAllData() {
   hideLoading(false);
   try {
+    // Carrega cada tabela individualmente para não perder tudo se uma falhar
+    const loadTable = async (name, size=500) => {
+      try {
+        const data = await blGet(name,'','',size);
+        return Array.isArray(data) ? data : [];
+      } catch(e) {
+        console.warn(`Tabela ${name} falhou:`, e.message);
+        toast(`Aviso: não foi possível carregar "${name}" — ${e.message}`, 'warning', 6000);
+        return [];
+      }
+    };
+
     [allProdutos, allVendas, allClientes, allAvisos, allUsuarios, allMovimentos, allFornecedores, allCompras] = await Promise.all([
-      blGet('Produtos','','',500),
-      blGet('Vendas','','',1000),
-      blGet('Clientes','','',500),
-      blGet('Avisos','','',100),
-      blGet('Users','','',100),
-      blGet('EstoqueMovimentacoes','','',500),
-      blGet('Fornecedores','','',200).catch(()=>[]),
-      blGet('Compras','','',200).catch(()=>[]),
+      loadTable('Produtos', 500),
+      loadTable('Vendas', 1000),
+      loadTable('Clientes', 500),
+      loadTable('Avisos', 100),
+      loadTable('Users', 100),
+      loadTable('EstoqueMovimentacoes', 500),
+      loadTable('Fornecedores', 200),
+      loadTable('Compras', 200),
     ]);
-    allLogs = await blGet('LogsSistema','','',200).catch(()=>[]);
+    allLogs = await loadTable('LogsSistema', 200);
+
+    console.log(`✅ Dados carregados — Produtos: ${allProdutos.length}, Vendas: ${allVendas.length}, Clientes: ${allClientes.length}`);
+
     populateProdutoSelects();
     populateCompraSelects();
     updateBadges();
-  } catch(e) { toast('Erro ao carregar dados: '+e.message,'error'); }
+  } catch(e) { toast('Erro crítico ao carregar dados: '+e.message,'error', 8000); console.error(e); }
   hideLoading(true);
 }
 

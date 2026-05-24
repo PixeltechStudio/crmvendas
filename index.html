@@ -256,6 +256,7 @@ tbody tr{transition:background 0.15s}
 .toast.warning{border-left:3px solid var(--yellow)}
 .toast.info{border-left:3px solid var(--accent)}
 @keyframes toastIn{from{transform:translateX(100%);opacity:0}to{transform:none;opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
 @keyframes toastOut{to{transform:translateX(120%);opacity:0}}
 
 /* ── LOGIN SCREEN ── */
@@ -1435,6 +1436,21 @@ tbody tr{transition:background 0.15s}
         </div>
         <button class="btn btn-primary mt-3" onclick="saveConfigs()">Salvar Configurações</button>
       </div>
+
+      <!-- Verificador de Tabelas Backendless -->
+      <div class="card p-4 mt-3">
+        <div class="flex items-center justify-between mb-3" style="flex-wrap:wrap;gap:10px">
+          <div>
+            <div class="font-display font-bold text-lg">🗄️ Verificar Tabelas Backendless</div>
+            <div class="text-sm text-muted mt-1">Confere se todas as tabelas necessárias existem e estão acessíveis</div>
+          </div>
+          <button class="btn btn-primary" id="btn-check-all-tables" onclick="checkAllTables()">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Verificar Todas as Tabelas
+          </button>
+        </div>
+        <div id="all-tables-result"></div>
+      </div>
     </section>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
@@ -2503,7 +2519,11 @@ async function blFetch(path, method='GET', body=null, useToken=true) {
   if (body) opts.body = JSON.stringify(body);
   const res = await fetch(BL_BASE + path, opts);
   const data = await res.json().catch(()=>({}));
-  if (!res.ok) throw new Error(data.message || `HTTP ${res.status}`);
+  if (!res.ok) {
+    const msg = data.message || data.error || data.fault?.faultString || `HTTP ${res.status}`;
+    const code = data.code ? ` (código ${data.code})` : '';
+    throw new Error(msg + code);
+  }
   return data;
 }
 
@@ -2543,6 +2563,7 @@ async function doLogin() {
     localStorage.setItem('bl_user', JSON.stringify(data));
     await blUpdate('Users', data.objectId, { ultimoLogin: new Date().toISOString() }).catch(()=>{});
     await loadUserConfigs();
+    loadConfigs();
     startApp();
   } catch(e) {
     showError(errEl, e.message);
@@ -2957,13 +2978,16 @@ async function saveProduto() {
   btn.disabled=true; btn.textContent='Salvando...';
   try {
     if (id) {
-      await blUpdate('Produtos', id, obj);
+      const updated = await blUpdate('Produtos', id, obj);
       const idx = allProdutos.findIndex(p=>p.objectId===id);
-      if (idx>=0) allProdutos[idx]={...allProdutos[idx],...obj};
+      if (idx>=0) allProdutos[idx]={...allProdutos[idx],...obj,...(updated||{})};
+      await logAction('UPDATE','Produto',`${nome} (${sku})`).catch(()=>{});
       toast('Produto atualizado!','success');
     } else {
       const res = await blCreate('Produtos', obj);
+      if (!res || !res.objectId) throw new Error('Backendless não retornou o produto criado. Verifique as permissões da tabela Produtos.');
       allProdutos.unshift(res);
+      await logAction('CREATE','Produto',`${nome} (${sku})`).catch(()=>{});
       toast('Produto cadastrado!','success');
     }
     closeModal('modal-produto');
@@ -2972,7 +2996,10 @@ async function saveProduto() {
     filterProdutos();
     generateAutoAvisos();
     updateBadges();
-  } catch(e) { toast('Erro: '+e.message,'error'); }
+  } catch(e) {
+    console.error('Erro ao salvar produto:', e);
+    toast('Erro ao salvar produto: ' + e.message, 'error', 6000);
+  }
   finally { btn.disabled=false; btn.textContent='Salvar Produto'; }
 }
 
@@ -3878,14 +3905,15 @@ document.addEventListener('click',e=>{
   // Theme
   const savedTheme=localStorage.getItem('crm-theme');
   if(savedTheme) document.documentElement.setAttribute('data-theme',savedTheme);
-  // Load configs
-  loadConfigs();
   // Date defaults
   document.getElementById('v-data').value = new Date().toISOString().split('T')[0];
-  // Check session
+  // Check session (loadUserConfigs é chamado dentro do checkSession)
   const loggedIn = await checkSession();
   hideLoading(true);
-  if(loggedIn) { startApp(); }
+  if(loggedIn) {
+    loadConfigs(); // preenche campos de config com dados do usuário já carregado
+    startApp();
+  }
   // Register SW
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
@@ -5179,6 +5207,106 @@ function initShopeeConfig() {
   if (autoEl && saved.autoSyncMinutes) autoEl.value = saved.autoSyncMinutes;
   const orderEl = document.getElementById('cfg-order-status');
   if (orderEl && saved.orderStatus) orderEl.value = saved.orderStatus;
+}
+
+// ══════════════════════════════════════════════════
+//  VERIFICADOR COMPLETO DE TABELAS
+// ══════════════════════════════════════════════════
+async function checkAllTables() {
+  const ALL_TABLES = [
+    { name: 'Produtos',             desc: 'Catálogo de produtos',           icon: '📦', required: true  },
+    { name: 'Vendas',               desc: 'Registro de vendas',             icon: '💰', required: true  },
+    { name: 'Clientes',             desc: 'Base de clientes',               icon: '👥', required: true  },
+    { name: 'EstoqueMovimentacoes', desc: 'Histórico de movimentações',     icon: '📊', required: true  },
+    { name: 'Avisos',               desc: 'Notificações do sistema',        icon: '🔔', required: true  },
+    { name: 'Fornecedores',         desc: 'Cadastro de fornecedores',       icon: '🏭', required: false },
+    { name: 'Compras',              desc: 'Pedidos de reposição',           icon: '🛒', required: false },
+    { name: 'LogsSistema',          desc: 'Auditoria e logs',               icon: '📋', required: false },
+    { name: 'ShopeePedidos',        desc: 'Pedidos sincronizados Shopee',   icon: '🟠', required: false },
+    { name: 'ShopeeProdutos',       desc: 'Produtos sincronizados Shopee',  icon: '🟠', required: false },
+    { name: 'ShopeeConfig',         desc: 'Tokens OAuth Shopee',            icon: '🔐', required: false },
+    { name: 'ShopeeSyncLogs',       desc: 'Logs de sincronização Shopee',   icon: '🟠', required: false },
+  ];
+
+  const btn = document.getElementById('btn-check-all-tables');
+  const resultEl = document.getElementById('all-tables-result');
+  if (!resultEl) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-block;animation:spin 1s linear infinite">⏳</span> Verificando...';
+  resultEl.innerHTML = '<div class="text-sm text-muted" style="padding:12px 0">Testando conexão com cada tabela...</div>';
+
+  const results = await Promise.all(ALL_TABLES.map(async t => {
+    const start = Date.now();
+    try {
+      const data = await blGet(t.name, '', '', 1);
+      const ms = Date.now() - start;
+      const count = Array.isArray(data) ? data.length : '?';
+      return { ...t, ok: true, ms, info: `${count} registro(s) visível(is)` };
+    } catch(e) {
+      const ms = Date.now() - start;
+      const isNotFound = e.message.includes('not found') || e.message.includes('1009') || e.message.includes('does not exist');
+      const isPerm     = e.message.includes('permission') || e.message.includes('1006') || e.message.includes('Access denied');
+      let reason = e.message;
+      if (isNotFound) reason = 'Tabela não existe no Backendless';
+      else if (isPerm) reason = 'Sem permissão de leitura (verifique ACL)';
+      return { ...t, ok: false, ms, info: reason };
+    }
+  }));
+
+  const ok    = results.filter(r => r.ok);
+  const fail  = results.filter(r => !r.ok && r.required);
+  const warn  = results.filter(r => !r.ok && !r.required);
+
+  let summary = '';
+  if (fail.length === 0 && ok.length === ALL_TABLES.length) {
+    summary = `<div style="padding:12px 16px;border-radius:12px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--green2);font-weight:600;font-size:0.88rem;margin-bottom:14px">
+      ✅ Todas as ${ok.length} tabelas encontradas e acessíveis!
+    </div>`;
+  } else if (fail.length > 0) {
+    summary = `<div style="padding:12px 16px;border-radius:12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:var(--red2);font-weight:600;font-size:0.88rem;margin-bottom:14px">
+      ❌ ${fail.length} tabela(s) obrigatória(s) com problema · ${ok.length} OK · ${warn.length} opcional(is) ausente(s)
+    </div>`;
+  } else {
+    summary = `<div style="padding:12px 16px;border-radius:12px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:var(--yellow2);font-weight:600;font-size:0.88rem;margin-bottom:14px">
+      ⚠️ Tabelas obrigatórias OK · ${warn.length} tabela(s) opcional(is) ausente(s)
+    </div>`;
+  }
+
+  const rows = results.map(r => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:${r.ok ? 'rgba(16,185,129,0.05)' : r.required ? 'rgba(239,68,68,0.06)' : 'rgba(245,158,11,0.05)'};border:1px solid ${r.ok ? 'rgba(16,185,129,0.15)' : r.required ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.15)'}">
+      <span style="font-size:1.1rem">${r.icon}</span>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="font-semibold text-sm">${r.name}</span>
+          ${r.required ? '<span style="font-size:0.65rem;font-weight:700;padding:1px 6px;border-radius:99px;background:rgba(99,102,241,0.15);color:var(--accent2)">OBRIGATÓRIA</span>' : '<span style="font-size:0.65rem;font-weight:700;padding:1px 6px;border-radius:99px;background:var(--surface2);color:var(--text3)">opcional</span>'}
+        </div>
+        <div class="text-xs text-muted">${r.desc}</div>
+      </div>
+      <div style="text-align:right;min-width:0;max-width:220px">
+        <div style="font-size:0.8rem;font-weight:600;color:${r.ok ? 'var(--green2)' : r.required ? 'var(--red2)' : 'var(--yellow2)'}">${r.ok ? '✅ OK' : r.required ? '❌ Problema' : '⚠️ Ausente'}</div>
+        <div class="text-xs text-muted truncate" title="${r.info}">${r.info}</div>
+        <div class="text-xs" style="color:var(--text3)">${r.ms}ms</div>
+      </div>
+    </div>`).join('');
+
+  resultEl.innerHTML = summary + `<div style="display:flex;flex-direction:column;gap:8px">${rows}</div>`;
+
+  if (fail.length > 0 || warn.length > 0) {
+    const missing = results.filter(r => !r.ok).map(r => r.name);
+    resultEl.innerHTML += `<div style="margin-top:14px;padding:12px 16px;border-radius:10px;background:var(--surface2);border:1px solid var(--border)">
+      <div class="font-semibold text-sm mb-2">📌 Como criar as tabelas ausentes no Backendless:</div>
+      <ol style="padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:0.82rem;color:var(--text2)">
+        <li>Acesse o <strong>Backendless Console</strong> → aba <strong>Data</strong></li>
+        <li>Clique em <strong>"+ New Table"</strong></li>
+        <li>Crie cada tabela com o nome exato: <code style="background:rgba(99,102,241,0.1);padding:1px 6px;border-radius:4px;color:var(--accent2)">${missing.join('</code>, <code style="background:rgba(99,102,241,0.1);padding:1px 6px;border-radius:4px;color:var(--accent2)">')}</code></li>
+        <li>Em <strong>Permissions</strong> de cada tabela, certifique que <strong>Authenticated Users</strong> têm permissão de <strong>Find, Create, Update, Remove</strong></li>
+      </ol>
+    </div>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Verificar Novamente';
 }
 
 function renderShopeeConfig() {

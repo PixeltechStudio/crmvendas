@@ -2542,6 +2542,7 @@ async function doLogin() {
     localStorage.setItem('bl_token', authToken);
     localStorage.setItem('bl_user', JSON.stringify(data));
     await blUpdate('Users', data.objectId, { ultimoLogin: new Date().toISOString() }).catch(()=>{});
+    await loadUserConfigs();
     startApp();
   } catch(e) {
     showError(errEl, e.message);
@@ -2560,6 +2561,7 @@ async function checkSession() {
     const data = await blFetch('/users/currentuser');
     currentUser = data;
     localStorage.setItem('bl_user', JSON.stringify(data));
+    await loadUserConfigs();
     return true;
   } catch { localStorage.removeItem('bl_token'); authToken=null; return false; }
 }
@@ -3697,17 +3699,73 @@ async function toggleUserStatus(id, currentStatus) {
   renderAdmin(); toast(`Usuário ${newStatus==='ativo'?'ativado':'bloqueado'}`,'success');
 }
 
-function saveConfigs() {
-  localStorage.setItem('crm-meta', document.getElementById('cfg-meta').value);
-  localStorage.setItem('crm-comissao-shopee', document.getElementById('cfg-comissao-shopee').value);
-  localStorage.setItem('crm-comissao-ml', document.getElementById('cfg-comissao-ml').value);
-  toast('Configurações salvas!','success');
+// ══════════════════════════════════════════════════
+//  USER CONFIGS (salvas no Backendless, campo Users)
+// ══════════════════════════════════════════════════
+async function loadUserConfigs() {
+  if (!currentUser) return;
+  // Prioridade: Backendless > localStorage (migração automática)
+  const meta     = currentUser.crm_meta      || localStorage.getItem('crm-meta')            || '';
+  const cShopee  = currentUser.crm_comissao_shopee != null ? String(currentUser.crm_comissao_shopee) : (localStorage.getItem('crm-comissao-shopee') || '12');
+  const cML      = currentUser.crm_comissao_ml     != null ? String(currentUser.crm_comissao_ml)     : (localStorage.getItem('crm-comissao-ml')     || '14');
+  const blUrl    = currentUser.shopee_bl_url  || localStorage.getItem('shopee_bl_url')       || '';
+  const shopeeCfg = (() => {
+    try { return JSON.parse(currentUser.shopee_config || localStorage.getItem('shopee_config') || '{}'); } catch { return {}; }
+  })();
+
+  // Popula variáveis globais
+  if (blUrl) shopeeConfig.blServiceUrl = blUrl;
+  if (shopeeCfg.daysBack)        shopeeConfig.daysBack     = shopeeCfg.daysBack;
+  if (shopeeCfg.orderStatus)     shopeeConfig.orderStatus  = shopeeCfg.orderStatus;
+  if (shopeeCfg.autoSyncMinutes > 0) setupAutoSync(shopeeCfg.autoSyncMinutes);
+
+  // Atualiza campos da UI de configurações (se já renderizados)
+  const setIfExists = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
+  setIfExists('cfg-meta',            meta);
+  setIfExists('cfg-comissao-shopee', cShopee);
+  setIfExists('cfg-comissao-ml',     cML);
+  setIfExists('cfg-bl-url',          blUrl);
+  if (shopeeCfg.daysBack)     setIfExists('cfg-days-back',   shopeeCfg.daysBack);
+  if (shopeeCfg.orderStatus)  setIfExists('cfg-order-status', shopeeCfg.orderStatus);
+  if (shopeeCfg.autoSyncMinutes) setIfExists('cfg-auto-sync', shopeeCfg.autoSyncMinutes);
+
+  // Limpa localStorage antigo após migração bem-sucedida
+  if (currentUser.crm_meta != null || currentUser.shopee_bl_url != null) {
+    localStorage.removeItem('crm-meta');
+    localStorage.removeItem('crm-comissao-shopee');
+    localStorage.removeItem('crm-comissao-ml');
+    localStorage.removeItem('shopee_bl_url');
+    localStorage.removeItem('shopee_config');
+  }
+}
+
+async function saveConfigs() {
+  const meta    = document.getElementById('cfg-meta')?.value || '';
+  const cShopee = document.getElementById('cfg-comissao-shopee')?.value || '12';
+  const cML     = document.getElementById('cfg-comissao-ml')?.value || '14';
+  try {
+    await blUpdate('Users', currentUser.objectId, {
+      crm_meta: meta,
+      crm_comissao_shopee: parseFloat(cShopee) || 0,
+      crm_comissao_ml:     parseFloat(cML)     || 0,
+    });
+    currentUser.crm_meta = meta;
+    currentUser.crm_comissao_shopee = parseFloat(cShopee) || 0;
+    currentUser.crm_comissao_ml     = parseFloat(cML)     || 0;
+    localStorage.setItem('bl_user', JSON.stringify(currentUser));
+    toast('Configurações salvas!', 'success');
+  } catch(e) {
+    toast('Erro ao salvar configurações: ' + e.message, 'error');
+  }
 }
 
 function loadConfigs() {
-  const meta=localStorage.getItem('crm-meta'); if(meta) setVal('cfg-meta',meta);
-  const cs=localStorage.getItem('crm-comissao-shopee'); if(cs) setVal('cfg-comissao-shopee',cs);
-  const cm=localStorage.getItem('crm-comissao-ml'); if(cm) setVal('cfg-comissao-ml',cm);
+  // Chamado ao navegar para a página de config — dados já foram carregados em loadUserConfigs()
+  if (!currentUser) return;
+  const setIfExists = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+  setIfExists('cfg-meta',            currentUser.crm_meta            || localStorage.getItem('crm-meta') || '');
+  setIfExists('cfg-comissao-shopee', currentUser.crm_comissao_shopee != null ? String(currentUser.crm_comissao_shopee) : (localStorage.getItem('crm-comissao-shopee') || '12'));
+  setIfExists('cfg-comissao-ml',     currentUser.crm_comissao_ml     != null ? String(currentUser.crm_comissao_ml)     : (localStorage.getItem('crm-comissao-ml')     || '14'));
 }
 
 // ══════════════════════════════════════════════════
@@ -4580,7 +4638,7 @@ let shopeeAutoTimer = null;
 
 // ── Helpers: chamar Cloud Code do Backendless ──
 async function blService(method, params = {}) {
-  const url = shopeeConfig.blServiceUrl || localStorage.getItem('shopee_bl_url');
+  const url = shopeeConfig.blServiceUrl || currentUser?.shopee_bl_url || localStorage.getItem('shopee_bl_url');
   if (!url) throw new Error('URL do serviço Backendless não configurada. Vá em Configurações.');
   const res = await fetch(`${url}/${method}`, {
     method: 'POST',
@@ -4625,7 +4683,7 @@ async function handleTokenExpired() {
 
 // ── Iniciar OAuth Shopee (abre popup/redirect do Backendless) ──
 async function startOAuth() {
-  const url = shopeeConfig.blServiceUrl || localStorage.getItem('shopee_bl_url');
+  const url = shopeeConfig.blServiceUrl || currentUser?.shopee_bl_url || localStorage.getItem('shopee_bl_url');
   if (!url) { toast('Configure a URL do serviço Backendless primeiro.', 'warning'); return; }
   try {
     const result = await blService('getOAuthUrl', {});
@@ -5024,8 +5082,23 @@ async function saveShopeeConfig() {
   shopeeConfig.orderStatus = document.getElementById('cfg-order-status')?.value || 'READY_TO_SHIP,SHIPPED,COMPLETED';
   const autoMin = parseInt(document.getElementById('cfg-auto-sync')?.value) || 0;
 
-  localStorage.setItem('shopee_bl_url', url);
-  localStorage.setItem('shopee_config', JSON.stringify({ daysBack: shopeeConfig.daysBack, orderStatus: shopeeConfig.orderStatus, autoSyncMinutes: autoMin }));
+  const cfgObj = { daysBack: shopeeConfig.daysBack, orderStatus: shopeeConfig.orderStatus, autoSyncMinutes: autoMin };
+
+  try {
+    await blUpdate('Users', currentUser.objectId, {
+      shopee_bl_url:  url,
+      shopee_config:  JSON.stringify(cfgObj),
+    });
+    currentUser.shopee_bl_url = url;
+    currentUser.shopee_config = JSON.stringify(cfgObj);
+    localStorage.setItem('bl_user', JSON.stringify(currentUser));
+    // Limpa chaves antigas do localStorage
+    localStorage.removeItem('shopee_bl_url');
+    localStorage.removeItem('shopee_config');
+  } catch(e) {
+    toast('Erro ao salvar no Backendless: ' + e.message, 'error');
+    return;
+  }
 
   setupAutoSync(autoMin);
   await logAction('UPDATE', 'Shopee Config', 'Configurações salvas');
@@ -5089,10 +5162,13 @@ function showSyncProgress(show, title = '', pct = 0) {
 
 // ── Inicializar config salva ──
 function initShopeeConfig() {
-  const url = localStorage.getItem('shopee_bl_url') || '';
-  const saved = JSON.parse(localStorage.getItem('shopee_config') || '{}');
+  // Dados já carregados em loadUserConfigs() — apenas preenche a UI
+  const url = currentUser?.shopee_bl_url || localStorage.getItem('shopee_bl_url') || '';
+  const saved = (() => {
+    try { return JSON.parse(currentUser?.shopee_config || localStorage.getItem('shopee_config') || '{}'); } catch { return {}; }
+  })();
   if (url) shopeeConfig.blServiceUrl = url;
-  if (saved.daysBack) shopeeConfig.daysBack = saved.daysBack;
+  if (saved.daysBack)    shopeeConfig.daysBack    = saved.daysBack;
   if (saved.orderStatus) shopeeConfig.orderStatus = saved.orderStatus;
   if (saved.autoSyncMinutes > 0) setupAutoSync(saved.autoSyncMinutes);
   const urlEl = document.getElementById('cfg-bl-url');
@@ -5112,7 +5188,7 @@ function renderShopeeConfig() {
 
 // ── Inicializa ao carregar ──
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(initShopeeConfig, 500);
+  // configs carregadas via loadUserConfigs() após login/checkSession
 });
 
 </script>

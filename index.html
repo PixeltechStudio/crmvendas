@@ -2090,8 +2090,22 @@ tbody tr{transition:background 0.15s}
           <input type="number" class="input" id="p-estoque-min" placeholder="5"/>
         </div>
         <div class="input-group span-2">
-          <label class="label">URL da Imagem</label>
-          <input type="text" class="input" id="p-imagem" placeholder="https://..."/>
+          <label class="label">Imagem do Produto</label>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <input type="text" class="input" id="p-imagem" placeholder="https://... (cole uma URL)" oninput="onImageUrlInput()"/>
+            <div style="display:flex;align-items:center;gap:10px;color:var(--text3);font-size:0.78rem">
+              <div style="flex:1;height:1px;background:var(--border)"></div>
+              <span>ou envie um arquivo</span>
+              <div style="flex:1;height:1px;background:var(--border)"></div>
+            </div>
+            <div class="file-drop" id="p-img-drop" onclick="document.getElementById('p-img-file').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleImgDrop(event)">
+              <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <div id="p-img-drop-label">Arraste ou clique para enviar PNG, JPG ou PDF</div>
+              <div id="p-img-upload-status" style="font-size:0.75rem;margin-top:4px;color:var(--accent2)"></div>
+              <img id="p-img-preview" src="" alt="" style="display:none;max-height:90px;border-radius:8px;margin-top:10px;object-fit:contain"/>
+            </div>
+            <input type="file" id="p-img-file" accept="image/png,image/jpeg,image/jpg,application/pdf" style="display:none" onchange="handleImgFileSelect(this)"/>
+          </div>
         </div>
         <div class="input-group">
           <label class="label">Status</label>
@@ -2906,6 +2920,13 @@ function editProduto(id) {
   setVal('p-preco',p.precoVenda); setVal('p-estoque',p.estoqueAtual);
   setVal('p-estoque-min',p.estoqueMinimo); setVal('p-imagem',p.imagem);
   setVal('p-status',p.status); calcMargem();
+  resetImgDropZone();
+  if (p.imagem) {
+    const preview = document.getElementById('p-img-preview');
+    const label = document.getElementById('p-img-drop-label');
+    if (preview && !p.imagem.endsWith('.pdf')) { preview.src=p.imagem; preview.style.display='block'; }
+    if (label) label.textContent = 'Imagem atual (arraste para substituir)';
+  }
   openModal('modal-produto');
 }
 
@@ -2957,6 +2978,100 @@ function clearProdutoForm() {
   ['p-id','p-nome','p-sku','p-barras','p-categoria','p-marca','p-fornecedor','p-custo','p-preco','p-estoque','p-estoque-min','p-imagem','p-margem'].forEach(id=>setVal(id,''));
   setVal('p-marketplace','Shopee'); setVal('p-status','Ativo');
   document.getElementById('modal-produto-title').textContent='Novo Produto';
+  resetImgDropZone();
+}
+
+function resetImgDropZone() {
+  const preview = document.getElementById('p-img-preview');
+  const status = document.getElementById('p-img-upload-status');
+  const label = document.getElementById('p-img-drop-label');
+  const fileInput = document.getElementById('p-img-file');
+  if (preview) { preview.style.display='none'; preview.src=''; }
+  if (status) status.textContent='';
+  if (label) label.textContent='Arraste ou clique para enviar PNG, JPG ou PDF';
+  if (fileInput) fileInput.value='';
+}
+
+function onImageUrlInput() {
+  const url = document.getElementById('p-imagem').value.trim();
+  const preview = document.getElementById('p-img-preview');
+  if (!preview) return;
+  if (url) {
+    preview.src = url;
+    preview.style.display = 'block';
+    preview.onerror = () => { preview.style.display='none'; };
+  } else {
+    preview.style.display='none';
+    preview.src='';
+  }
+}
+
+function handleImgDrop(event) {
+  event.preventDefault();
+  document.getElementById('p-img-drop').classList.remove('drag');
+  const file = event.dataTransfer.files[0];
+  if (file) processImgFile(file);
+}
+
+function handleImgFileSelect(input) {
+  const file = input.files[0];
+  if (file) processImgFile(file);
+}
+
+async function processImgFile(file) {
+  const allowed = ['image/png','image/jpeg','image/jpg','application/pdf'];
+  if (!allowed.includes(file.type)) {
+    toast('Formato não suportado. Use PNG, JPG ou PDF.','warning'); return;
+  }
+  const maxMB = 5;
+  if (file.size > maxMB * 1024 * 1024) {
+    toast(`Arquivo muito grande. Máximo ${maxMB}MB.`,'warning'); return;
+  }
+  const status = document.getElementById('p-img-upload-status');
+  const label = document.getElementById('p-img-drop-label');
+  const preview = document.getElementById('p-img-preview');
+  if (status) status.textContent='Enviando para Backendless...';
+  if (label) label.textContent = file.name;
+
+  // Preview local para imagens (não PDF)
+  if (file.type !== 'application/pdf' && preview) {
+    const reader = new FileReader();
+    reader.onload = e => { preview.src=e.target.result; preview.style.display='block'; };
+    reader.readAsDataURL(file);
+  } else if (preview) {
+    preview.style.display='none';
+  }
+
+  try {
+    const url = await uploadImgToBackendless(file);
+    setVal('p-imagem', url);
+    if (status) status.textContent='✅ Upload concluído!';
+    toast('Imagem enviada com sucesso!','success');
+  } catch(e) {
+    if (status) status.textContent='❌ Erro no upload: ' + e.message;
+    toast('Erro no upload da imagem: ' + e.message, 'error');
+  }
+}
+
+async function uploadImgToBackendless(file) {
+  // Backendless Files API requer multipart/form-data
+  const safeName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+  const uploadUrl = `${BL_BASE}/files/produtos/${encodeURIComponent(safeName)}?overwrite=true`;
+  const formData = new FormData();
+  formData.append('file', file, safeName);
+  const resp = await fetch(uploadUrl, {
+    method: 'POST',
+    // NÃO setar Content-Type — o browser define automaticamente com o boundary correto
+    body: formData
+  });
+  if (!resp.ok) {
+    const err = await resp.text().catch(()=>'');
+    throw new Error(err || `HTTP ${resp.status}`);
+  }
+  const data = await resp.json();
+  // Backendless retorna { fileURL: "https://..." }
+  if (typeof data === 'string') return data;
+  return data.fileURL || data.url || data.fileUrl || '';
 }
 
 function deleteProduto(id) {

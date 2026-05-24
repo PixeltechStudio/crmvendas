@@ -2531,21 +2531,8 @@ async function blGet(table, where='', props='', pageSize=100, offset=0) {
   let q = `/data/${table}?pageSize=${pageSize}&offset=${offset}`;
   if (where) q += `&where=${encodeURIComponent(where)}`;
   if (props) q += `&props=${encodeURIComponent(props)}`;
-  // Tenta com ordenação; se falhar (campo não disponível), tenta sem
-  try {
-    const data = await blFetch(q + '&sortBy=created%20desc');
-    // Backendless pode retornar objeto de erro com code mesmo com status 200
-    if (Array.isArray(data)) return data;
-    if (data && data.code) throw new Error(data.message || 'Erro Backendless');
-    return Array.isArray(data) ? data : (data.data || data.rows || []);
-  } catch(e) {
-    // Se o erro for de ordenação, tenta sem sortBy
-    if (e.message && (e.message.includes('sort') || e.message.includes('column') || e.message.includes('1008'))) {
-      const data = await blFetch(q);
-      return Array.isArray(data) ? data : (data.data || data.rows || []);
-    }
-    throw e;
-  }
+  const data = await blFetch(q);
+  return Array.isArray(data) ? data : [];
 }
 
 async function blCreate(table, obj) { return blFetch(`/data/${table}`, 'POST', obj); }
@@ -2629,24 +2616,7 @@ async function startApp() {
   generateAutoAvisos();
 }
 
-async function loadAllData() {
-  hideLoading(false);
-  try {
-    [allProdutos, allVendas, allClientes, allAvisos, allUsuarios, allMovimentos] = await Promise.all([
-      blGet('Produtos', '', '', 500),
-      blGet('Vendas', '', '', 1000),
-      blGet('Clientes', '', '', 500),
-      blGet('Avisos', '', '', 100),
-      blGet('Users', '', '', 100),
-      blGet('EstoqueMovimentacoes', '', '', 500),
-    ]);
-    populateProdutoSelects();
-    updateBadges();
-  } catch(e) {
-    toast('Erro ao carregar dados: ' + e.message, 'error');
-  }
-  hideLoading(true);
-}
+// loadAllData definida abaixo na seção de dados estendidos
 
 function hideLoading(done) {
   document.getElementById('loading-screen').style.display = done ? 'none' : 'flex';
@@ -3943,35 +3913,77 @@ let importData = null;
 let importHeaders = [];
 
 // ══════════════════════════════════════════════════
-//  EXTENDED loadAllData
+//  EXTENDED loadAllData — com auto-criação de tabelas
 // ══════════════════════════════════════════════════
-const _origLoadAllData = loadAllData;
+
+// Estrutura das tabelas necessárias para o CRM
+const CRM_TABLES = {
+  Vendas:                 [{ name:'codigoPedido',type:'STRING'},{name:'produto',type:'STRING'},{name:'marketplace',type:'STRING'},{name:'valorVenda',type:'DOUBLE'},{name:'quantidade',type:'INT'},{name:'lucro',type:'DOUBLE'},{name:'statusPedido',type:'STRING'},{name:'dataVenda',type:'DATETIME'},{name:'cliente',type:'STRING'},{name:'observacao',type:'STRING'}],
+  Clientes:               [{ name:'nome',type:'STRING'},{name:'email',type:'STRING'},{name:'telefone',type:'STRING'},{name:'cpf',type:'STRING'},{name:'endereco',type:'STRING'},{name:'cidade',type:'STRING'},{name:'estado',type:'STRING'},{name:'totalCompras',type:'INT'},{name:'dataCadastro',type:'DATETIME'},{name:'observacao',type:'STRING'}],
+  Avisos:                 [{ name:'tipo',type:'STRING'},{name:'titulo',type:'STRING'},{name:'descricao',type:'STRING'},{name:'lido',type:'BOOLEAN'},{name:'prioridade',type:'STRING'}],
+  EstoqueMovimentacoes:   [{ name:'produto',type:'STRING'},{name:'sku',type:'STRING'},{name:'tipoMovimentacao',type:'STRING'},{name:'quantidade',type:'INT'},{name:'motivo',type:'STRING'},{name:'usuario',type:'STRING'},{name:'data',type:'DATETIME'}],
+  Fornecedores:           [{ name:'nome',type:'STRING'},{name:'cnpj',type:'STRING'},{name:'contato',type:'STRING'},{name:'email',type:'STRING'},{name:'telefone',type:'STRING'},{name:'prazoEntrega',type:'INT'},{name:'status',type:'STRING'}],
+  Compras:                [{ name:'fornecedor',type:'STRING'},{name:'produto',type:'STRING'},{name:'quantidade',type:'INT'},{name:'valorUnitario',type:'DOUBLE'},{name:'status',type:'STRING'},{name:'dataPedido',type:'DATETIME'},{name:'dataEntrega',type:'DATETIME'},{name:'observacao',type:'STRING'}],
+  LogsSistema:            [{ name:'acao',type:'STRING'},{name:'entidade',type:'STRING'},{name:'detalhes',type:'STRING'},{name:'usuario',type:'STRING'},{name:'data',type:'DATETIME'}],
+  ShopeePedidos:          [{ name:'orderId',type:'STRING'},{name:'status',type:'STRING'},{name:'total',type:'DOUBLE'},{name:'buyerName',type:'STRING'},{name:'items',type:'STRING'},{name:'createdAt',type:'DATETIME'},{name:'syncedAt',type:'DATETIME'}],
+  ShopeeConfig:           [{ name:'shopId',type:'STRING'},{name:'accessToken',type:'STRING'},{name:'refreshToken',type:'STRING'},{name:'expiresAt',type:'INT'},{name:'refreshExpiresAt',type:'INT'}],
+};
+
+async function ensureTable(tableName) {
+  // Tenta buscar — se retornar 404/1009, cria a tabela
+  try {
+    await blFetch(`/data/${tableName}?pageSize=1`);
+    return true; // tabela existe
+  } catch(e) {
+    if (!e.message.includes('1009') && !e.message.includes('not found') && !e.message.includes('404')) throw e;
+  }
+  // Cria a tabela via API REST do Backendless
+  try {
+    await blFetch(`/data/tables`, 'POST', { name: tableName });
+    // Cria as colunas
+    const cols = CRM_TABLES[tableName] || [];
+    for (const col of cols) {
+      await blFetch(`/data/tables/${tableName}/columns`, 'POST', col).catch(()=>{});
+    }
+    console.log(`✅ Tabela "${tableName}" criada automaticamente`);
+    toast(`Tabela "${tableName}" criada no Backendless!`, 'success', 4000);
+    return true;
+  } catch(e) {
+    console.warn(`Não foi possível criar tabela "${tableName}":`, e.message);
+    return false;
+  }
+}
+
 async function loadAllData() {
   hideLoading(false);
   try {
-    // Carrega cada tabela individualmente para não perder tudo se uma falhar
-    const loadTable = async (name, size=500) => {
+    const loadTable = async (name, size=100) => {
       try {
-        const data = await blGet(name,'','',size);
+        const data = await blGet(name, '', '', Math.min(size, 100));
         return Array.isArray(data) ? data : [];
       } catch(e) {
+        const isNotFound = e.message.includes('1009') || e.message.includes('not found') || e.message.includes('404');
+        if (isNotFound) {
+          // Tenta criar a tabela automaticamente
+          const created = await ensureTable(name).catch(()=>false);
+          if (created) return []; // tabela criada, mas vazia
+        }
         console.warn(`Tabela ${name} falhou:`, e.message);
-        toast(`Aviso: não foi possível carregar "${name}" — ${e.message}`, 'warning', 6000);
         return [];
       }
     };
 
     [allProdutos, allVendas, allClientes, allAvisos, allUsuarios, allMovimentos, allFornecedores, allCompras] = await Promise.all([
-      loadTable('Produtos', 500),
-      loadTable('Vendas', 1000),
-      loadTable('Clientes', 500),
-      loadTable('Avisos', 100),
-      loadTable('Users', 100),
-      loadTable('EstoqueMovimentacoes', 500),
-      loadTable('Fornecedores', 200),
-      loadTable('Compras', 200),
+      loadTable('Produtos'),
+      loadTable('Vendas'),
+      loadTable('Clientes'),
+      loadTable('Avisos'),
+      loadTable('Users'),
+      loadTable('EstoqueMovimentacoes'),
+      loadTable('Fornecedores'),
+      loadTable('Compras'),
     ]);
-    allLogs = await loadTable('LogsSistema', 200);
+    allLogs = await loadTable('LogsSistema');
 
     console.log(`✅ Dados carregados — Produtos: ${allProdutos.length}, Vendas: ${allVendas.length}, Clientes: ${allClientes.length}`);
 
@@ -5323,18 +5335,44 @@ async function checkAllTables() {
   if (fail.length > 0 || warn.length > 0) {
     const missing = results.filter(r => !r.ok).map(r => r.name);
     resultEl.innerHTML += `<div style="margin-top:14px;padding:12px 16px;border-radius:10px;background:var(--surface2);border:1px solid var(--border)">
-      <div class="font-semibold text-sm mb-2">📌 Como criar as tabelas ausentes no Backendless:</div>
-      <ol style="padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:0.82rem;color:var(--text2)">
-        <li>Acesse o <strong>Backendless Console</strong> → aba <strong>Data</strong></li>
-        <li>Clique em <strong>"+ New Table"</strong></li>
-        <li>Crie cada tabela com o nome exato: <code style="background:rgba(99,102,241,0.1);padding:1px 6px;border-radius:4px;color:var(--accent2)">${missing.join('</code>, <code style="background:rgba(99,102,241,0.1);padding:1px 6px;border-radius:4px;color:var(--accent2)">')}</code></li>
-        <li>Em <strong>Permissions</strong> de cada tabela, certifique que <strong>Authenticated Users</strong> têm permissão de <strong>Find, Create, Update, Remove</strong></li>
-      </ol>
+      <div class="font-semibold text-sm mb-2">🚀 Criar tabelas ausentes automaticamente:</div>
+      <div class="text-sm text-muted mb-3">Clique no botão abaixo para criar todas as tabelas faltantes direto no seu Backendless.</div>
+      <button class="btn btn-primary btn-sm" onclick="createMissingTables(${JSON.stringify(missing).replace(/"/g,'&quot;')})">
+        ✨ Criar ${missing.length} tabela(s) automaticamente
+      </button>
+      <div id="create-tables-result" class="mt-2"></div>
+      <div class="mt-3 text-xs text-muted">Ou crie manualmente: Backendless Console → Data → New Table com os nomes: <strong>${missing.join(', ')}</strong></div>
     </div>`;
   }
 
   btn.disabled = false;
   btn.innerHTML = '<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Verificar Novamente';
+}
+
+async function createMissingTables(tableNames) {
+  const resultEl = document.getElementById('create-tables-result');
+  if (resultEl) resultEl.innerHTML = '<div class="text-sm text-muted">Criando tabelas...</div>';
+  let ok = 0, fail = 0;
+  for (const name of tableNames) {
+    try {
+      await blFetch('/data/tables', 'POST', { name });
+      const cols = CRM_TABLES[name] || [];
+      for (const col of cols) {
+        await blFetch(`/data/tables/${name}/columns`, 'POST', col).catch(()=>{});
+      }
+      ok++;
+      console.log(`✅ Tabela "${name}" criada`);
+    } catch(e) {
+      fail++;
+      console.warn(`Falha ao criar "${name}":`, e.message);
+    }
+  }
+  const msg = fail === 0
+    ? `✅ ${ok} tabela(s) criada(s) com sucesso! Recarregando dados...`
+    : `⚠️ ${ok} criada(s), ${fail} com erro (veja o console).`;
+  if (resultEl) resultEl.innerHTML = `<div class="text-sm mt-2" style="color:${fail===0?'var(--green2)':'var(--yellow2)'}">${msg}</div>`;
+  toast(msg, fail === 0 ? 'success' : 'warning', 5000);
+  if (ok > 0) setTimeout(() => loadAllData(), 1500);
 }
 
 function renderShopeeConfig() {

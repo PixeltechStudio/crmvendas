@@ -656,6 +656,65 @@ tbody tr{transition:background 0.15s}
 }
 .activity-time{font-size:0.72rem;color:var(--text3);white-space:nowrap}
 
+/* ══ NEW MODULES CSS ══ */
+
+/* KANBAN */
+.kanban-col {
+  min-width: 220px; max-width: 220px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  display: flex; flex-direction: column;
+  max-height: calc(100vh - 220px);
+}
+.kanban-col-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  border-radius: var(--radius2) var(--radius2) 0 0;
+}
+.kanban-col-title { font-family: var(--font-display); font-size: 0.82rem; font-weight: 700; }
+.kanban-count { font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: var(--surface2); color: var(--text2); }
+.kanban-cards { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.kanban-card {
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 12px; padding: 11px 12px;
+  cursor: grab; transition: var(--transition);
+  font-size: 0.82rem;
+}
+.kanban-card:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-1px); }
+.kanban-card.dragging { opacity: 0.5; cursor: grabbing; }
+.kanban-col.drag-over { border-color: var(--accent); background: rgba(99,102,241,0.06); }
+.kanban-card-code { font-size: 0.7rem; color: var(--text3); margin-bottom: 3px; }
+.kanban-card-prod { font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kanban-card-val { font-size: 0.78rem; color: var(--green2); font-weight: 700; }
+
+/* SIMULADOR */
+.sim-bar { height: 8px; border-radius: 999px; }
+.sim-bar-item { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; }
+
+/* CURVA ABC */
+.abc-badge-a { background: rgba(16,185,129,0.15); color: var(--green2); border: 1px solid rgba(16,185,129,0.25); padding: 3px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; }
+.abc-badge-b { background: rgba(245,158,11,0.15); color: var(--yellow2); border: 1px solid rgba(245,158,11,0.25); padding: 3px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; }
+.abc-badge-c { background: rgba(239,68,68,0.12); color: var(--red2); border: 1px solid rgba(239,68,68,0.2); padding: 3px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; }
+
+/* PRODUTOS PARADOS */
+.parado-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius2);
+  padding: 16px;
+  transition: var(--transition);
+}
+.parado-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: var(--shadow); }
+.parado-days { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; }
+
+/* LOGS */
+.log-action-create { color: var(--green2); }
+.log-action-update { color: var(--blue2); }
+.log-action-delete { color: var(--red2); }
+.log-action-login  { color: var(--accent2); }
+
 /* ── PRINT ── */
 @media print{
   #sidebar,#topbar,.btn,#toast-container{display:none!important}
@@ -793,6 +852,45 @@ tbody tr{transition:background 0.15s}
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         <span class="nav-item-label">Financeiro</span>
       </div>
+
+      <div class="nav-section-title">Operações</div>
+      <div class="nav-item" onclick="navigate('kanban')" data-page="kanban">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="18"/><rect x="10" y="3" width="5" height="12"/><rect x="17" y="3" width="5" height="8"/></svg>
+        <span class="nav-item-label">Kanban</span>
+      </div>
+      <div class="nav-item" onclick="navigate('simulador')" data-page="simulador">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        <span class="nav-item-label">Simulador</span>
+      </div>
+      <div class="nav-item" onclick="navigate('curva-abc')" data-page="curva-abc">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span class="nav-item-label">Curva ABC</span>
+      </div>
+      <div class="nav-item" onclick="navigate('reposicao')" data-page="reposicao">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+        <span class="nav-item-label">Reposição</span>
+      </div>
+      <div class="nav-item" onclick="navigate('parados')" data-page="parados">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span class="nav-item-label">Parados</span>
+      </div>
+      <div class="nav-section-title">Suprimentos</div>
+      <div class="nav-item" onclick="navigate('fornecedores')" data-page="fornecedores">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-item-label">Fornecedores</span>
+      </div>
+      <div class="nav-item" onclick="navigate('compras')" data-page="compras">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <span class="nav-item-label">Compras</span>
+      </div>
+      <div class="nav-item" onclick="navigate('importacao')" data-page="importacao">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span class="nav-item-label">Importar CSV</span>
+      </div>
+      <div class="nav-item" onclick="navigate('logs')" data-page="logs">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span class="nav-item-label">Logs</span>
+      </div>
       <div class="nav-section-title">Sistema</div>
       <div class="nav-item" onclick="navigate('avisos')" data-page="avisos">
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
@@ -831,6 +929,7 @@ tbody tr{transition:background 0.15s}
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
           <div class="notif-dot hidden" id="notif-count">0</div>
         </div>
+        <button class="btn btn-icon btn-sm" onclick="requestPushPermission()" title="Ativar notificações push" style="border-radius:11px"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/><line x1="12" y1="1" x2="12" y2="2"/></svg></button>
         <div class="theme-btn" onclick="toggleTheme()" title="Tema">
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         </div>
@@ -1290,6 +1389,367 @@ tbody tr{transition:background 0.15s}
       </div>
     </section>
 
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- NEW PAGES: KANBAN, SIMULADOR, CURVA ABC, FORNECEDORES etc  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<!-- KANBAN PAGE -->
+<section class="page" id="page-kanban">
+  <div class="page-header">
+    <div><div class="page-title">Kanban de Pedidos</div><div class="page-sub">Gestão visual do fluxo de pedidos</div></div>
+    <div class="page-actions">
+      <select class="input" id="kb-filter-mp" onchange="renderKanban()" style="width:160px">
+        <option value="">Todos os Marketplaces</option>
+        <option value="Shopee">Shopee</option>
+        <option value="Mercado Livre">Mercado Livre</option>
+      </select>
+      <input type="date" class="input" id="kb-filter-data" onchange="renderKanban()" style="width:150px" placeholder="Filtrar por data"/>
+      <div class="input-icon" style="width:200px">
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="input" id="kb-search" placeholder="Buscar pedido..." oninput="renderKanban()"/>
+      </div>
+    </div>
+  </div>
+  <div id="kanban-board" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:16px;min-height:500px"></div>
+</section>
+
+<!-- SIMULADOR DE LUCRO -->
+<section class="page" id="page-simulador">
+  <div class="page-header">
+    <div><div class="page-title">Simulador de Lucro</div><div class="page-sub">Calcule a rentabilidade real de cada produto</div></div>
+  </div>
+  <div class="grid" style="grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+    <div class="card p-4">
+      <div class="font-display font-bold text-lg mb-3">🧮 Parâmetros</div>
+      <div class="flex flex-col gap-3">
+        <div class="input-group"><label class="label">Preço de Venda (R$)</label><input type="number" class="input" id="sim-preco" step="0.01" value="100" oninput="calcSimulador()"/></div>
+        <div class="input-group"><label class="label">Custo do Produto (R$)</label><input type="number" class="input" id="sim-custo" step="0.01" value="40" oninput="calcSimulador()"/></div>
+        <div class="input-group"><label class="label">Frete (R$)</label><input type="number" class="input" id="sim-frete" step="0.01" value="0" oninput="calcSimulador()"/></div>
+        <div class="input-group"><label class="label">Embalagem (R$)</label><input type="number" class="input" id="sim-embalagem" step="0.01" value="2" oninput="calcSimulador()"/></div>
+        <div class="input-group"><label class="label">Taxa Marketplace (%)</label><input type="number" class="input" id="sim-taxa" step="0.1" value="12" oninput="calcSimulador()"/></div>
+        <div class="input-group"><label class="label">Comissão (%)</label><input type="number" class="input" id="sim-comissao" step="0.1" value="0" oninput="calcSimulador()"/></div>
+        <div class="input-group"><label class="label">Imposto (%)</label><input type="number" class="input" id="sim-imposto" step="0.1" value="6" oninput="calcSimulador()"/></div>
+        <div class="input-group"><label class="label">Desconto (R$)</label><input type="number" class="input" id="sim-desconto" step="0.01" value="0" oninput="calcSimulador()"/></div>
+        <div class="input-group"><label class="label">Cashback (R$)</label><input type="number" class="input" id="sim-cashback" step="0.01" value="0" oninput="calcSimulador()"/></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card p-4" id="sim-result-card">
+        <div class="font-display font-bold text-lg mb-3">📊 Resultado</div>
+        <div id="sim-alerta" class="hidden" style="padding:10px 14px;border-radius:10px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:var(--red2);font-size:0.84rem;font-weight:600;margin-bottom:14px">⚠️ Margem baixa! Considere ajustar o preço.</div>
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:12px">
+          <div style="padding:14px;background:var(--surface2);border-radius:12px;border:1px solid var(--border)">
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);font-weight:700;margin-bottom:6px">Lucro Bruto</div>
+            <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800" id="sim-lucro-bruto">R$ 0,00</div>
+          </div>
+          <div style="padding:14px;background:var(--surface2);border-radius:12px;border:1px solid var(--border)">
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);font-weight:700;margin-bottom:6px">Lucro Líquido</div>
+            <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--green2)" id="sim-lucro-liq">R$ 0,00</div>
+          </div>
+          <div style="padding:14px;background:var(--surface2);border-radius:12px;border:1px solid var(--border)">
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);font-weight:700;margin-bottom:6px">Margem %</div>
+            <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800" id="sim-margem">0%</div>
+          </div>
+          <div style="padding:14px;background:var(--surface2);border-radius:12px;border:1px solid var(--border)">
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);font-weight:700;margin-bottom:6px">ROI %</div>
+            <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--accent2)" id="sim-roi">0%</div>
+          </div>
+          <div style="padding:14px;background:var(--surface2);border-radius:12px;border:1px solid var(--border)">
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);font-weight:700;margin-bottom:6px">Markup %</div>
+            <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--blue2)" id="sim-markup">0%</div>
+          </div>
+          <div style="padding:14px;background:var(--surface2);border-radius:12px;border:1px solid var(--border)">
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);font-weight:700;margin-bottom:6px">Preço Ideal</div>
+            <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--yellow2)" id="sim-preco-ideal">R$ 0,00</div>
+          </div>
+        </div>
+        <div style="margin-top:16px">
+          <div style="font-size:0.78rem;font-weight:600;color:var(--text2);margin-bottom:8px">Distribuição dos Custos</div>
+          <div id="sim-breakdown" class="flex flex-col gap-2"></div>
+        </div>
+      </div>
+      <div class="card p-4">
+        <div class="font-display font-bold mb-3">📈 Projeção de Vendas</div>
+        <div class="flex flex-col gap-3">
+          <div class="input-group"><label class="label">Unidades/Mês</label><input type="number" class="input" id="sim-unidades" value="50" oninput="calcSimulador()"/></div>
+          <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px" id="sim-projecao"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CURVA ABC -->
+<section class="page" id="page-curva-abc">
+  <div class="page-header">
+    <div><div class="page-title">Curva ABC</div><div class="page-sub">Classificação automática de produtos por desempenho</div></div>
+    <div class="page-actions">
+      <button class="btn btn-secondary btn-sm" onclick="exportCurvaABCCSV()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar
+      </button>
+      <button class="btn btn-primary" onclick="loadCurvaABC()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+        Recalcular
+      </button>
+    </div>
+  </div>
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:16px">
+    <div class="card p-4" style="border-top:3px solid var(--green)">
+      <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:900;color:var(--green2)">A</div>
+      <div class="text-sm text-muted mt-1">Produtos mais lucrativos</div>
+      <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;margin-top:8px" id="abc-a-count">0</div>
+      <div class="text-xs text-muted" id="abc-a-pct">0% do lucro total</div>
+      <div class="progress-bar mt-2"><div class="progress-fill" id="abc-a-bar" style="background:var(--green);width:0%"></div></div>
+    </div>
+    <div class="card p-4" style="border-top:3px solid var(--yellow)">
+      <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:900;color:var(--yellow2)">B</div>
+      <div class="text-sm text-muted mt-1">Desempenho intermediário</div>
+      <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;margin-top:8px" id="abc-b-count">0</div>
+      <div class="text-xs text-muted" id="abc-b-pct">0% do lucro total</div>
+      <div class="progress-bar mt-2"><div class="progress-fill" id="abc-b-bar" style="background:var(--yellow);width:0%"></div></div>
+    </div>
+    <div class="card p-4" style="border-top:3px solid var(--red)">
+      <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:900;color:var(--red2)">C</div>
+      <div class="text-sm text-muted mt-1">Baixo giro / prejuízo</div>
+      <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;margin-top:8px" id="abc-c-count">0</div>
+      <div class="text-xs text-muted" id="abc-c-pct">0% do lucro total</div>
+      <div class="progress-bar mt-2"><div class="progress-fill" id="abc-c-bar" style="background:var(--red);width:0%"></div></div>
+    </div>
+  </div>
+  <div class="grid" style="grid-template-columns:1fr 1fr;gap:16px">
+    <div class="card chart-card">
+      <div class="chart-title font-display">Pareto — Curva ABC</div>
+      <div class="chart-wrap"><canvas id="chart-abc"></canvas></div>
+    </div>
+    <div class="card chart-card">
+      <div class="chart-title font-display">Distribuição por Classe</div>
+      <div class="chart-wrap"><canvas id="chart-abc-pie"></canvas></div>
+    </div>
+  </div>
+  <div class="card p-4">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div class="font-display font-bold text-lg">Ranking Completo</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-secondary" onclick="filterABC('')" id="abc-btn-all" style="background:var(--accent);color:#fff">Todos</button>
+        <button class="btn btn-sm btn-secondary" onclick="filterABC('A')" id="abc-btn-a">Classe A</button>
+        <button class="btn btn-sm btn-secondary" onclick="filterABC('B')" id="abc-btn-b">Classe B</button>
+        <button class="btn btn-sm btn-secondary" onclick="filterABC('C')" id="abc-btn-c">Classe C</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Produto</th><th>SKU</th><th>Qtd Vendida</th><th>Faturamento</th><th>Lucro</th><th>Margem</th><th>% Lucro Acum.</th><th>Classe</th></tr></thead>
+        <tbody id="abc-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUTOS PARADOS -->
+<section class="page" id="page-parados">
+  <div class="page-header">
+    <div><div class="page-title">Produtos Parados</div><div class="page-sub">Produtos sem vendas recentes — oportunidades de promoção</div></div>
+    <div class="page-actions">
+      <select class="input" id="parados-filter" onchange="renderProdutosParados()" style="width:160px">
+        <option value="15">Sem venda há 15+ dias</option>
+        <option value="30">Sem venda há 30+ dias</option>
+        <option value="60">Sem venda há 60+ dias</option>
+        <option value="90">Sem venda há 90+ dias</option>
+      </select>
+    </div>
+  </div>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+    <div class="stat-card" style="--stat-color:var(--yellow)"><div class="stat-label">15+ dias</div><div class="stat-value" id="par-15">0</div></div>
+    <div class="stat-card" style="--stat-color:var(--shopee)"><div class="stat-label">30+ dias</div><div class="stat-value" id="par-30">0</div></div>
+    <div class="stat-card" style="--stat-color:var(--red)"><div class="stat-label">60+ dias</div><div class="stat-value" id="par-60">0</div></div>
+    <div class="stat-card" style="--stat-color:var(--red)"><div class="stat-label">90+ dias</div><div class="stat-value" id="par-90">0</div></div>
+  </div>
+  <div id="parados-grid" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"></div>
+</section>
+
+<!-- FORNECEDORES -->
+<section class="page" id="page-fornecedores">
+  <div class="page-header">
+    <div><div class="page-title">Fornecedores</div><div class="page-sub">Cadastro e histórico de fornecedores</div></div>
+    <div class="page-actions">
+      <button class="btn btn-primary" onclick="openModal('modal-fornecedor')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Fornecedor
+      </button>
+    </div>
+  </div>
+  <div class="search-bar">
+    <div class="input-icon" style="flex:1;min-width:200px">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="input" id="forn-search" placeholder="Buscar fornecedor..." oninput="filterFornecedores()"/>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Nome</th><th>Telefone</th><th>E-mail</th><th>CNPJ</th><th>Prazo Entrega</th><th>Preço Médio</th><th>Último Pedido</th><th>Ações</th></tr></thead>
+      <tbody id="forn-tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- COMPRAS -->
+<section class="page" id="page-compras">
+  <div class="page-header">
+    <div><div class="page-title">Compras</div><div class="page-sub">Pedidos de compra e reposição de estoque</div></div>
+    <div class="page-actions">
+      <button class="btn btn-primary" onclick="openModal('modal-compra')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nova Compra
+      </button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pedido</th><th>Fornecedor</th><th>Produto</th><th>Qtd</th><th>Valor Total</th><th>Status</th><th>Previsão</th><th>Ações</th></tr></thead>
+      <tbody id="compras-tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- IMPORTAÇÃO CSV -->
+<section class="page" id="page-importacao">
+  <div class="page-header">
+    <div><div class="page-title">Importação CSV</div><div class="page-sub">Importe dados da Shopee ou Mercado Livre</div></div>
+  </div>
+  <div class="grid" style="grid-template-columns:1fr 1fr;gap:20px">
+    <div class="card p-4">
+      <div class="font-display font-bold text-lg mb-1">Configurar Importação</div>
+      <div class="text-sm text-muted mb-4">Selecione o tipo e fonte de dados</div>
+      <div class="flex flex-col gap-3">
+        <div class="input-group">
+          <label class="label">Tipo de Dado</label>
+          <select class="input" id="imp-tipo" onchange="updateImpTemplate()">
+            <option value="produtos">Produtos</option>
+            <option value="vendas">Vendas</option>
+            <option value="clientes">Clientes</option>
+            <option value="estoque">Estoque</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="label">Fonte / Marketplace</label>
+          <select class="input" id="imp-fonte">
+            <option value="generico">Genérico / Outro</option>
+            <option value="shopee">Shopee</option>
+            <option value="ml">Mercado Livre</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="label">Arquivo CSV</label>
+          <div class="file-drop" id="imp-drop" onclick="document.getElementById('imp-file').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleImportDrop(event)">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="margin:0 auto 8px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div>Clique ou arraste o arquivo CSV aqui</div>
+            <div style="font-size:0.75rem;color:var(--text3);margin-top:4px" id="imp-filename">Nenhum arquivo selecionado</div>
+          </div>
+          <input type="file" id="imp-file" accept=".csv,.txt" class="hidden" onchange="handleImportFile(event)"/>
+        </div>
+        <div id="imp-map-area" class="hidden">
+          <div class="label mb-2">Mapeamento de Colunas</div>
+          <div id="imp-map-cols" class="flex flex-col gap-2"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card p-4">
+      <div class="font-display font-bold text-lg mb-1">Preview e Validação</div>
+      <div class="text-sm text-muted mb-4">Verifique os dados antes de importar</div>
+      <div id="imp-preview-area">
+        <div class="empty-state" style="padding:32px 0">
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+          <h3>Nenhum arquivo carregado</h3>
+          <p>Selecione um CSV para visualizar o preview</p>
+        </div>
+      </div>
+      <div id="imp-erros" class="hidden" style="margin-top:12px;padding:12px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px">
+        <div style="font-weight:700;font-size:0.84rem;color:var(--red2);margin-bottom:6px">⚠️ Erros encontrados:</div>
+        <div id="imp-erros-list" style="font-size:0.8rem;color:var(--red2)"></div>
+      </div>
+      <div id="imp-progress-area" class="hidden" style="margin-top:12px">
+        <div style="font-size:0.82rem;font-weight:600;margin-bottom:6px" id="imp-progress-label">Importando...</div>
+        <div class="progress-bar"><div class="progress-fill" id="imp-progress-fill" style="background:var(--accent);width:0%"></div></div>
+        <div style="font-size:0.78rem;color:var(--text3);margin-top:4px" id="imp-progress-info"></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="btn-importar" onclick="doImport()" disabled>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Importar Dados
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="downloadImpTemplate()">Baixar Modelo CSV</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REPOSIÇÃO AUTOMÁTICA -->
+<section class="page" id="page-reposicao">
+  <div class="page-header">
+    <div><div class="page-title">Reposição Automática</div><div class="page-sub">Inteligência de estoque baseada em dados de vendas</div></div>
+    <div class="page-actions">
+      <button class="btn btn-secondary btn-sm" onclick="exportReposicaoCSV()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar Lista
+      </button>
+      <button class="btn btn-primary" onclick="loadReposicao()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+        Recalcular
+      </button>
+    </div>
+  </div>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+    <div class="stat-card" style="--stat-color:var(--red)"><div class="stat-label">Críticos (< 7 dias)</div><div class="stat-value" id="rep-critico">0</div></div>
+    <div class="stat-card" style="--stat-color:var(--yellow)"><div class="stat-label">Atenção (< 15 dias)</div><div class="stat-value" id="rep-atencao">0</div></div>
+    <div class="stat-card" style="--stat-color:var(--green)"><div class="stat-label">OK (15+ dias)</div><div class="stat-value" id="rep-ok">0</div></div>
+    <div class="stat-card" style="--stat-color:var(--accent)"><div class="stat-label">Total a Repor</div><div class="stat-value" id="rep-total-valor">R$ 0</div></div>
+  </div>
+  <div class="card p-4">
+    <div class="font-display font-bold text-lg mb-3">📋 Lista de Reposição</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Produto</th><th>SKU</th><th>Estoque Atual</th><th>Média/Dia</th><th>Dias Restantes</th><th>Sugestão Compra</th><th>Custo Estimado</th><th>Urgência</th></tr></thead>
+        <tbody id="reposicao-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- LOGS DO SISTEMA -->
+<section class="page" id="page-logs">
+  <div class="page-header">
+    <div><div class="page-title">Logs do Sistema</div><div class="page-sub">Auditoria e histórico de ações</div></div>
+    <div class="page-actions">
+      <button class="btn btn-secondary btn-sm" onclick="exportLogsCSV()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar
+      </button>
+    </div>
+  </div>
+  <div class="search-bar">
+    <div class="input-icon" style="flex:1;min-width:200px">
+      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="input" id="logs-search" placeholder="Buscar log..." oninput="filterLogs()"/>
+    </div>
+    <select class="input" id="logs-filter-tipo" onchange="filterLogs()" style="width:150px">
+      <option value="">Todos</option>
+      <option value="CREATE">Criação</option>
+      <option value="UPDATE">Atualização</option>
+      <option value="DELETE">Exclusão</option>
+      <option value="LOGIN">Login</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Data/Hora</th><th>Usuário</th><th>Ação</th><th>Entidade</th><th>Detalhes</th></tr></thead>
+      <tbody id="logs-tbody"></tbody>
+    </table>
+  </div>
+  <div class="pagination" id="logs-pagination"></div>
+</section>
+
+
     </main>
   </div>
 </div>
@@ -1662,6 +2122,67 @@ tbody tr{transition:background 0.15s}
     <div class="modal-body" id="venda-detalhe-body"></div>
   </div>
 </div>
+<!-- Modal Fornecedor -->
+<div class="modal-overlay hidden" id="modal-fornecedor">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-forn-title">Novo Fornecedor</div>
+      <div class="modal-close" onclick="closeModal('modal-fornecedor')">×</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="input-group span-2"><label class="label">Nome *</label><input type="text" class="input" id="forn-nome" placeholder="Razão Social ou Nome"/></div>
+        <div class="input-group"><label class="label">Telefone</label><input type="text" class="input" id="forn-tel" placeholder="(11) 99999-9999"/></div>
+        <div class="input-group"><label class="label">E-mail</label><input type="email" class="input" id="forn-email" placeholder="email@fornecedor.com"/></div>
+        <div class="input-group"><label class="label">CNPJ</label><input type="text" class="input" id="forn-cnpj" placeholder="00.000.000/0001-00"/></div>
+        <div class="input-group"><label class="label">Prazo Entrega (dias)</label><input type="number" class="input" id="forn-prazo" placeholder="7"/></div>
+        <div class="input-group span-2"><label class="label">Observações</label><textarea class="input" id="forn-obs" placeholder="Informações adicionais..."></textarea></div>
+      </div>
+      <input type="hidden" id="forn-id"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-fornecedor')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveFornecedor()">Salvar Fornecedor</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Compra -->
+<div class="modal-overlay hidden" id="modal-compra">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-compra-title">Nova Compra</div>
+      <div class="modal-close" onclick="closeModal('modal-compra')">×</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="input-group span-2"><label class="label">Fornecedor</label><select class="input" id="comp-fornecedor"><option value="">Selecione...</option></select></div>
+        <div class="input-group span-2"><label class="label">Produto *</label><select class="input" id="comp-produto"><option value="">Selecione...</option></select></div>
+        <div class="input-group"><label class="label">Quantidade *</label><input type="number" class="input" id="comp-qtd" min="1" value="1" oninput="calcTotalCompra()"/></div>
+        <div class="input-group"><label class="label">Preço Unitário (R$)</label><input type="number" class="input" id="comp-preco" step="0.01" oninput="calcTotalCompra()"/></div>
+        <div class="input-group"><label class="label">Valor Total</label><input type="text" class="input" id="comp-total" readonly style="background:var(--surface);color:var(--accent2);font-weight:700"/></div>
+        <div class="input-group"><label class="label">Status</label>
+          <select class="input" id="comp-status">
+            <option value="Pedido">Pedido</option>
+            <option value="Confirmado">Confirmado</option>
+            <option value="Em Trânsito">Em Trânsito</option>
+            <option value="Recebido">Recebido</option>
+            <option value="Cancelado">Cancelado</option>
+          </select>
+        </div>
+        <div class="input-group"><label class="label">Data do Pedido</label><input type="date" class="input" id="comp-data"/></div>
+        <div class="input-group"><label class="label">Previsão Entrega</label><input type="date" class="input" id="comp-previsao"/></div>
+      </div>
+      <input type="hidden" id="comp-id"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-compra')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveCompra()">Salvar Compra</button>
+    </div>
+  </div>
+</div>
+
+
 <script>
 // ══════════════════════════════════════════════════
 //  BACKENDLESS CONFIG
@@ -2886,6 +3407,790 @@ document.addEventListener('click',e=>{
   // Register SW
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
+
+// ══════════════════════════════════════════════════
+//  NEW DATA STORES
+// ══════════════════════════════════════════════════
+let allFornecedores = [];
+let allCompras = [];
+let allLogs = [];
+let filtLogs = [];
+let pagLogs = 1;
+let importData = null;
+let importHeaders = [];
+
+// ══════════════════════════════════════════════════
+//  EXTENDED loadAllData
+// ══════════════════════════════════════════════════
+const _origLoadAllData = loadAllData;
+async function loadAllData() {
+  hideLoading(false);
+  try {
+    [allProdutos, allVendas, allClientes, allAvisos, allUsuarios, allMovimentos, allFornecedores, allCompras] = await Promise.all([
+      blGet('Produtos','','',500),
+      blGet('Vendas','','',1000),
+      blGet('Clientes','','',500),
+      blGet('Avisos','','',100),
+      blGet('Users','','',100),
+      blGet('EstoqueMovimentacoes','','',500),
+      blGet('Fornecedores','','',200).catch(()=>[]),
+      blGet('Compras','','',200).catch(()=>[]),
+    ]);
+    allLogs = await blGet('LogsSistema','','',200).catch(()=>[]);
+    populateProdutoSelects();
+    populateCompraSelects();
+    updateBadges();
+  } catch(e) { toast('Erro ao carregar dados: '+e.message,'error'); }
+  hideLoading(true);
+}
+
+// ══════════════════════════════════════════════════
+//  SYSTEM LOG
+// ══════════════════════════════════════════════════
+async function logAction(acao, entidade, detalhes='') {
+  const obj = { acao, entidade, detalhes, usuario: currentUser?.name||currentUser?.email||'sistema', data: new Date().toISOString() };
+  try { const r = await blCreate('LogsSistema', obj); allLogs.unshift(r); } catch(e){}
+}
+
+// ══════════════════════════════════════════════════
+//  KANBAN
+// ══════════════════════════════════════════════════
+const KB_COLUMNS = [
+  { id:'Pago',       label:'💳 Pago',       color:'var(--blue)',    headerBg:'rgba(59,130,246,0.12)' },
+  { id:'Separando',  label:'📦 Separando',  color:'var(--accent)',  headerBg:'rgba(99,102,241,0.12)' },
+  { id:'Embalando',  label:'🎁 Embalando',  color:'var(--yellow)',  headerBg:'rgba(245,158,11,0.12)' },
+  { id:'Enviado',    label:'🚚 Enviado',    color:'var(--yellow2)', headerBg:'rgba(245,158,11,0.08)' },
+  { id:'Entregue',   label:'✅ Entregue',   color:'var(--green)',   headerBg:'rgba(16,185,129,0.12)' },
+  { id:'Cancelado',  label:'❌ Cancelado',  color:'var(--red)',     headerBg:'rgba(239,68,68,0.1)' },
+  { id:'Devolvido',  label:'↩️ Devolvido',  color:'var(--text3)',   headerBg:'var(--surface2)' },
+];
+
+let kbDragId = null;
+
+function renderKanban() {
+  const board = document.getElementById('kanban-board');
+  if (!board) return;
+  const filterMp = document.getElementById('kb-filter-mp')?.value||'';
+  const filterData = document.getElementById('kb-filter-data')?.value||'';
+  const search = (document.getElementById('kb-search')?.value||'').toLowerCase();
+  let vendas = allVendas.filter(v=>{
+    if (filterMp && v.marketplace !== filterMp) return false;
+    if (filterData && v.dataVenda && !v.dataVenda.startsWith(filterData)) return false;
+    if (search && !(v.codigoPedido||'').toLowerCase().includes(search) && !(v.produto||'').toLowerCase().includes(search) && !(v.cliente||'').toLowerCase().includes(search)) return false;
+    return true;
+  });
+  board.innerHTML = KB_COLUMNS.map(col => {
+    const cards = vendas.filter(v => v.statusPedido === col.id);
+    const cardsHtml = cards.slice(0,50).map(v => `
+      <div class="kanban-card" draggable="true" data-id="${v.objectId}" ondragstart="kbDragStart(event,'${v.objectId}')" onclick="showVendaDetalhe('${v.objectId}')">
+        <div class="kanban-card-code">${v.codigoPedido||'--'} · ${mpBadge(v.marketplace)}</div>
+        <div class="kanban-card-prod">${v.produto||'--'}</div>
+        <div class="flex items-center justify-between">
+          <div class="kanban-card-val">${formatMoney((v.valorVenda||0)*(v.quantidade||1))}</div>
+          <div style="font-size:0.72rem;color:var(--text3)">${fmtDate(v.dataVenda)}</div>
+        </div>
+      </div>`).join('');
+    return `
+      <div class="kanban-col" data-status="${col.id}" ondragover="kbDragOver(event)" ondrop="kbDrop(event,'${col.id}')" ondragleave="kbDragLeave(event)">
+        <div class="kanban-col-header" style="background:${col.headerBg};border-left:3px solid ${col.color}">
+          <div class="kanban-col-title">${col.label}</div>
+          <span class="kanban-count">${cards.length}</span>
+        </div>
+        <div class="kanban-cards">${cardsHtml||'<div style="padding:12px;text-align:center;font-size:0.78rem;color:var(--text3)">Nenhum pedido</div>'}</div>
+      </div>`;
+  }).join('');
+}
+
+function kbDragStart(e, id) { kbDragId = id; e.target.classList.add('dragging'); }
+function kbDragOver(e) { e.preventDefault(); e.currentTarget.closest('.kanban-col')?.classList.add('drag-over'); }
+function kbDragLeave(e) { e.currentTarget.closest('.kanban-col')?.classList.remove('drag-over'); }
+
+async function kbDrop(e, newStatus) {
+  e.preventDefault();
+  e.currentTarget.closest('.kanban-col')?.classList.remove('drag-over');
+  if (!kbDragId) return;
+  const v = allVendas.find(x => x.objectId === kbDragId); kbDragId = null;
+  if (!v || v.statusPedido === newStatus) return;
+  const old = v.statusPedido;
+  try {
+    await blUpdate('Vendas', v.objectId, { statusPedido: newStatus });
+    v.statusPedido = newStatus;
+    await logAction('UPDATE', 'Vendas', `Status: ${old} → ${newStatus} | Pedido: ${v.codigoPedido}`);
+    toast(`Pedido movido para "${newStatus}"`, 'success');
+    renderKanban();
+    generateAutoAvisos();
+  } catch(err) { toast('Erro: '+err.message, 'error'); }
+}
+
+// ══════════════════════════════════════════════════
+//  SIMULADOR DE LUCRO
+// ══════════════════════════════════════════════════
+function calcSimulador() {
+  const preco    = parseFloat(document.getElementById('sim-preco')?.value)||0;
+  const custo    = parseFloat(document.getElementById('sim-custo')?.value)||0;
+  const frete    = parseFloat(document.getElementById('sim-frete')?.value)||0;
+  const embal    = parseFloat(document.getElementById('sim-embalagem')?.value)||0;
+  const taxa     = parseFloat(document.getElementById('sim-taxa')?.value)||0;
+  const comissao = parseFloat(document.getElementById('sim-comissao')?.value)||0;
+  const imposto  = parseFloat(document.getElementById('sim-imposto')?.value)||0;
+  const desconto = parseFloat(document.getElementById('sim-desconto')?.value)||0;
+  const cashback = parseFloat(document.getElementById('sim-cashback')?.value)||0;
+  const unidades = parseFloat(document.getElementById('sim-unidades')?.value)||0;
+
+  const precoLiq = preco - desconto - cashback;
+  const taxaVal  = precoLiq * taxa / 100;
+  const comVal   = precoLiq * comissao / 100;
+  const impVal   = precoLiq * imposto / 100;
+  const totalCustos = custo + frete + embal + taxaVal + comVal + impVal;
+  const lucroBruto  = preco - custo;
+  const lucroLiq    = precoLiq - totalCustos;
+  const margem      = precoLiq > 0 ? lucroLiq / precoLiq * 100 : 0;
+  const roi         = totalCustos > 0 ? lucroLiq / totalCustos * 100 : 0;
+  const markup      = custo > 0 ? (preco - custo) / custo * 100 : 0;
+  const precoIdeal  = custo > 0 ? custo / (1 - (taxa + comissao + imposto) / 100 - 0.25) + frete + embal : 0;
+
+  setText('sim-lucro-bruto', formatMoney(lucroBruto));
+  const liqEl = document.getElementById('sim-lucro-liq');
+  if (liqEl) { liqEl.textContent = formatMoney(lucroLiq); liqEl.style.color = lucroLiq >= 0 ? 'var(--green2)' : 'var(--red2)'; }
+  const margEl = document.getElementById('sim-margem');
+  if (margEl) { margEl.textContent = margem.toFixed(1)+'%'; margEl.style.color = margem >= 20 ? 'var(--green2)' : margem >= 10 ? 'var(--yellow2)' : 'var(--red2)'; }
+  setText('sim-roi', roi.toFixed(1)+'%');
+  setText('sim-markup', markup.toFixed(1)+'%');
+  setText('sim-preco-ideal', formatMoney(precoIdeal));
+
+  const alerta = document.getElementById('sim-alerta');
+  if (alerta) alerta.classList.toggle('hidden', margem >= 15);
+
+  const bd = document.getElementById('sim-breakdown');
+  if (bd) {
+    const items = [
+      { label:'Custo Produto', val:custo, color:'#ef4444' },
+      { label:'Frete', val:frete, color:'#f59e0b' },
+      { label:'Embalagem', val:embal, color:'#f97316' },
+      { label:'Taxa Marketplace', val:taxaVal, color:'#8b5cf6' },
+      { label:'Comissão', val:comVal, color:'#6366f1' },
+      { label:'Imposto', val:impVal, color:'#ec4899' },
+      { label:'Desconto', val:desconto, color:'#94a3b8' },
+      { label:'Cashback', val:cashback, color:'#64748b' },
+    ].filter(i => i.val > 0);
+    bd.innerHTML = items.map(i => {
+      const pct = preco > 0 ? i.val / preco * 100 : 0;
+      return `<div class="sim-bar-item"><div style="width:100px;font-size:0.78rem;color:var(--text2)">${i.label}</div><div style="flex:1;height:6px;background:var(--border);border-radius:999px;overflow:hidden"><div style="height:100%;width:${Math.min(pct,100)}%;background:${i.color};border-radius:999px;transition:width 0.4s"></div></div><div style="width:64px;text-align:right;font-size:0.78rem;font-weight:600">${formatMoney(i.val)}</div></div>`;
+    }).join('');
+  }
+
+  const proj = document.getElementById('sim-projecao');
+  if (proj && unidades > 0) {
+    proj.innerHTML = `
+      <div style="padding:12px;background:var(--surface2);border-radius:10px"><div style="font-size:0.72rem;color:var(--text3);font-weight:700;text-transform:uppercase;margin-bottom:4px">Receita/Mês</div><div style="font-family:var(--font-display);font-size:1.2rem;font-weight:800">${formatMoney(preco*unidades)}</div></div>
+      <div style="padding:12px;background:var(--surface2);border-radius:10px"><div style="font-size:0.72rem;color:var(--text3);font-weight:700;text-transform:uppercase;margin-bottom:4px">Lucro/Mês</div><div style="font-family:var(--font-display);font-size:1.2rem;font-weight:800;color:${lucroLiq>=0?'var(--green2)':'var(--red2)'}">${formatMoney(lucroLiq*unidades)}</div></div>
+      <div style="padding:12px;background:var(--surface2);border-radius:10px"><div style="font-size:0.72rem;color:var(--text3);font-weight:700;text-transform:uppercase;margin-bottom:4px">Receita/Ano</div><div style="font-family:var(--font-display);font-size:1.2rem;font-weight:800">${formatMoney(preco*unidades*12)}</div></div>
+      <div style="padding:12px;background:var(--surface2);border-radius:10px"><div style="font-size:0.72rem;color:var(--text3);font-weight:700;text-transform:uppercase;margin-bottom:4px">Lucro/Ano</div><div style="font-family:var(--font-display);font-size:1.2rem;font-weight:800;color:${lucroLiq>=0?'var(--green2)':'var(--red2)'}">${formatMoney(lucroLiq*unidades*12)}</div></div>
+    `;
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  CURVA ABC
+// ══════════════════════════════════════════════════
+let abcData = []; let abcFilter = '';
+function loadCurvaABC() {
+  const map = {};
+  allVendas.filter(v => v.statusPedido !== 'Cancelado' && v.statusPedido !== 'Devolvido').forEach(v => {
+    const k = v.produto || '--';
+    if (!map[k]) map[k] = { nome: k, sku: v.sku||'--', qtd: 0, fat: 0, lucro: 0 };
+    map[k].qtd  += v.quantidade || 1;
+    map[k].fat  += (v.valorVenda||0) * (v.quantidade||1);
+    map[k].lucro += v.lucro || 0;
+  });
+  const sorted = Object.values(map).sort((a,b) => b.lucro - a.lucro);
+  const totalLucro = sorted.reduce((s,p) => s + Math.max(0,p.lucro), 0);
+  let acum = 0;
+  abcData = sorted.map(p => {
+    acum += Math.max(0, p.lucro);
+    const pctAcum = totalLucro > 0 ? acum / totalLucro * 100 : 0;
+    const classe = pctAcum <= 80 ? 'A' : pctAcum <= 95 ? 'B' : 'C';
+    return { ...p, pctAcum, classe };
+  });
+  const classA = abcData.filter(p => p.classe==='A');
+  const classB = abcData.filter(p => p.classe==='B');
+  const classC = abcData.filter(p => p.classe==='C');
+  const pctA = totalLucro > 0 ? classA.reduce((s,p)=>s+Math.max(0,p.lucro),0)/totalLucro*100 : 0;
+  const pctB = totalLucro > 0 ? classB.reduce((s,p)=>s+Math.max(0,p.lucro),0)/totalLucro*100 : 0;
+  const pctC = 100 - pctA - pctB;
+  setText('abc-a-count', classA.length); setText('abc-a-pct', pctA.toFixed(1)+'% do lucro');
+  setText('abc-b-count', classB.length); setText('abc-b-pct', pctB.toFixed(1)+'% do lucro');
+  setText('abc-c-count', classC.length); setText('abc-c-pct', pctC.toFixed(1)+'% do lucro');
+  const aBar=document.getElementById('abc-a-bar'); if(aBar) aBar.style.width=pctA+'%';
+  const bBar=document.getElementById('abc-b-bar'); if(bBar) bBar.style.width=pctB+'%';
+  const cBar=document.getElementById('abc-c-bar'); if(cBar) cBar.style.width=pctC+'%';
+  buildABCChart(abcData, totalLucro);
+  buildABCPie(classA.length, classB.length, classC.length);
+  filterABC(abcFilter);
+}
+
+function buildABCChart(data, total) {
+  const ctx = document.getElementById('chart-abc'); if (!ctx) return;
+  if (charts.abc) charts.abc.destroy();
+  const labels = data.slice(0,20).map(p => p.nome.substring(0,12));
+  const vals = data.slice(0,20).map(p => p.lucro);
+  const colors = data.slice(0,20).map(p => p.classe==='A'?'#10b981':p.classe==='B'?'#f59e0b':'#ef4444');
+  charts.abc = new Chart(ctx, { type:'bar', data:{ labels, datasets:[{ label:'Lucro', data:vals, backgroundColor:colors, borderRadius:6 }] }, options: { ...chartOpts({prefix:'R$ '}), plugins:{ legend:{ display:false } } } });
+}
+
+function buildABCPie(a,b,c) {
+  const ctx = document.getElementById('chart-abc-pie'); if (!ctx) return;
+  if (charts.abcPie) charts.abcPie.destroy();
+  charts.abcPie = new Chart(ctx, { type:'doughnut', data:{ labels:['Classe A','Classe B','Classe C'], datasets:[{ data:[a,b,c], backgroundColor:['#10b981','#f59e0b','#ef4444'], borderColor:'transparent', borderWidth:0, hoverOffset:8 }] }, options:{ responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{ legend:{ position:'bottom', labels:{ color:'#8b9cc8', boxWidth:12, padding:14, font:{size:11} } } } } });
+}
+
+function filterABC(cls) {
+  abcFilter = cls;
+  ['all','a','b','c'].forEach(k => {
+    const el = document.getElementById('abc-btn-'+k);
+    if(el) el.style.background = ((cls===''&&k==='all')||(cls===k.toUpperCase())) ? 'var(--accent)' : '';
+    if(el) el.style.color = ((cls===''&&k==='all')||(cls===k.toUpperCase())) ? '#fff' : '';
+  });
+  const rows = cls ? abcData.filter(p=>p.classe===cls) : abcData;
+  const tb = document.getElementById('abc-tbody'); if (!tb) return;
+  if (!rows.length) { tb.innerHTML='<tr><td colspan="9" style="padding:32px;text-align:center;color:var(--text3)">Sem dados para exibir</td></tr>'; return; }
+  tb.innerHTML = rows.map((p,i) => `
+    <tr>
+      <td><span style="width:22px;height:22px;border-radius:7px;background:var(--surface2);display:inline-flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:800">${i+1}</span></td>
+      <td class="font-medium">${p.nome}</td>
+      <td class="text-sm text-muted">${p.sku}</td>
+      <td>${p.qtd}</td>
+      <td class="font-semibold">${formatMoney(p.fat)}</td>
+      <td class="${p.lucro>=0?'text-green':'text-red'} font-bold">${formatMoney(p.lucro)}</td>
+      <td>${p.fat>0?((p.lucro/p.fat)*100).toFixed(1)+'%':'--'}</td>
+      <td class="text-sm">${p.pctAcum.toFixed(1)}%</td>
+      <td><span class="abc-badge-${p.classe.toLowerCase()}">${p.classe}</span></td>
+    </tr>`).join('');
+}
+
+function exportCurvaABCCSV() {
+  const rows = [['#','Produto','SKU','Qtd Vendida','Faturamento','Lucro','Margem','% Acumulado','Classe']];
+  abcData.forEach((p,i) => rows.push([i+1,p.nome,p.sku,p.qtd,p.fat.toFixed(2),p.lucro.toFixed(2),p.fat>0?((p.lucro/p.fat)*100).toFixed(1)+'%':'--',p.pctAcum.toFixed(1)+'%',p.classe]));
+  downloadCSV(rows, 'curva_abc');
+}
+
+// ══════════════════════════════════════════════════
+//  PRODUTOS PARADOS
+// ══════════════════════════════════════════════════
+function loadProdutosParados() {
+  const dias = [15,30,60,90];
+  const now = Date.now();
+  const lastSaleMap = {};
+  allVendas.filter(v=>v.statusPedido!=='Cancelado').forEach(v => {
+    const k = v.produto||v.sku;
+    const t = new Date(v.dataVenda).getTime();
+    if (!lastSaleMap[k] || t > lastSaleMap[k]) lastSaleMap[k] = t;
+  });
+  dias.forEach(d => {
+    const c = allProdutos.filter(p => {
+      const last = lastSaleMap[p.nome] || lastSaleMap[p.sku] || 0;
+      return (now - last) >= d * 86400000;
+    }).length;
+    setText('par-'+d, c);
+  });
+  renderProdutosParados();
+}
+
+function renderProdutosParados() {
+  const dias = parseInt(document.getElementById('parados-filter')?.value||15);
+  const now = Date.now();
+  const lastSaleMap = {};
+  allVendas.filter(v=>v.statusPedido!=='Cancelado').forEach(v => {
+    const k = v.produto||v.sku;
+    const t = new Date(v.dataVenda).getTime();
+    if (!lastSaleMap[k] || t > lastSaleMap[k]) lastSaleMap[k] = t;
+  });
+  const parados = allProdutos.filter(p => {
+    const last = lastSaleMap[p.nome] || lastSaleMap[p.sku] || 0;
+    return (now - last) >= dias * 86400000;
+  });
+  const grid = document.getElementById('parados-grid'); if (!grid) return;
+  if (!parados.length) { grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><h3>Nenhum produto parado</h3><p>Todos os produtos têm vendas recentes.</p></div>'; return; }
+  grid.innerHTML = parados.map(p => {
+    const last = lastSaleMap[p.nome] || lastSaleMap[p.sku] || 0;
+    const daysAgo = last ? Math.floor((now - last) / 86400000) : null;
+    const urgency = daysAgo === null ? 'Nunca vendeu' : daysAgo >= 90 ? 'Crítico' : daysAgo >= 60 ? 'Alto' : daysAgo >= 30 ? 'Médio' : 'Baixo';
+    const urgColor = urgency==='Crítico'?'var(--red2)':urgency==='Alto'?'var(--shopee)':urgency==='Médio'?'var(--yellow2)':'var(--text2)';
+    return `<div class="parado-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+        <div style="flex:1;min-width:0"><div class="font-semibold truncate">${p.nome}</div><div class="text-xs text-muted">${p.sku||'--'} · ${p.categoria||''}</div></div>
+        <span style="font-size:0.72rem;font-weight:700;color:${urgColor};background:${urgColor.replace(')',',0.12)').replace('var(','rgba(')};padding:3px 8px;border-radius:999px;white-space:nowrap;margin-left:8px">${urgency}</span>
+      </div>
+      <div class="parado-days" style="color:${urgColor}">${daysAgo !== null ? daysAgo+'d' : '∞'}</div>
+      <div class="text-xs text-muted mb-3">${daysAgo !== null ? 'dias sem venda' : 'nunca vendido'}</div>
+      <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text2);margin-bottom:12px">
+        <span>Estoque: <strong>${p.estoqueAtual||0}</strong></span>
+        <span>Custo: <strong>${formatMoney(p.custo||0)}</strong></span>
+      </div>
+      <button class="btn btn-secondary btn-sm w-full" onclick="sugerirPromocao('${p.objectId}')">💡 Sugerir Promoção</button>
+    </div>`;
+  }).join('');
+}
+
+function sugerirPromocao(prodId) {
+  const p = allProdutos.find(x => x.objectId === prodId); if (!p) return;
+  const preco = p.precoVenda || 0;
+  const custo = p.custo || 0;
+  const minProfit = custo * 1.1;
+  const suggested = Math.max(minProfit, preco * 0.85);
+  toast(`Sugestão para "${p.nome}": Ofereça por ${formatMoney(suggested)} (desconto de ${((1-suggested/preco)*100).toFixed(0)}%)`, 'info', 6000);
+}
+
+// ══════════════════════════════════════════════════
+//  FORNECEDORES
+// ══════════════════════════════════════════════════
+let filtFornecedores = [];
+
+function filterFornecedores() {
+  const q = (document.getElementById('forn-search')?.value||'').toLowerCase();
+  filtFornecedores = allFornecedores.filter(f => !q || (f.nome||'').toLowerCase().includes(q) || (f.email||'').toLowerCase().includes(q));
+  renderFornecedores();
+}
+
+function renderFornecedores() {
+  if (!filtFornecedores.length) filtFornecedores = [...allFornecedores];
+  const tb = document.getElementById('forn-tbody'); if (!tb) return;
+  if (!filtFornecedores.length) { tb.innerHTML='<tr><td colspan="8" style="padding:32px;text-align:center;color:var(--text3)">Nenhum fornecedor cadastrado</td></tr>'; return; }
+  tb.innerHTML = filtFornecedores.map(f => `
+    <tr>
+      <td class="font-medium">${f.nome||'--'}</td>
+      <td class="text-sm">${f.telefone||'--'}</td>
+      <td class="text-sm text-muted">${f.email||'--'}</td>
+      <td class="text-sm text-muted">${f.cnpj||'--'}</td>
+      <td class="text-sm">${f.prazoEntrega?f.prazoEntrega+' dias':'--'}</td>
+      <td class="text-sm">${f.precoMedio?formatMoney(f.precoMedio):'--'}</td>
+      <td class="text-sm text-muted">${fmtDate(f.ultimoPedido)}</td>
+      <td>
+        <div class="flex gap-1">
+          <button class="btn btn-icon btn-sm" onclick="editFornecedor('${f.objectId}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="btn btn-icon btn-sm" onclick="deleteFornecedor('${f.objectId}')"><svg width="13" height="13" fill="none" stroke="var(--red2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function editFornecedor(id) {
+  const f = allFornecedores.find(x=>x.objectId===id); if(!f) return;
+  document.getElementById('modal-forn-title').textContent='Editar Fornecedor';
+  setVal('forn-id',f.objectId); setVal('forn-nome',f.nome); setVal('forn-tel',f.telefone);
+  setVal('forn-email',f.email); setVal('forn-cnpj',f.cnpj); setVal('forn-prazo',f.prazoEntrega);
+  setVal('forn-obs',f.observacoes);
+  openModal('modal-fornecedor');
+}
+
+async function saveFornecedor() {
+  const nome = document.getElementById('forn-nome')?.value.trim();
+  if (!nome) { toast('Nome obrigatório','warning'); return; }
+  const id = document.getElementById('forn-id')?.value;
+  const obj = { nome, telefone: document.getElementById('forn-tel')?.value, email: document.getElementById('forn-email')?.value, cnpj: document.getElementById('forn-cnpj')?.value, prazoEntrega: parseInt(document.getElementById('forn-prazo')?.value)||0, observacoes: document.getElementById('forn-obs')?.value };
+  try {
+    if (id) { await blUpdate('Fornecedores',id,obj); const i=allFornecedores.findIndex(f=>f.objectId===id); if(i>=0) allFornecedores[i]={...allFornecedores[i],...obj}; toast('Fornecedor atualizado!','success'); }
+    else { const r = await blCreate('Fornecedores',obj); allFornecedores.unshift(r); toast('Fornecedor cadastrado!','success'); }
+    await logAction(id?'UPDATE':'CREATE','Fornecedores',nome);
+    closeModal('modal-fornecedor');
+    ['forn-id','forn-nome','forn-tel','forn-email','forn-cnpj','forn-prazo','forn-obs'].forEach(i=>setVal(i,''));
+    document.getElementById('modal-forn-title').textContent='Novo Fornecedor';
+    filterFornecedores();
+    populateCompraSelects();
+  } catch(e) { toast('Erro: '+e.message,'error'); }
+}
+
+function deleteFornecedor(id) {
+  confirm2('Excluir Fornecedor','Tem certeza?',async()=>{ await blDelete('Fornecedores',id); allFornecedores=allFornecedores.filter(f=>f.objectId!==id); filterFornecedores(); toast('Fornecedor excluído','success'); });
+}
+
+// ══════════════════════════════════════════════════
+//  COMPRAS
+// ══════════════════════════════════════════════════
+function populateCompraSelects() {
+  const sel = document.getElementById('comp-fornecedor'); if (!sel) return;
+  sel.innerHTML = '<option value="">Selecione...</option>' + allFornecedores.map(f=>`<option value="${f.objectId}">${f.nome}</option>`).join('');
+  const sp = document.getElementById('comp-produto'); if (!sp) return;
+  sp.innerHTML = '<option value="">Selecione...</option>' + allProdutos.map(p=>`<option value="${p.objectId}">${p.nome} (${p.sku||'--'})</option>`).join('');
+}
+
+function calcTotalCompra() {
+  const qtd = parseFloat(document.getElementById('comp-qtd')?.value)||0;
+  const preco = parseFloat(document.getElementById('comp-preco')?.value)||0;
+  const el = document.getElementById('comp-total'); if(el) el.value = formatMoney(qtd*preco);
+}
+
+function renderCompras() {
+  const tb = document.getElementById('compras-tbody'); if (!tb) return;
+  if (!allCompras.length) { tb.innerHTML='<tr><td colspan="8" style="padding:32px;text-align:center;color:var(--text3)">Nenhuma compra registrada</td></tr>'; return; }
+  const statusColor = {Pedido:'badge-gray',Confirmado:'badge-blue',EmTransito:'badge-yellow','Em Trânsito':'badge-yellow',Recebido:'badge-green',Cancelado:'badge-red'};
+  tb.innerHTML = allCompras.map(c => {
+    const forn = allFornecedores.find(f=>f.objectId===c.fornecedorId);
+    return `<tr>
+      <td class="font-medium text-sm">${c.objectId?.slice(-6)||'--'}</td>
+      <td class="text-sm">${forn?.nome||c.fornecedorNome||'--'}</td>
+      <td class="font-medium text-sm">${c.produtoNome||'--'}</td>
+      <td class="text-sm">${c.quantidade||0}</td>
+      <td class="font-semibold text-sm">${formatMoney(c.valorTotal||0)}</td>
+      <td><span class="badge ${statusColor[c.status]||'badge-gray'}">${c.status||'--'}</span></td>
+      <td class="text-sm text-muted">${fmtDate(c.previsaoEntrega)}</td>
+      <td>
+        <div class="flex gap-1">
+          ${c.status!=='Recebido'?`<button class="btn btn-sm btn-success" onclick="receberCompra('${c.objectId}')">Receber</button>`:''}
+          <button class="btn btn-icon btn-sm" onclick="deleteCompra('${c.objectId}')"><svg width="13" height="13" fill="none" stroke="var(--red2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function saveCompra() {
+  const prodId = document.getElementById('comp-produto')?.value;
+  const qtd = parseInt(document.getElementById('comp-qtd')?.value)||0;
+  const preco = parseFloat(document.getElementById('comp-preco')?.value)||0;
+  if (!prodId || !qtd) { toast('Produto e quantidade obrigatórios','warning'); return; }
+  const prod = allProdutos.find(p=>p.objectId===prodId);
+  const fornId = document.getElementById('comp-fornecedor')?.value;
+  const forn = allFornecedores.find(f=>f.objectId===fornId);
+  const obj = { fornecedorId:fornId, fornecedorNome:forn?.nome||'', produtoId:prodId, produtoNome:prod?.nome||'', quantidade:qtd, precoUnitario:preco, valorTotal:qtd*preco, status:document.getElementById('comp-status')?.value||'Pedido', dataPedido:document.getElementById('comp-data')?.value||new Date().toISOString().split('T')[0], previsaoEntrega:document.getElementById('comp-previsao')?.value||'' };
+  try {
+    const r = await blCreate('Compras',obj); allCompras.unshift(r);
+    await logAction('CREATE','Compras',`${obj.produtoNome} - Qtd: ${qtd} - ${formatMoney(obj.valorTotal)}`);
+    closeModal('modal-compra'); renderCompras(); toast('Compra registrada!','success');
+  } catch(e) { toast('Erro: '+e.message,'error'); }
+}
+
+async function receberCompra(id) {
+  const c = allCompras.find(x=>x.objectId===id); if (!c) return;
+  const prod = allProdutos.find(p=>p.objectId===c.produtoId);
+  if (prod) {
+    const novoEst = (prod.estoqueAtual||0) + (c.quantidade||0);
+    await blUpdate('Produtos',prod.objectId,{estoqueAtual:novoEst});
+    prod.estoqueAtual = novoEst;
+    await blCreate('EstoqueMovimentacoes',{ produto:prod.nome, sku:prod.sku, tipoMovimentacao:'Entrada', quantidade:c.quantidade, motivo:'Recebimento Compra', data:new Date().toISOString(), usuario:currentUser?.name||currentUser?.email });
+  }
+  await blUpdate('Compras',id,{status:'Recebido'});
+  c.status = 'Recebido';
+  await logAction('UPDATE','Compras',`Recebido: ${c.produtoNome} Qtd: ${c.quantidade}`);
+  renderCompras(); renderEstoque(); toast('Compra recebida e estoque atualizado!','success');
+}
+
+function deleteCompra(id) {
+  confirm2('Excluir Compra','Tem certeza?',async()=>{ await blDelete('Compras',id); allCompras=allCompras.filter(c=>c.objectId!==id); renderCompras(); toast('Compra excluída','success'); });
+}
+
+// ══════════════════════════════════════════════════
+//  REPOSIÇÃO AUTOMÁTICA
+// ══════════════════════════════════════════════════
+function loadReposicao() {
+  const now = Date.now();
+  const mesAtras = now - 30 * 86400000;
+  const vendasMes = allVendas.filter(v => v.statusPedido!=='Cancelado' && new Date(v.dataVenda).getTime() >= mesAtras);
+  const mediaMap = {};
+  vendasMes.forEach(v => {
+    const k = v.produtoId || v.sku || v.produto;
+    if (!mediaMap[k]) mediaMap[k] = 0;
+    mediaMap[k] += v.quantidade || 1;
+  });
+  const rows = allProdutos.map(p => {
+    const vendas30d = mediaMap[p.objectId] || mediaMap[p.sku] || mediaMap[p.nome] || 0;
+    const mediaDia = vendas30d / 30;
+    const diasRestantes = mediaDia > 0 ? (p.estoqueAtual||0) / mediaDia : null;
+    const sugestao = mediaDia > 0 ? Math.ceil(mediaDia * 45) : 0;
+    return { ...p, vendas30d, mediaDia, diasRestantes, sugestao, custo: p.custo||0 };
+  }).filter(p => p.mediaDia > 0 || (p.estoqueAtual||0) <= (p.estoqueMinimo||0)).sort((a,b)=>((a.diasRestantes||999)-(b.diasRestantes||999)));
+
+  let critico=0, atencao=0, ok=0, totalVal=0;
+  rows.forEach(r => {
+    if (r.diasRestantes !== null && r.diasRestantes <= 7) critico++;
+    else if (r.diasRestantes === null || r.diasRestantes <= 15) atencao++;
+    else ok++;
+    totalVal += r.sugestao * r.custo;
+  });
+  setText('rep-critico',critico); setText('rep-atencao',atencao); setText('rep-ok',ok);
+  setText('rep-total-valor', formatMoney(totalVal));
+
+  const tb = document.getElementById('reposicao-tbody'); if (!tb) return;
+  if (!rows.length) { tb.innerHTML='<tr><td colspan="8" style="padding:32px;text-align:center;color:var(--text3)">Nenhum produto requer reposição</td></tr>'; return; }
+  tb.innerHTML = rows.map(r => {
+    const urg = r.diasRestantes !== null && r.diasRestantes <= 7 ? '<span class="badge badge-red">🔴 Crítico</span>' : r.diasRestantes === null || r.diasRestantes <= 15 ? '<span class="badge badge-yellow">🟡 Atenção</span>' : '<span class="badge badge-green">🟢 OK</span>';
+    return `<tr>
+      <td class="font-medium">${r.nome}</td>
+      <td class="text-muted text-sm">${r.sku||'--'}</td>
+      <td class="${(r.estoqueAtual||0)<=(r.estoqueMinimo||0)?'stock-low':'stock-ok'} font-bold">${r.estoqueAtual||0}</td>
+      <td class="text-sm">${r.mediaDia.toFixed(1)}/dia</td>
+      <td class="${r.diasRestantes!==null&&r.diasRestantes<=7?'text-red':r.diasRestantes!==null&&r.diasRestantes<=15?'text-yellow':'text-green'} font-bold">${r.diasRestantes!==null?Math.round(r.diasRestantes)+' dias':'N/A'}</td>
+      <td class="font-bold text-accent">${r.sugestao} un</td>
+      <td class="text-sm">${formatMoney(r.sugestao*r.custo)}</td>
+      <td>${urg}</td>
+    </tr>`;
+  }).join('');
+}
+
+function exportReposicaoCSV() {
+  const rows = [['Produto','SKU','Estoque Atual','Média/Dia','Dias Restantes','Sugestão Compra','Custo Estimado']];
+  document.querySelectorAll('#reposicao-tbody tr').forEach(tr => {
+    const tds = tr.querySelectorAll('td');
+    if (tds.length > 1) rows.push(Array.from(tds).slice(0,7).map(td=>td.textContent.trim()));
+  });
+  downloadCSV(rows, 'reposicao');
+}
+
+// ══════════════════════════════════════════════════
+//  IMPORTAÇÃO CSV
+// ══════════════════════════════════════════════════
+const IMPORT_TEMPLATES = {
+  produtos: { cols: ['nome','sku','custo','precoVenda','estoqueAtual','categoria','marca','marketplace'], required:['nome','sku'] },
+  vendas:   { cols: ['codigoPedido','produto','valorVenda','quantidade','cliente','marketplace','statusPedido','dataVenda'], required:['produto','valorVenda'] },
+  clientes: { cols: ['nome','email','telefone','cidade','estado','marketplace'], required:['nome'] },
+  estoque:  { cols: ['sku','quantidade','tipo','motivo'], required:['sku','quantidade'] },
+};
+
+const SHOPEE_MAP = { 'nome do item':'nome','sku do item':'sku','preço':'precoVenda','preço de custo':'custo','estoque':'estoqueAtual','número do pedido':'codigoPedido','nome do produto':'produto','preço total do item':'valorVenda','quantidade':'quantidade','nome do comprador':'cliente' };
+const ML_MAP = { 'título':'nome','sku':'sku','preço':'precoVenda','custo':'custo','estoque':'estoqueAtual','número do pedido':'codigoPedido','produto':'produto','valor total':'valorVenda','quantidade':'quantidade','nome do comprador':'cliente' };
+
+function updateImpTemplate() { importData = null; importHeaders = []; document.getElementById('imp-preview-area').innerHTML='<div class="empty-state" style="padding:32px 0"><h3>Nenhum arquivo carregado</h3><p>Selecione um CSV</p></div>'; document.getElementById('imp-map-area')?.classList.add('hidden'); document.getElementById('btn-importar').disabled=true; }
+
+function handleImportDrop(e) { e.preventDefault(); document.getElementById('imp-drop').classList.remove('drag'); const f = e.dataTransfer.files[0]; if (f) processImportFile(f); }
+function handleImportFile(e) { const f = e.target.files[0]; if (f) processImportFile(f); }
+
+function processImportFile(file) {
+  document.getElementById('imp-filename').textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const text = e.target.result;
+    parseCSV(text);
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function parseCSV(text) {
+  const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l=>l.trim());
+  if (lines.length < 2) { toast('CSV vazio ou inválido','error'); return; }
+  const delim = lines[0].includes(';') ? ';' : ',';
+  const parseRow = row => { const r=[]; let inQ=false, cur=''; for(let c of row){if(c==='"'){inQ=!inQ;}else if(c===delim&&!inQ){r.push(cur.trim());cur='';}else cur+=c;} r.push(cur.trim()); return r; };
+  importHeaders = parseRow(lines[0]).map(h=>h.replace(/["\uFEFF]/g,'').trim().toLowerCase());
+  importData = lines.slice(1).filter(l=>l.trim()).map(l=>{ const row=parseRow(l); const obj={}; importHeaders.forEach((h,i)=>{ obj[h]=row[i]||''; }); return obj; });
+  buildImportMapping();
+  showImportPreview();
+}
+
+function buildImportMapping() {
+  const tipo = document.getElementById('imp-tipo')?.value||'produtos';
+  const fonte = document.getElementById('imp-fonte')?.value||'generico';
+  const targetCols = IMPORT_TEMPLATES[tipo]?.cols||[];
+  const autoMap = fonte==='shopee'?SHOPEE_MAP:fonte==='ml'?ML_MAP:{};
+  const mapArea = document.getElementById('imp-map-area'); if (!mapArea) return;
+  mapArea.classList.remove('hidden');
+  document.getElementById('imp-map-cols').innerHTML = targetCols.map(col => {
+    const autoMatch = autoMap[importHeaders.find(h=>autoMap[h]===col)] || importHeaders.find(h=>h===col||h.includes(col));
+    return `<div class="flex items-center gap-2" style="font-size:0.82rem">
+      <div style="width:130px;font-weight:600;color:var(--text2)">${col}</div>
+      <select class="input" id="map-${col}" style="flex:1">
+        <option value="">— ignorar —</option>
+        ${importHeaders.map(h=>`<option value="${h}" ${h===autoMatch?'selected':''}>${h}</option>`).join('')}
+      </select>
+    </div>`;
+  }).join('');
+}
+
+function showImportPreview() {
+  if (!importData || !importData.length) return;
+  const preview = importData.slice(0,5);
+  const pArea = document.getElementById('imp-preview-area'); if (!pArea) return;
+  pArea.innerHTML = `
+    <div style="font-size:0.82rem;font-weight:600;margin-bottom:8px;color:var(--text2)">${importData.length} registros encontrados — Preview dos primeiros 5:</div>
+    <div class="table-wrap" style="max-height:200px;overflow-y:auto">
+      <table style="font-size:0.75rem">
+        <thead><tr>${importHeaders.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>${preview.map(row=>`<tr>${importHeaders.map(h=>`<td>${row[h]||''}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+  document.getElementById('btn-importar').disabled = false;
+  validateImport();
+}
+
+function validateImport() {
+  if (!importData) return;
+  const tipo = document.getElementById('imp-tipo')?.value||'produtos';
+  const required = IMPORT_TEMPLATES[tipo]?.required||[];
+  const errors = [];
+  importData.forEach((row,i) => {
+    required.forEach(col => {
+      const mapped = document.getElementById('map-'+col)?.value;
+      if (!mapped || !row[mapped]) errors.push(`Linha ${i+2}: campo "${col}" vazio`);
+    });
+  });
+  const errDiv = document.getElementById('imp-erros'); if (!errDiv) return;
+  if (errors.length > 0) {
+    errDiv.classList.remove('hidden');
+    document.getElementById('imp-erros-list').innerHTML = errors.slice(0,10).map(e=>`<div>• ${e}</div>`).join('') + (errors.length>10?`<div>... e mais ${errors.length-10} erros</div>`:'');
+  } else errDiv.classList.add('hidden');
+  return errors.length === 0;
+}
+
+async function doImport() {
+  if (!importData || !importData.length) return;
+  const tipo = document.getElementById('imp-tipo')?.value||'produtos';
+  if (!validateImport()) { toast('Corrija os erros antes de importar','warning'); return; }
+  const getMapping = col => document.getElementById('map-'+col)?.value||'';
+  const prog = document.getElementById('imp-progress-area'); if(prog) prog.classList.remove('hidden');
+  const fillBar = (pct,info='') => {
+    const b=document.getElementById('imp-progress-fill'); if(b) b.style.width=pct+'%';
+    const lbl=document.getElementById('imp-progress-label'); if(lbl) lbl.textContent=pct>=100?'Concluído!':'Importando... '+pct+'%';
+    const info2=document.getElementById('imp-progress-info'); if(info2) info2.textContent=info;
+  };
+  const btn = document.getElementById('btn-importar'); if(btn) btn.disabled=true;
+  let created=0, updated=0, errors=0;
+  for (let i=0; i<importData.length; i++) {
+    const row = importData[i];
+    fillBar(Math.round((i/importData.length)*100), `${i+1}/${importData.length}`);
+    try {
+      if (tipo==='produtos') {
+        const obj = { nome:row[getMapping('nome')]||'', sku:row[getMapping('sku')]||'', custo:parseFloat(row[getMapping('custo')])||0, precoVenda:parseFloat(row[getMapping('precoVenda')])||0, estoqueAtual:parseInt(row[getMapping('estoqueAtual')])||0, categoria:row[getMapping('categoria')]||'', marca:row[getMapping('marca')]||'', marketplace:row[getMapping('marketplace')]||'Shopee', status:'Ativo' };
+        const existing = allProdutos.find(p=>(p.sku||'').toLowerCase()===(obj.sku||'').toLowerCase());
+        if (existing) { await blUpdate('Produtos',existing.objectId,obj); Object.assign(existing,obj); updated++; }
+        else { const r=await blCreate('Produtos',obj); allProdutos.push(r); created++; }
+      } else if (tipo==='vendas') {
+        const obj = { codigoPedido:row[getMapping('codigoPedido')]||'IMP-'+Date.now(), produto:row[getMapping('produto')]||'', valorVenda:parseFloat(row[getMapping('valorVenda')])||0, quantidade:parseInt(row[getMapping('quantidade')])||1, cliente:row[getMapping('cliente')]||'', marketplace:row[getMapping('marketplace')]||'Shopee', statusPedido:row[getMapping('statusPedido')]||'Entregue', dataVenda:row[getMapping('dataVenda')]||new Date().toISOString().split('T')[0] };
+        const r=await blCreate('Vendas',obj); allVendas.unshift(r); created++;
+      } else if (tipo==='clientes') {
+        const obj = { nome:row[getMapping('nome')]||'', email:row[getMapping('email')]||'', telefone:row[getMapping('telefone')]||'', cidade:row[getMapping('cidade')]||'', estado:row[getMapping('estado')]||'', marketplace:row[getMapping('marketplace')]||'Shopee', totalCompras:0, dataCadastro:new Date().toISOString() };
+        const existing = allClientes.find(c=>(c.email||'').toLowerCase()===(obj.email||'').toLowerCase()&&obj.email);
+        if (existing) { await blUpdate('Clientes',existing.objectId,obj); updated++; }
+        else { const r=await blCreate('Clientes',obj); allClientes.push(r); created++; }
+      }
+    } catch(e) { errors++; }
+  }
+  fillBar(100, `Criados: ${created} | Atualizados: ${updated} | Erros: ${errors}`);
+  await logAction('CREATE','Importação',`Tipo: ${tipo} | Criados: ${created} | Atualizados: ${updated}`);
+  populateProdutoSelects();
+  if(btn) btn.disabled=false;
+  toast(`Importação concluída! ${created} criados, ${updated} atualizados, ${errors} erros.`, errors>0?'warning':'success', 6000);
+}
+
+function downloadImpTemplate() {
+  const tipo = document.getElementById('imp-tipo')?.value||'produtos';
+  const cols = IMPORT_TEMPLATES[tipo]?.cols||[];
+  downloadCSV([cols, cols.map(c=>c+'_exemplo')], 'modelo_'+tipo);
+}
+
+// ══════════════════════════════════════════════════
+//  LOGS
+// ══════════════════════════════════════════════════
+const PAGE_LOGS = 50;
+
+function filterLogs() {
+  const q = (document.getElementById('logs-search')?.value||'').toLowerCase();
+  const tipo = document.getElementById('logs-filter-tipo')?.value||'';
+  filtLogs = allLogs.filter(l => {
+    if (q && !(l.acao||'').toLowerCase().includes(q) && !(l.entidade||'').toLowerCase().includes(q) && !(l.usuario||'').toLowerCase().includes(q) && !(l.detalhes||'').toLowerCase().includes(q)) return false;
+    if (tipo && (l.acao||'').toUpperCase() !== tipo) return false;
+    return true;
+  });
+  pagLogs=1; renderLogs();
+}
+
+function renderLogs() {
+  if (!filtLogs.length) filtLogs=[...allLogs];
+  const tb = document.getElementById('logs-tbody'); if (!tb) return;
+  const start=(pagLogs-1)*PAGE_LOGS;
+  const page=filtLogs.slice(start,start+PAGE_LOGS);
+  if(!page.length){tb.innerHTML='<tr><td colspan="5" style="padding:32px;text-align:center;color:var(--text3)">Nenhum log encontrado</td></tr>';return;}
+  const cls={CREATE:'log-action-create',UPDATE:'log-action-update',DELETE:'log-action-delete',LOGIN:'log-action-login'};
+  tb.innerHTML=page.map(l=>`<tr>
+    <td class="text-sm text-muted">${l.data?new Date(l.data).toLocaleString('pt-BR'):'--'}</td>
+    <td class="text-sm font-medium">${l.usuario||'--'}</td>
+    <td><span class="${cls[l.acao?.toUpperCase()]||''} font-bold text-sm">${l.acao||'--'}</span></td>
+    <td class="text-sm">${l.entidade||'--'}</td>
+    <td class="text-sm text-muted" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.detalhes||'--'}</td>
+  </tr>`).join('');
+  renderPagination('logs-pagination',filtLogs.length,'logs');
+}
+
+function exportLogsCSV() {
+  const rows=[['Data/Hora','Usuário','Ação','Entidade','Detalhes']];
+  allLogs.forEach(l=>rows.push([l.data?new Date(l.data).toLocaleString('pt-BR'):'',l.usuario||'',l.acao||'',l.entidade||'',l.detalhes||'']));
+  downloadCSV(rows,'logs_sistema');
+}
+
+// ══════════════════════════════════════════════════
+//  EXTENDED NAVIGATION
+// ══════════════════════════════════════════════════
+const _origNavigate = navigate;
+const pagesMeta2 = {
+  kanban:      { title:'Kanban de Pedidos',    sub:'Gestão visual do fluxo de pedidos' },
+  simulador:   { title:'Simulador de Lucro',   sub:'Calcule a rentabilidade real' },
+  'curva-abc': { title:'Curva ABC',            sub:'Classificação automática de produtos' },
+  parados:     { title:'Produtos Parados',     sub:'Produtos sem vendas recentes' },
+  fornecedores:{ title:'Fornecedores',         sub:'Cadastro e histórico' },
+  compras:     { title:'Compras',              sub:'Pedidos de reposição' },
+  importacao:  { title:'Importação CSV',       sub:'Importe da Shopee ou Mercado Livre' },
+  reposicao:   { title:'Reposição Automática', sub:'Inteligência de estoque' },
+  logs:        { title:'Logs do Sistema',      sub:'Auditoria e histórico de ações' },
+};
+
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page)?.classList.add('active');
+  document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
+  const meta = pagesMeta[page] || pagesMeta2[page] || {};
+  document.getElementById('topbar-title').textContent = meta.title||page;
+  document.getElementById('topbar-sub').textContent = meta.sub||'';
+  closeMobileMenu();
+  // existing pages
+  if (page==='dashboard') loadDashboard();
+  if (page==='produtos') renderProdutos();
+  if (page==='vendas') renderVendas();
+  if (page==='estoque') renderEstoque();
+  if (page==='clientes') renderClientes();
+  if (page==='relatorios') initRelatorios();
+  if (page==='financeiro') loadFinanceiro();
+  if (page==='avisos') renderAvisos();
+  if (page==='admin') renderAdmin();
+  // new pages
+  if (page==='kanban') renderKanban();
+  if (page==='simulador') calcSimulador();
+  if (page==='curva-abc') loadCurvaABC();
+  if (page==='parados') loadProdutosParados();
+  if (page==='fornecedores') { filtFornecedores=[...allFornecedores]; renderFornecedores(); }
+  if (page==='compras') { renderCompras(); populateCompraSelects(); }
+  if (page==='importacao') updateImpTemplate();
+  if (page==='reposicao') loadReposicao();
+  if (page==='logs') { filtLogs=[...allLogs]; renderLogs(); }
+}
+
+// ══════════════════════════════════════════════════
+//  PWA PREMIUM — push notification support
+// ══════════════════════════════════════════════════
+function requestPushPermission() {
+  if ('Notification' in window) {
+    Notification.requestPermission().then(p => {
+      if (p === 'granted') toast('Notificações push ativadas!','success');
+    });
+  }
+}
+
+function sendPushNotification(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body, icon: '/icons/icon-192.png' });
+  }
+}
+
+// Override generateAutoAvisos to also check push
+const _origGenAvisos = generateAutoAvisos;
+function generateAutoAvisos() {
+  _origGenAvisos();
+  const zerados = allProdutos.filter(p=>!p.estoqueAtual||p.estoqueAtual<=0);
+  if (zerados.length > 0) sendPushNotification('⚠️ Estoque Zerado', `${zerados.length} produto(s) sem estoque.`);
+}
+
+// Auto-init simulador when page loads
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>{ if(document.getElementById('page-simulador')?.classList.contains('active')) calcSimulador(); },300);
+});
+
 
 // Override filterProdutos to call _renderProdutos
 const _origFilterProdutos = filterProdutos;

@@ -2617,24 +2617,58 @@ const pagesMeta = {
   admin:     { title:'Administração', sub:'Usuários e configurações' },
 };
 
+const pagesMeta2 = {
+  kanban:           { title:'Kanban de Pedidos',    sub:'Gestão visual do fluxo de pedidos' },
+  simulador:        { title:'Simulador de Lucro',   sub:'Calcule a rentabilidade real' },
+  'curva-abc':      { title:'Curva ABC',            sub:'Classificação automática de produtos' },
+  parados:          { title:'Produtos Parados',     sub:'Produtos sem vendas recentes' },
+  fornecedores:     { title:'Fornecedores',         sub:'Cadastro e histórico' },
+  compras:          { title:'Compras',              sub:'Pedidos de reposição' },
+  importacao:       { title:'Importação CSV',       sub:'Importe da Shopee ou Mercado Livre' },
+  reposicao:        { title:'Reposição Automática', sub:'Inteligência de estoque' },
+  logs:             { title:'Logs do Sistema',      sub:'Auditoria e histórico de ações' },
+  shopee:           { title:'Shopee Sync',          sub:'Sincronização com Shopee Open Platform' },
+  'shopee-config':  { title:'Configuração Shopee',  sub:'OAuth e parâmetros de integração' },
+};
+
 function navigate(page) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+page)?.classList.add('active');
   document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
-  const meta = pagesMeta[page] || {};
-  document.getElementById('topbar-title').textContent = meta.title||page;
-  document.getElementById('topbar-sub').textContent = meta.sub||'';
+  const meta = pagesMeta[page] || pagesMeta2[page] || {};
+  document.getElementById('topbar-title').textContent = meta.title || page;
+  document.getElementById('topbar-sub').textContent = meta.sub || '';
   closeMobileMenu();
-  if (page==='dashboard') loadDashboard();
-  if (page==='produtos') renderProdutos();
-  if (page==='vendas') renderVendas();
-  if (page==='estoque') renderEstoque();
-  if (page==='clientes') renderClientes();
-  if (page==='relatorios') initRelatorios();
-  if (page==='financeiro') loadFinanceiro();
-  if (page==='avisos') renderAvisos();
-  if (page==='admin') renderAdmin();
+  // páginas originais
+  if (page==='dashboard')    loadDashboard();
+  if (page==='produtos')     renderProdutos();
+  if (page==='vendas')       renderVendas();
+  if (page==='estoque')      renderEstoque();
+  if (page==='clientes')     renderClientes();
+  if (page==='relatorios')   initRelatorios();
+  if (page==='financeiro')   loadFinanceiro();
+  if (page==='avisos')       renderAvisos();
+  if (page==='admin')        renderAdmin();
+  // páginas estendidas
+  if (page==='kanban')       renderKanban();
+  if (page==='simulador')    calcSimulador();
+  if (page==='curva-abc')    loadCurvaABC();
+  if (page==='parados')      loadProdutosParados();
+  if (page==='fornecedores') { filtFornecedores=[...allFornecedores]; renderFornecedores(); }
+  if (page==='compras')      { renderCompras(); populateCompraSelects(); }
+  if (page==='importacao')   updateImpTemplate();
+  if (page==='reposicao')    loadReposicao();
+  if (page==='logs')         { filtLogs=[...allLogs]; renderLogs(); }
+  // páginas Shopee
+  if (page==='shopee') {
+    initShopeeConfig();
+    updateOAuthStatus();
+    updateShopeeStat('sh-stat-pedidos', allVendas.filter(v=>v.marketplace==='Shopee').length);
+    updateShopeeStat('sh-stat-produtos', allProdutos.filter(p=>p.marketplace==='Shopee').length);
+    renderSyncLogs();
+  }
+  if (page==='shopee-config') renderShopeeConfig();
 }
 
 // ══════════════════════════════════════════════════
@@ -2781,10 +2815,10 @@ function renderDashVendasRecentes() {
 //  PRODUTOS
 // ══════════════════════════════════════════════════
 function filterProdutos() {
-  const q = (document.getElementById('prod-search').value||'').toLowerCase();
-  const mp = document.getElementById('prod-filter-mp').value;
-  const st = document.getElementById('prod-filter-status').value;
-  const est = document.getElementById('prod-filter-estoque').value;
+  const q = (document.getElementById('prod-search')?.value||'').toLowerCase();
+  const mp = document.getElementById('prod-filter-mp')?.value||'';
+  const st = document.getElementById('prod-filter-status')?.value||'';
+  const est = document.getElementById('prod-filter-estoque')?.value||'';
   filtProdutos = allProdutos.filter(p=>{
     if (q && !(p.nome||'').toLowerCase().includes(q) && !(p.sku||'').toLowerCase().includes(q)) return false;
     if (mp && p.marketplace !== mp) return false;
@@ -2794,12 +2828,12 @@ function filterProdutos() {
     return true;
   });
   pag.produtos = 1;
-  renderProdutos();
+  _renderProdutos();
 }
 
 function renderProdutos() {
-  if (!filtProdutos.length) filtProdutos = [...allProdutos];
-  filterProdutos(); return; // ensure filter runs
+  filtProdutos = [...allProdutos];
+  _renderProdutos();
 }
 
 function _renderProdutos() {
@@ -3413,6 +3447,9 @@ function generateAutoAvisos() {
   if(lowMargin.length) auto.push({titulo:`${lowMargin.length} produto${lowMargin.length>1?'s':''} com margem baixa (<10%)`,descricao:'Revise os preços de venda.',tipo:'info',auto:true});
   window._autoAvisos = auto;
   updateNotifCount();
+  // Push notification para estoque zerado
+  const zeradosPush = allProdutos.filter(p=>!p.estoqueAtual||p.estoqueAtual<=0);
+  if (zeradosPush.length > 0) sendPushNotification('⚠️ Estoque Zerado', `${zeradosPush.length} produto(s) sem estoque.`);
 }
 
 function updateNotifCount() {
@@ -4387,53 +4424,6 @@ function exportLogsCSV() {
 }
 
 // ══════════════════════════════════════════════════
-//  EXTENDED NAVIGATION
-// ══════════════════════════════════════════════════
-const _origNavigate = navigate;
-const pagesMeta2 = {
-  kanban:      { title:'Kanban de Pedidos',    sub:'Gestão visual do fluxo de pedidos' },
-  simulador:   { title:'Simulador de Lucro',   sub:'Calcule a rentabilidade real' },
-  'curva-abc': { title:'Curva ABC',            sub:'Classificação automática de produtos' },
-  parados:     { title:'Produtos Parados',     sub:'Produtos sem vendas recentes' },
-  fornecedores:{ title:'Fornecedores',         sub:'Cadastro e histórico' },
-  compras:     { title:'Compras',              sub:'Pedidos de reposição' },
-  importacao:  { title:'Importação CSV',       sub:'Importe da Shopee ou Mercado Livre' },
-  reposicao:   { title:'Reposição Automática', sub:'Inteligência de estoque' },
-  logs:        { title:'Logs do Sistema',      sub:'Auditoria e histórico de ações' },
-};
-
-function navigate(page) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+page)?.classList.add('active');
-  document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
-  const meta = pagesMeta[page] || pagesMeta2[page] || {};
-  document.getElementById('topbar-title').textContent = meta.title||page;
-  document.getElementById('topbar-sub').textContent = meta.sub||'';
-  closeMobileMenu();
-  // existing pages
-  if (page==='dashboard') loadDashboard();
-  if (page==='produtos') renderProdutos();
-  if (page==='vendas') renderVendas();
-  if (page==='estoque') renderEstoque();
-  if (page==='clientes') renderClientes();
-  if (page==='relatorios') initRelatorios();
-  if (page==='financeiro') loadFinanceiro();
-  if (page==='avisos') renderAvisos();
-  if (page==='admin') renderAdmin();
-  // new pages
-  if (page==='kanban') renderKanban();
-  if (page==='simulador') calcSimulador();
-  if (page==='curva-abc') loadCurvaABC();
-  if (page==='parados') loadProdutosParados();
-  if (page==='fornecedores') { filtFornecedores=[...allFornecedores]; renderFornecedores(); }
-  if (page==='compras') { renderCompras(); populateCompraSelects(); }
-  if (page==='importacao') updateImpTemplate();
-  if (page==='reposicao') loadReposicao();
-  if (page==='logs') { filtLogs=[...allLogs]; renderLogs(); }
-}
-
-// ══════════════════════════════════════════════════
 //  PWA PREMIUM — push notification support
 // ══════════════════════════════════════════════════
 function requestPushPermission() {
@@ -4450,43 +4440,10 @@ function sendPushNotification(title, body) {
   }
 }
 
-// Override generateAutoAvisos to also check push
-const _origGenAvisos = generateAutoAvisos;
-function generateAutoAvisos() {
-  _origGenAvisos();
-  const zerados = allProdutos.filter(p=>!p.estoqueAtual||p.estoqueAtual<=0);
-  if (zerados.length > 0) sendPushNotification('⚠️ Estoque Zerado', `${zerados.length} produto(s) sem estoque.`);
-}
-
 // Auto-init simulador when page loads
 document.addEventListener('DOMContentLoaded',()=>{
   setTimeout(()=>{ if(document.getElementById('page-simulador')?.classList.contains('active')) calcSimulador(); },300);
 });
-
-
-// Override filterProdutos to call _renderProdutos
-const _origFilterProdutos = filterProdutos;
-// Override at init
-window.addEventListener('DOMContentLoaded', ()=>{
-  // Monkey-patch: filterProdutos sets filtProdutos then calls _renderProdutos
-});
-// Fix filterProdutos to actually render after setting:
-function filterProdutos() {
-  const q = (document.getElementById('prod-search')?.value||'').toLowerCase();
-  const mp = document.getElementById('prod-filter-mp')?.value||'';
-  const st = document.getElementById('prod-filter-status')?.value||'';
-  const est = document.getElementById('prod-filter-estoque')?.value||'';
-  filtProdutos = allProdutos.filter(p=>{
-    if (q && !(p.nome||'').toLowerCase().includes(q) && !(p.sku||'').toLowerCase().includes(q)) return false;
-    if (mp && p.marketplace !== mp) return false;
-    if (st && p.status !== st) return false;
-    if (est==='low' && !(p.estoqueAtual <= p.estoqueMinimo && p.estoqueAtual > 0)) return false;
-    if (est==='zero' && p.estoqueAtual > 0) return false;
-    return true;
-  });
-  _renderProdutos();
-}
-function renderProdutos() { filtProdutos=[...allProdutos]; _renderProdutos(); }
 
 // ══════════════════════════════════════════════════
 //  SHOPEE INTEGRATION — SECURE via Backendless Cloud Code
@@ -5036,32 +4993,6 @@ function initShopeeConfig() {
 function renderShopeeConfig() {
   initShopeeConfig();
   updateOAuthStatus();
-}
-
-// ── Estende navigate() para a página Shopee ──
-const _pagesMeta2Shopee = {
-  shopee: { title: 'Shopee Sync', sub: 'Sincronização com Shopee Open Platform' },
-  'shopee-config': { title: 'Configuração Shopee', sub: 'OAuth e parâmetros de integração' },
-};
-const _origNavigateShopee = navigate;
-function navigate(page) {
-  _origNavigateShopee(page);
-  if (!_pagesMeta2Shopee[page]) return;
-  document.getElementById('topbar-title').textContent = _pagesMeta2Shopee[page].title;
-  document.getElementById('topbar-sub').textContent = _pagesMeta2Shopee[page].sub;
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + page)?.classList.add('active');
-  document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
-  closeMobileMenu();
-  if (page === 'shopee') {
-    initShopeeConfig();
-    updateOAuthStatus();
-    updateShopeeStat('sh-stat-pedidos', allVendas.filter(v => v.marketplace === 'Shopee').length);
-    updateShopeeStat('sh-stat-produtos', allProdutos.filter(p => p.marketplace === 'Shopee').length);
-    renderSyncLogs();
-  }
-  if (page === 'shopee-config') renderShopeeConfig();
 }
 
 // ── Inicializa ao carregar ──

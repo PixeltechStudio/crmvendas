@@ -3314,7 +3314,31 @@ async function blGet(table, where='', props='', pageSize=100, offset=0) {
   return Array.isArray(data) ? data : [];
 }
 
-async function blCreate(table, obj) { return blFetch(`/data/${table}`, 'POST', obj); }
+// Tabelas compartilhadas entre todos os usuários (não filtrar por owner)
+const SHARED_TABLES = ['Users', 'Avisos', 'LogsSistema'];
+
+// Retorna cláusula where para filtrar registros do usuário logado
+function ownerWhere(extraWhere='') {
+  const uid = currentUser?.objectId;
+  if (!uid) return extraWhere;
+  const ownerClause = `ownerId = '${uid}'`;
+  return extraWhere ? `(${ownerClause}) AND (${extraWhere})` : ownerClause;
+}
+
+// blGet com filtro de owner automático para tabelas privadas
+async function blGetOwned(table, where='', props='', pageSize=100, offset=0) {
+  const isShared = SHARED_TABLES.includes(table);
+  const finalWhere = isShared ? where : ownerWhere(where);
+  return blGet(table, finalWhere, props, pageSize, offset);
+}
+
+// blCreate injeta ownerId automaticamente em tabelas privadas
+async function blCreate(table, obj) {
+  const isShared = SHARED_TABLES.includes(table);
+  const uid = currentUser?.objectId;
+  const enriched = (isShared || !uid) ? obj : { ...obj, ownerId: uid };
+  return blFetch(`/data/${table}`, 'POST', enriched);
+}
 async function blUpdate(table, id, obj) { return blFetch(`/data/${table}/${id}`, 'PUT', obj); }
 async function blDelete(table, id) { return blFetch(`/data/${table}/${id}`, 'DELETE'); }
 
@@ -4759,7 +4783,8 @@ async function loadAllData() {
   try {
     const loadTable = async (name, size=100) => {
       try {
-        const data = await blGet(name, '', '', Math.min(size, 100));
+        // Usa blGetOwned: filtra por ownerId em tabelas privadas, sem filtro em tabelas compartilhadas
+        const data = await blGetOwned(name, '', '', Math.min(size, 100));
         return Array.isArray(data) ? data : [];
       } catch(e) {
         const isNotFound = e.message.includes('1009') || e.message.includes('not found') || e.message.includes('404');
@@ -5681,7 +5706,7 @@ async function syncOrders(silent = false) {
 
     for (const order of orders) {
       // Salva em ShopeePedidos
-      const existing = await blGet('ShopeePedidos', `orderId = '${order.order_sn}'`, '', 1).catch(() => []);
+      const existing = await blGetOwned('ShopeePedidos', `orderId = '${order.order_sn}'`, '', 1).catch(() => []);
       const shopeeObj = {
         orderId: order.order_sn,
         status: order.order_status,
@@ -5703,7 +5728,7 @@ async function syncOrders(silent = false) {
       // Sincroniza com tabela Vendas do CRM
       if (order.order_status === 'COMPLETED') {
         for (const item of (order.item_list || [])) {
-          const vendaExisting = await blGet('Vendas', `codigoPedido = '${order.order_sn}-${item.item_id}'`, '', 1).catch(() => []);
+          const vendaExisting = await blGetOwned('Vendas', `codigoPedido = '${order.order_sn}-${item.item_id}'`, '', 1).catch(() => []);
           if (!vendaExisting.length) {
             const venda = {
               codigoPedido: `${order.order_sn}-${item.item_id}`,
@@ -5757,7 +5782,7 @@ async function syncProducts(silent = false) {
         status: item.item_status,
         syncedAt: new Date().toISOString(),
       };
-      const existing = await blGet('ShopeeProdutos', `itemId = '${item.item_id}'`, '', 1).catch(() => []);
+      const existing = await blGetOwned('ShopeeProdutos', `itemId = '${item.item_id}'`, '', 1).catch(() => []);
       if (existing.length) await blUpdate('ShopeeProdutos', existing[0].objectId, shopeeObj);
       else await blCreate('ShopeeProdutos', shopeeObj);
 
@@ -5792,7 +5817,7 @@ async function syncStock(silent = false) {
   if (!silent) showSyncProgress(true, 'Enviando estoque para Shopee...', 10);
   addSyncLog('📊', 'Atualizando estoque na Shopee...', 'info');
   try {
-    const shopeeProds = await blGet('ShopeeProdutos', '', '', 500).catch(() => []);
+    const shopeeProds = await blGetOwned('ShopeeProdutos', '', '', 500).catch(() => []);
     let updated = 0, errors = 0;
     for (const sp of shopeeProds) {
       const crmProd = allProdutos.find(p => (p.sku || '').toLowerCase() === (sp.shopSku || '').toLowerCase());
@@ -5911,7 +5936,7 @@ function updateShopeeStatusUI(connected) {
 
 async function updateOAuthStatus() {
   try {
-    const cfg = await blGet('ShopeeConfig', '', '', 1).catch(() => []);
+    const cfg = await blGetOwned('ShopeeConfig', '', '', 1).catch(() => []);
     if (cfg.length && cfg[0].accessToken) {
       updateShopeeStatusUI(true);
       const expiry = cfg[0].expiresAt ? new Date(cfg[0].expiresAt * 1000).toLocaleString('pt-BR') : '--';
@@ -6264,7 +6289,7 @@ async function loadContadorFiscal() {
 // ── Carregar empresa fiscal do Backendless ──
 async function loadEmpresaFiscal() {
   try {
-    const data = await blGet('EmpresaFiscal','','',1);
+    const data = await blGetOwned('EmpresaFiscal','','',1);
     fiscalEmpresa = data[0] || null;
     updateRegimeBadge();
     preencherFormEmpresa();
@@ -6650,7 +6675,7 @@ function exportarApuracaoCSV() {
 
 // ── DAS ──
 async function loadDASList() {
-  try { allDAS = await blGet('DASGuias','','',100); } catch(e) { allDAS = []; }
+  try { allDAS = await blGetOwned('DASGuias','','',100); } catch(e) { allDAS = []; }
 }
 
 function renderDASList() {
@@ -6747,7 +6772,7 @@ async function deletarDAS(id) {
 
 // ── Taxas Marketplace ──
 async function loadMPTaxas() {
-  try { allMPTaxas = await blGet('MarketplaceTaxas','','',100); } catch(e) { allMPTaxas = []; }
+  try { allMPTaxas = await blGetOwned('MarketplaceTaxas','','',100); } catch(e) { allMPTaxas = []; }
 }
 
 function renderMPTaxas() {
@@ -6799,7 +6824,7 @@ async function deletarTaxaMP(id) {
 
 // ── ICMS ──
 async function loadICMSList() {
-  try { allICMS = await blGet('ICMSAliquotas','','',100); } catch(e) { allICMS = []; }
+  try { allICMS = await blGetOwned('ICMSAliquotas','','',100); } catch(e) { allICMS = []; }
 }
 
 function renderICMSList() {
@@ -6850,7 +6875,7 @@ async function deletarICMS(id) {
 
 // ── Documentos Fiscais ──
 async function loadDocumentosFiscais() {
-  try { allDocumentosFiscais = await blGet('DocumentosFiscais','','',200); } catch(e) { allDocumentosFiscais = []; }
+  try { allDocumentosFiscais = await blGetOwned('DocumentosFiscais','','',200); } catch(e) { allDocumentosFiscais = []; }
 }
 
 function renderDocumentos() {
@@ -6926,7 +6951,7 @@ async function deletarDocumento(id) {
 
 // ── Fechamento Mensal ──
 async function loadFechamentos() {
-  try { allFechamentos = await blGet('FechamentoMensal','','',50); } catch(e) { allFechamentos = []; }
+  try { allFechamentos = await blGetOwned('FechamentoMensal','','',50); } catch(e) { allFechamentos = []; }
 }
 
 async function gerarFechamentoMes() {
@@ -7083,7 +7108,7 @@ function exportFechamentoCSV(id) {
 
 // ── Observações Fiscais ──
 async function loadObsFiscais() {
-  try { allObsFiscais = await blGet('ObsFiscais','','',100); } catch(e) { allObsFiscais = []; }
+  try { allObsFiscais = await blGetOwned('ObsFiscais','','',100); } catch(e) { allObsFiscais = []; }
 }
 
 function renderObsFiscais() {
@@ -7140,7 +7165,7 @@ async function salvarAcessoContador() {
     atualizadoEm: new Date().toISOString(),
   };
   try {
-    const existing = await blGet('AcessoContador','','',1).catch(()=>[]);
+    const existing = await blGetOwned('AcessoContador','','',1).catch(()=>[]);
     if (existing[0]) {
       await blUpdate('AcessoContador',existing[0].objectId,obj);
     } else {

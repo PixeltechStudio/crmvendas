@@ -764,6 +764,145 @@ tbody tr{transition:background 0.15s}
 .shopee-stat { padding:14px 18px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border); }
 .shopee-stat-val { font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--shopee); }
 .shopee-stat-lbl { font-size:0.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-top:3px; }
+
+/* ── CONTADOR FISCAL MODULE ── */
+:root {
+  --fiscal: #0ea5e9;
+  --fiscal2: #38bdf8;
+  --fiscal3: #7dd3fc;
+  --fiscal-dark: #0369a1;
+  --mei-color: #a855f7;
+  --simples-color: #0ea5e9;
+  --presumido-color: #f59e0b;
+  --real-color: #ef4444;
+}
+.fiscal-header {
+  background: linear-gradient(135deg, rgba(14,165,233,0.15) 0%, rgba(14,165,233,0.04) 100%);
+  border: 1px solid rgba(14,165,233,0.25);
+  border-radius: var(--radius2);
+  padding: 22px 26px;
+  position: relative; overflow: hidden;
+}
+.fiscal-header::before {
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:160px; height:160px; border-radius:50%;
+  background: radial-gradient(circle, rgba(14,165,233,0.2), transparent);
+  pointer-events:none;
+}
+.fiscal-regime-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 14px; border-radius:999px; font-size:0.78rem; font-weight:700;
+  letter-spacing:0.04em; text-transform:uppercase;
+}
+.regime-mei { background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.3); }
+.regime-simples { background:rgba(14,165,233,0.15); color:var(--fiscal2); border:1px solid rgba(14,165,233,0.3); }
+.regime-presumido { background:rgba(245,158,11,0.15); color:var(--yellow2); border:1px solid rgba(245,158,11,0.3); }
+.regime-real { background:rgba(239,68,68,0.15); color:var(--red2); border:1px solid rgba(239,68,68,0.3); }
+
+.fiscal-card {
+  padding:20px; border-radius:var(--radius2); border:1px solid var(--border);
+  background: linear-gradient(135deg, var(--surface), transparent);
+  position:relative; overflow:hidden; transition:var(--transition);
+}
+.fiscal-card:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--shadow); }
+.fiscal-card-accent { border-top: 3px solid var(--fiscal); }
+.fiscal-card-green  { border-top: 3px solid var(--green); }
+.fiscal-card-yellow { border-top: 3px solid var(--yellow); }
+.fiscal-card-red    { border-top: 3px solid var(--red); }
+.fiscal-card-purple { border-top: 3px solid #a855f7; }
+
+.mei-progress-wrap { margin-top:14px; }
+.mei-progress-bar { height:10px; background:var(--border); border-radius:999px; overflow:hidden; margin:8px 0; }
+.mei-progress-fill { height:100%; border-radius:999px; transition:width 0.8s cubic-bezier(0.4,0,0.2,1); }
+.mei-safe    { background:linear-gradient(90deg, var(--green), var(--green2)); }
+.mei-warn    { background:linear-gradient(90deg, var(--yellow), var(--yellow2)); }
+.mei-danger  { background:linear-gradient(90deg, var(--red), var(--red2)); }
+.mei-critical{ background:linear-gradient(90deg, #dc2626, #ef4444); }
+
+.das-card {
+  padding:16px 18px; border-radius:var(--radius); border:1px solid var(--border);
+  background:var(--surface); display:flex; align-items:center; gap:14px;
+  transition:var(--transition);
+}
+.das-card:hover { border-color:var(--border2); }
+.das-status-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.das-pendente { background:var(--yellow2); box-shadow:0 0 8px rgba(245,158,11,0.5); }
+.das-pago { background:var(--green2); box-shadow:0 0 8px rgba(16,185,129,0.5); }
+.das-vencido { background:var(--red2); box-shadow:0 0 8px rgba(239,68,68,0.5); }
+
+.aliquota-row {
+  display:flex; align-items:center; gap:12px; padding:10px 14px;
+  border-radius:10px; background:var(--surface); border:1px solid var(--border);
+  font-size:0.84rem; transition:var(--transition);
+}
+.aliquota-row:hover { border-color:var(--border2); }
+
+.tax-breakdown {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:var(--radius); padding:14px 18px; font-size:0.83rem;
+}
+.tax-line { display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid var(--border); }
+.tax-line:last-child { border-bottom:none; font-weight:700; font-size:0.9rem; }
+.tax-positive { color:var(--green2); }
+.tax-negative { color:var(--red2); }
+.tax-neutral  { color:var(--fiscal2); }
+
+.doc-upload-item {
+  display:flex; align-items:center; gap:12px; padding:11px 14px;
+  border-radius:10px; background:var(--surface); border:1px solid var(--border);
+  font-size:0.82rem; cursor:pointer; transition:var(--transition);
+}
+.doc-upload-item:hover { border-color:var(--accent); }
+.doc-icon { width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+
+.alert-fiscal {
+  display:flex; align-items:flex-start; gap:12px; padding:14px 16px;
+  border-radius:var(--radius); border-left:3px solid; margin-bottom:8px;
+  animation:fadeUp 0.3s ease;
+}
+.alert-fiscal.critical { background:rgba(239,68,68,0.08); border-color:var(--red); }
+.alert-fiscal.warning  { background:rgba(245,158,11,0.08); border-color:var(--yellow); }
+.alert-fiscal.info     { background:rgba(14,165,233,0.08); border-color:var(--fiscal); }
+.alert-fiscal.success  { background:rgba(16,185,129,0.08); border-color:var(--green); }
+.alert-fiscal-icon { font-size:1.2rem; margin-top:1px; flex-shrink:0; }
+.alert-fiscal-title { font-weight:700; font-size:0.86rem; margin-bottom:2px; }
+.alert-fiscal-desc { font-size:0.78rem; color:var(--text2); }
+
+.fiscal-tabs { display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:22px; overflow-x:auto; }
+.fiscal-tab { padding:10px 18px; font-size:0.84rem; font-weight:600; color:var(--text2); cursor:pointer; border-bottom:2px solid transparent; transition:var(--transition); white-space:nowrap; }
+.fiscal-tab.active { color:var(--fiscal2); border-bottom-color:var(--fiscal); }
+.fiscal-tab:hover { color:var(--text); }
+.fiscal-tab-content { display:none; }
+.fiscal-tab-content.active { display:block; }
+
+.marketplace-tax-row {
+  display:grid; grid-template-columns:1fr 1fr 1fr 1fr auto; gap:10px; align-items:center;
+  padding:12px 16px; background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; font-size:0.83rem; transition:var(--transition);
+}
+.marketplace-tax-row:hover { border-color:var(--border2); }
+
+.fechamento-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 0; border-bottom:1px solid var(--border); font-size:0.85rem;
+}
+.fechamento-row:last-child { border-bottom:none; font-weight:700; }
+.fechamento-total { font-family:var(--font-display); font-size:1rem; }
+
+.contador-access-card {
+  background:linear-gradient(135deg, rgba(14,165,233,0.1), rgba(14,165,233,0.03));
+  border:1px solid rgba(14,165,233,0.25); border-radius:var(--radius2); padding:22px;
+}
+
+.stats-grid-fiscal { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; }
+
+@media(max-width:768px){
+  .marketplace-tax-row { grid-template-columns:1fr 1fr; }
+  .stats-grid-fiscal { grid-template-columns:1fr 1fr; }
+}
+@media(max-width:480px){
+  .stats-grid-fiscal { grid-template-columns:1fr; }
+}
 </style>
 </head>
 <body>
@@ -935,10 +1074,15 @@ tbody tr{transition:background 0.15s}
         <span class="nav-item-label">Logs</span>
       </div>
       <div class="nav-section-title">Integrações</div>
-      <div class="nav-item" onclick="navigate('shopee')" data-page="shopee">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61H19a2 2 0 001.99-1.73l1.38-9H6"/></svg>
+      <div class="nav-item" onclick="navigate('shopee')" data-page="shopee">        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61H19a2 2 0 001.99-1.73l1.38-9H6"/></svg>
         <span class="nav-item-label">Shopee Sync</span>
         <span class="nav-badge hidden" id="badge-shopee" style="background:rgba(238,77,45,0.2);color:#ff6b47">0</span>
+      </div>
+      <div class="nav-section-title">Fiscal</div>
+      <div class="nav-item" onclick="navigate('contador')" data-page="contador">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M6 8h.01M6 12h.01M10 8h4M10 12h4M16 8h2M16 12h2"/></svg>
+        <span class="nav-item-label" style="font-weight:700">Contador Fiscal</span>
+        <span class="nav-badge hidden" id="badge-fiscal" style="background:rgba(14,165,233,0.2);color:var(--fiscal2)">0</span>
       </div>
       <div class="nav-section-title">Sistema</div>
       <div class="nav-item" onclick="navigate('avisos')" data-page="avisos">
@@ -2038,11 +2182,646 @@ tbody tr{transition:background 0.15s}
   </div>
 </section>
 
+<!-- ══════════════════════════════════════════════════════
+     CONTADOR DIGITAL / FISCAL INTELIGENTE - PAGE SECTION
+     ══════════════════════════════════════════════════════ -->
+<section class="page" id="page-contador">
+
+  <!-- FISCAL HEADER BANNER -->
+  <div class="fiscal-header">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#0ea5e9,#38bdf8);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(14,165,233,0.4)">
+          <svg width="26" height="26" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M6 8h.01M6 12h.01M10 8h4M10 12h4M16 8h2M16 12h2"/></svg>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.15rem;font-weight:800;color:var(--text)">Contador Digital / Fiscal Inteligente</div>
+          <div style="font-size:0.79rem;color:var(--text2);margin-top:2px">Diagnóstico tributário · Apuração automática · DAS · Documentos · Alertas fiscais</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span id="fiscal-regime-badge" class="fiscal-regime-badge regime-mei">MEI</span>
+        <button class="btn btn-secondary btn-sm" onclick="openFiscalConfig()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.34 19.66l-1.41 1.41M20 12h2M2 12h2M19.07 19.07l-1.41-1.41M4.34 4.34L2.93 2.93M12 20v2M12 2v2"/></svg>
+          Configurar Empresa
+        </button>
+        <button class="btn btn-sm" style="background:linear-gradient(135deg,#0ea5e9,#38bdf8);color:#fff;box-shadow:0 4px 14px rgba(14,165,233,0.35)" onclick="exportFiscalRelatorio()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar Relatório
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERTAS FISCAIS INTELIGENTES -->
+  <div id="fiscal-alertas-container"></div>
+
+  <!-- DASHBOARD FISCAL - CARDS PRINCIPAIS -->
+  <div class="stats-grid-fiscal" id="fiscal-dashboard-cards">
+    <div class="fiscal-card fiscal-card-accent">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text2)">Faturamento do Mês</div>
+        <div style="width:34px;height:34px;border-radius:10px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center">
+          <svg width="16" height="16" fill="none" stroke="var(--fiscal2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+      </div>
+      <div id="fc-faturamento" style="font-family:var(--font-display);font-size:1.6rem;font-weight:800">R$ 0,00</div>
+      <div id="fc-fat-meta" style="font-size:0.73rem;color:var(--text3);margin-top:4px">0 vendas no mês</div>
+    </div>
+    <div class="fiscal-card fiscal-card-yellow">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text2)">Imposto Estimado</div>
+        <div style="width:34px;height:34px;border-radius:10px;background:rgba(245,158,11,0.12);display:flex;align-items:center;justify-content:center">
+          <svg width="16" height="16" fill="none" stroke="var(--yellow2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+      </div>
+      <div id="fc-imposto" style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--yellow2)">R$ 0,00</div>
+      <div id="fc-aliquota" style="font-size:0.73rem;color:var(--text3);margin-top:4px">Alíquota efetiva: 0%</div>
+    </div>
+    <div class="fiscal-card fiscal-card-purple">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text2)">DAS Previsto</div>
+        <div style="width:34px;height:34px;border-radius:10px;background:rgba(168,85,247,0.12);display:flex;align-items:center;justify-content:center">
+          <svg width="16" height="16" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+      </div>
+      <div id="fc-das" style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:#c084fc">R$ 0,00</div>
+      <div id="fc-das-venc" style="font-size:0.73rem;color:var(--text3);margin-top:4px">Vencimento: dia 20</div>
+    </div>
+    <div class="fiscal-card fiscal-card-green">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text2)">Lucro Líquido</div>
+        <div style="width:34px;height:34px;border-radius:10px;background:rgba(16,185,129,0.12);display:flex;align-items:center;justify-content:center">
+          <svg width="16" height="16" fill="none" stroke="var(--green2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        </div>
+      </div>
+      <div id="fc-lucro" style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--green2)">R$ 0,00</div>
+      <div id="fc-margem" style="font-size:0.73rem;color:var(--text3);margin-top:4px">Margem líquida: 0%</div>
+    </div>
+    <div class="fiscal-card fiscal-card-accent">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text2)">Taxas Marketplace</div>
+        <div style="width:34px;height:34px;border-radius:10px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center">
+          <svg width="16" height="16" fill="none" stroke="var(--fiscal2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61H19a2 2 0 001.99-1.73l1.38-9H6"/></svg>
+        </div>
+      </div>
+      <div id="fc-taxas" style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--fiscal2)">R$ 0,00</div>
+      <div style="font-size:0.73rem;color:var(--text3);margin-top:4px">Total taxas do mês</div>
+    </div>
+    <div class="fiscal-card fiscal-card-red">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text2)">Docs Pendentes</div>
+        <div style="width:34px;height:34px;border-radius:10px;background:rgba(239,68,68,0.12);display:flex;align-items:center;justify-content:center">
+          <svg width="16" height="16" fill="none" stroke="var(--red2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        </div>
+      </div>
+      <div id="fc-docs-pendentes" style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--red2)">0</div>
+      <div style="font-size:0.73rem;color:var(--text3);margin-top:4px">Documentos sem comprovante</div>
+    </div>
+  </div>
+
+  <!-- LIMITE MEI PROGRESS BAR -->
+  <div class="card p-4" id="mei-section">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+      <div>
+        <div style="font-family:var(--font-display);font-size:1rem;font-weight:700">📊 Limite Anual MEI</div>
+        <div style="font-size:0.78rem;color:var(--text2);margin-top:2px">Limite: R$ 81.000,00 / ano · Faturamento acumulado</div>
+      </div>
+      <div id="mei-regime-note" style="font-size:0.78rem;color:var(--text3)"></div>
+    </div>
+    <div class="mei-progress-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:0.78rem;font-weight:600;color:var(--text2)" id="mei-usado-label">R$ 0,00 utilizados</span>
+        <span id="mei-pct-label" style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;color:var(--green2)">0%</span>
+      </div>
+      <div class="mei-progress-bar">
+        <div class="mei-progress-fill mei-safe" id="mei-progress-fill" style="width:0%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text3);margin-top:6px">
+        <span>R$ 0</span>
+        <span style="color:var(--yellow2)">70% – R$ 56.700</span>
+        <span style="color:var(--red2)">85% – R$ 68.850</span>
+        <span>R$ 81.000</span>
+      </div>
+    </div>
+    <div id="mei-alert-msg" style="margin-top:14px"></div>
+  </div>
+
+  <!-- TABS PRINCIPAIS -->
+  <div class="card p-4">
+    <div class="fiscal-tabs">
+      <div class="fiscal-tab active" onclick="switchFiscalTab('apuracao')">💰 Apuração Mensal</div>
+      <div class="fiscal-tab" onclick="switchFiscalTab('das')">📋 DAS / Guias</div>
+      <div class="fiscal-tab" onclick="switchFiscalTab('marketplace')">🏪 Taxas Marketplace</div>
+      <div class="fiscal-tab" onclick="switchFiscalTab('icms')">🗺️ ICMS Estadual</div>
+      <div class="fiscal-tab" onclick="switchFiscalTab('fechamento')">📅 Fechamento Mensal</div>
+      <div class="fiscal-tab" onclick="switchFiscalTab('documentos')">📂 Documentos</div>
+      <div class="fiscal-tab" onclick="switchFiscalTab('contador-acesso')">👨‍💼 Painel Contador</div>
+    </div>
+
+    <!-- TAB: APURAÇÃO MENSAL -->
+    <div class="fiscal-tab-content active" id="ftab-apuracao">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px">
+        <div class="input-group">
+          <label class="label">Mês de Referência</label>
+          <input type="month" class="input" id="fiscal-mes-ref" onchange="calcApuracaoMensal()"/>
+        </div>
+        <div class="input-group">
+          <label class="label">Marketplace</label>
+          <select class="input" id="fiscal-mp-filter" onchange="calcApuracaoMensal()">
+            <option value="">Todos</option>
+            <option value="Shopee">Shopee</option>
+            <option value="Mercado Livre">Mercado Livre</option>
+            <option value="Loja Própria">Loja Própria</option>
+            <option value="Manual">Venda Manual</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+        <div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:0.95rem;margin-bottom:14px;color:var(--text)">📈 Demonstrativo de Resultados</div>
+          <div class="tax-breakdown" id="fiscal-dre">
+            <div class="tax-line"><span class="text-muted">Aguardando cálculo...</span></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:0.95rem;margin-bottom:14px;color:var(--text)">🏪 Por Marketplace</div>
+          <div id="fiscal-mp-breakdown" style="display:flex;flex-direction:column;gap:8px">
+            <div style="text-align:center;padding:30px;color:var(--text3);font-size:0.84rem">Selecione um mês para ver a apuração</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <div style="font-family:var(--font-display);font-weight:700;font-size:0.95rem;margin-bottom:14px;color:var(--text)">📋 Detalhamento por Venda</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Data</th><th>Produto</th><th>Marketplace</th>
+              <th>Vl. Bruto</th><th>Taxa MP</th><th>Custo</th>
+              <th>Imposto Est.</th><th>Lucro Líq.</th>
+            </tr></thead>
+            <tbody id="fiscal-vendas-tbody">
+              <tr><td colspan="8" style="text-align:center;color:var(--text3);padding:30px">Selecione mês e clique em calcular</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" onclick="calcApuracaoMensal()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+          Recalcular
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="salvarApuracao()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Salvar Apuração
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="exportarApuracaoCSV()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB: DAS -->
+    <div class="fiscal-tab-content" id="ftab-das">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px">
+        <div style="font-family:var(--font-display);font-weight:700;font-size:0.95rem">Guias DAS / Simples Nacional</div>
+        <button class="btn btn-primary btn-sm" onclick="gerarNovoDAS()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nova Guia DAS
+        </button>
+      </div>
+      <div id="das-list" style="display:flex;flex-direction:column;gap:10px">
+        <div style="text-align:center;padding:40px;color:var(--text3);font-size:0.84rem">Nenhuma guia DAS cadastrada. Clique em "Nova Guia DAS" para adicionar.</div>
+      </div>
+    </div>
+
+    <!-- TAB: MARKETPLACE TAXAS -->
+    <div class="fiscal-tab-content" id="ftab-marketplace">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px">
+        <div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:0.95rem">Taxas e Comissões por Marketplace</div>
+          <div style="font-size:0.78rem;color:var(--text2);margin-top:2px">Configure para cálculo automático de impostos e lucro</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openModalTaxaMP()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar Taxa
+        </button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:10px;padding:10px 16px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3)">
+        <span>Marketplace</span><span>Categoria</span><span>Comissão %</span><span>Frete Fixo</span><span></span>
+      </div>
+      <div id="mp-taxas-list" style="display:flex;flex-direction:column;gap:8px">
+        <div style="text-align:center;padding:30px;color:var(--text3);font-size:0.84rem">Nenhuma taxa configurada</div>
+      </div>
+    </div>
+
+    <!-- TAB: ICMS -->
+    <div class="fiscal-tab-content" id="ftab-icms">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px">
+        <div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:0.95rem">ICMS — Vendas Interestaduais</div>
+          <div style="font-size:0.78rem;color:var(--text2);margin-top:2px">Configure alíquotas por estado de destino</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openModalICMS()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar Estado
+        </button>
+      </div>
+      <div id="icms-list" style="display:flex;flex-direction:column;gap:8px">
+        <div style="text-align:center;padding:30px;color:var(--text3);font-size:0.84rem">Nenhuma alíquota cadastrada</div>
+      </div>
+    </div>
+
+    <!-- TAB: FECHAMENTO MENSAL -->
+    <div class="fiscal-tab-content" id="ftab-fechamento">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px">
+        <div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:0.95rem">Fechamentos Mensais</div>
+          <div style="font-size:0.78rem;color:var(--text2);margin-top:2px">Meses travados para auditoria fiscal</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="gerarFechamentoMes()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Fechar Mês Atual
+        </button>
+      </div>
+      <div id="fechamentos-list" style="display:flex;flex-direction:column;gap:10px">
+        <div style="text-align:center;padding:40px;color:var(--text3);font-size:0.84rem">Nenhum fechamento mensal gerado</div>
+      </div>
+    </div>
+
+    <!-- TAB: DOCUMENTOS -->
+    <div class="fiscal-tab-content" id="ftab-documentos">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+        <div style="font-family:var(--font-display);font-weight:700;font-size:0.95rem">Documentos Fiscais</div>
+        <button class="btn btn-primary btn-sm" onclick="openModalUploadDoc()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload Documento
+        </button>
+      </div>
+      <!-- Filtros -->
+      <div class="search-bar" style="margin-bottom:16px">
+        <div class="input-icon" style="flex:1;min-width:150px">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="input" id="doc-search" placeholder="Buscar por nome, mês, valor..." oninput="filterDocumentos()"/>
+        </div>
+        <select class="input" style="width:160px" id="doc-filter-tipo" onchange="filterDocumentos()">
+          <option value="">Todos os tipos</option>
+          <option value="NF">Nota Fiscal</option>
+          <option value="DAS">DAS/Guia</option>
+          <option value="Boleto">Boleto</option>
+          <option value="Comprovante">Comprovante</option>
+          <option value="XML">XML</option>
+          <option value="Recibo">Recibo</option>
+          <option value="Outro">Outro</option>
+        </select>
+        <select class="input" style="width:160px" id="doc-filter-mp" onchange="filterDocumentos()">
+          <option value="">Todos marketplaces</option>
+          <option value="Shopee">Shopee</option>
+          <option value="Mercado Livre">Mercado Livre</option>
+          <option value="Loja Própria">Loja Própria</option>
+          <option value="Geral">Geral</option>
+        </select>
+      </div>
+      <div id="documentos-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px">
+        <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3);font-size:0.84rem">Nenhum documento cadastrado</div>
+      </div>
+    </div>
+
+    <!-- TAB: PAINEL CONTADOR -->
+    <div class="fiscal-tab-content" id="ftab-contador-acesso">
+      <div class="contador-access-card" style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#0ea5e9,#38bdf8);display:flex;align-items:center;justify-content:center">
+            <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:1rem">Acesso do Contador Externo</div>
+            <div style="font-size:0.78rem;color:var(--text2);margin-top:2px">Permissões e área dedicada ao seu contador</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="input-group">
+            <label class="label">Nome do Contador</label>
+            <input type="text" class="input" id="contador-nome" placeholder="João da Silva CRC"/>
+          </div>
+          <div class="input-group">
+            <label class="label">E-mail de Acesso</label>
+            <input type="email" class="input" id="contador-email" placeholder="contador@escritorio.com"/>
+          </div>
+          <div class="input-group">
+            <label class="label">CRC</label>
+            <input type="text" class="input" id="contador-crc" placeholder="CRC/SP 000000"/>
+          </div>
+          <div class="input-group">
+            <label class="label">Nível de Acesso</label>
+            <select class="input" id="contador-nivel">
+              <option value="contador">Contador (leitura + obs)</option>
+              <option value="financeiro">Financeiro (leitura)</option>
+              <option value="admin">Admin (completo)</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" onclick="salvarAcessoContador()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Salvar Acesso
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="exportarParaContador()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar Pacote Fiscal
+          </button>
+        </div>
+      </div>
+
+      <div style="font-family:var(--font-display);font-weight:700;font-size:0.95rem;margin-bottom:14px">📝 Observações Fiscais</div>
+      <div id="obs-fiscais-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+        <div style="text-align:center;padding:20px;color:var(--text3);font-size:0.84rem">Nenhuma observação adicionada</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-end">
+        <div class="input-group" style="flex:1">
+          <label class="label">Nova Observação Fiscal</label>
+          <textarea class="input" id="nova-obs-fiscal" rows="2" placeholder="Ex: Conferir nota fiscal do fornecedor X do mês de abril..."></textarea>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="adicionarObsFiscal()">Adicionar</button>
+      </div>
+    </div>
+  </div><!-- end card tabs -->
+
+</section><!-- end page-contador -->
+
     </main>
   </div>
 </div>
 
-<!-- MODALS -->
+<!-- MODAIS FISCAIS -->
+
+<!-- Modal: Configurar Empresa Fiscal -->
+<div class="modal-overlay hidden" id="modal-fiscal-config">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-header">
+      <div class="modal-title">⚙️ Configuração da Empresa Fiscal</div>
+      <div class="modal-close" onclick="closeModal('modal-fiscal-config')">×</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="input-group span-2">
+          <label class="label">Razão Social / Nome</label>
+          <input type="text" class="input" id="cfg-razao-social" placeholder="Nome da empresa ou MEI"/>
+        </div>
+        <div class="input-group">
+          <label class="label">CNPJ</label>
+          <input type="text" class="input" id="cfg-cnpj" placeholder="00.000.000/0001-00"/>
+        </div>
+        <div class="input-group">
+          <label class="label">Regime Tributário</label>
+          <select class="input" id="cfg-regime" onchange="updateRegimeUI()">
+            <option value="MEI">MEI</option>
+            <option value="Simples Nacional">Simples Nacional</option>
+            <option value="Lucro Presumido">Lucro Presumido</option>
+            <option value="Lucro Real">Lucro Real</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="label">CNAE Principal</label>
+          <input type="text" class="input" id="cfg-cnae" placeholder="Ex: 4712-1/00"/>
+        </div>
+        <div class="input-group">
+          <label class="label">Alíquota Efetiva (%)</label>
+          <input type="number" class="input" id="cfg-aliquota" step="0.01" min="0" max="100" placeholder="Ex: 6 para MEI Simples"/>
+        </div>
+        <div class="input-group">
+          <label class="label">Estado (UF)</label>
+          <select class="input" id="cfg-estado">
+            <option value="">Selecione...</option>
+            <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option>
+            <option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option>
+            <option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option>
+            <option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
+            <option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option>
+            <option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option>
+            <option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option>
+            <option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option>
+            <option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="label">Cidade</label>
+          <input type="text" class="input" id="cfg-cidade" placeholder="São Paulo"/>
+        </div>
+        <div class="input-group">
+          <label class="label">Inscrição Estadual</label>
+          <input type="text" class="input" id="cfg-ie" placeholder="ISENTO ou número"/>
+        </div>
+        <div class="input-group">
+          <label class="label">Inscrição Municipal</label>
+          <input type="text" class="input" id="cfg-im" placeholder="Opcional"/>
+        </div>
+        <div class="input-group span-2" id="cfg-limite-row">
+          <label class="label">Limite Anual (MEI = R$81.000 / Simples varia)</label>
+          <input type="number" class="input" id="cfg-limite" placeholder="81000" step="1000"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-fiscal-config')">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="salvarEmpresaFiscal()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/></svg>
+        Salvar Empresa
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Novo DAS -->
+<div class="modal-overlay hidden" id="modal-das">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">📋 Guia DAS</div>
+      <div class="modal-close" onclick="closeModal('modal-das')">×</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="input-group">
+          <label class="label">Competência (Mês/Ano)</label>
+          <input type="month" class="input" id="das-competencia"/>
+        </div>
+        <div class="input-group">
+          <label class="label">Valor DAS (R$)</label>
+          <input type="number" class="input" id="das-valor" step="0.01" min="0" placeholder="0,00"/>
+        </div>
+        <div class="input-group">
+          <label class="label">Vencimento</label>
+          <input type="date" class="input" id="das-vencimento"/>
+        </div>
+        <div class="input-group">
+          <label class="label">Status</label>
+          <select class="input" id="das-status">
+            <option value="Pendente">Pendente</option>
+            <option value="Pago">Pago</option>
+            <option value="Vencido">Vencido</option>
+          </select>
+        </div>
+        <div class="input-group span-2">
+          <label class="label">Observação</label>
+          <input type="text" class="input" id="das-obs" placeholder="Ex: DAS mês 05/2025"/>
+        </div>
+        <div class="input-group span-2">
+          <label class="label">Comprovante (URL ou nome do arquivo)</label>
+          <input type="text" class="input" id="das-comprovante" placeholder="Opcional — cole link ou nome"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-das')">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="salvarDAS()">Salvar DAS</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Taxa Marketplace -->
+<div class="modal-overlay hidden" id="modal-taxa-mp">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">🏪 Taxa de Marketplace</div>
+      <div class="modal-close" onclick="closeModal('modal-taxa-mp')">×</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="input-group">
+          <label class="label">Marketplace</label>
+          <select class="input" id="taxa-mp-nome">
+            <option value="Shopee">Shopee</option>
+            <option value="Mercado Livre">Mercado Livre</option>
+            <option value="Loja Própria">Loja Própria</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="label">Categoria</label>
+          <input type="text" class="input" id="taxa-mp-categoria" placeholder="Ex: Eletrônicos, Geral..."/>
+        </div>
+        <div class="input-group">
+          <label class="label">Comissão (%)</label>
+          <input type="number" class="input" id="taxa-mp-comissao" step="0.01" min="0" max="50" placeholder="Ex: 12"/>
+        </div>
+        <div class="input-group">
+          <label class="label">Frete Fixo (R$)</label>
+          <input type="number" class="input" id="taxa-mp-frete" step="0.01" min="0" placeholder="0 = frete grátis"/>
+        </div>
+        <div class="input-group span-2">
+          <label class="label">Outras Taxas / Observação</label>
+          <input type="text" class="input" id="taxa-mp-obs" placeholder="Ex: Taxa de anúncio, subsídio..."/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-taxa-mp')">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="salvarTaxaMP()">Salvar Taxa</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: ICMS Estado -->
+<div class="modal-overlay hidden" id="modal-icms">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title">🗺️ Alíquota ICMS por Estado</div>
+      <div class="modal-close" onclick="closeModal('modal-icms')">×</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="input-group">
+          <label class="label">Estado Destino (UF)</label>
+          <select class="input" id="icms-estado">
+            <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option>
+            <option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option>
+            <option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option>
+            <option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
+            <option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option>
+            <option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option>
+            <option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option>
+            <option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option>
+            <option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="label">Alíquota Interestadual (%)</label>
+          <input type="number" class="input" id="icms-aliquota" step="0.01" min="0" max="30" placeholder="Ex: 12"/>
+        </div>
+        <div class="input-group span-2">
+          <label class="label">Observação</label>
+          <input type="text" class="input" id="icms-obs" placeholder="Ex: Protocolo ICMS SP-RJ"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-icms')">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="salvarICMS()">Salvar Alíquota</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Upload Documento Fiscal -->
+<div class="modal-overlay hidden" id="modal-upload-doc">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <div class="modal-title">📂 Documento Fiscal</div>
+      <div class="modal-close" onclick="closeModal('modal-upload-doc')">×</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="input-group">
+          <label class="label">Tipo de Documento</label>
+          <select class="input" id="doc-tipo">
+            <option value="NF">Nota Fiscal</option>
+            <option value="DAS">DAS/Guia</option>
+            <option value="Boleto">Boleto</option>
+            <option value="Comprovante">Comprovante</option>
+            <option value="XML">XML</option>
+            <option value="Recibo">Recibo</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="label">Marketplace</label>
+          <select class="input" id="doc-marketplace">
+            <option value="Geral">Geral</option>
+            <option value="Shopee">Shopee</option>
+            <option value="Mercado Livre">Mercado Livre</option>
+            <option value="Loja Própria">Loja Própria</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="label">Competência (Mês)</label>
+          <input type="month" class="input" id="doc-competencia"/>
+        </div>
+        <div class="input-group">
+          <label class="label">Valor (R$)</label>
+          <input type="number" class="input" id="doc-valor" step="0.01" min="0" placeholder="0,00"/>
+        </div>
+        <div class="input-group span-2">
+          <label class="label">Descrição / Nome</label>
+          <input type="text" class="input" id="doc-descricao" placeholder="Ex: NF-e venda Shopee abril 2025"/>
+        </div>
+        <div class="input-group span-2">
+          <label class="label">Link do Arquivo (URL ou Drive)</label>
+          <input type="text" class="input" id="doc-url" placeholder="https://drive.google.com/... ou nome do arquivo"/>
+        </div>
+        <div class="input-group span-2">
+          <label class="label">Número do Documento / Pedido</label>
+          <input type="text" class="input" id="doc-numero" placeholder="Ex: 12345678"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-upload-doc')">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="salvarDocumentoFiscal()">Salvar Documento</button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal Produto -->
 <div class="modal-overlay hidden" id="modal-produto">
@@ -2649,12 +3428,21 @@ const pagesMeta2 = {
   logs:             { title:'Logs do Sistema',      sub:'Auditoria e histórico de ações' },
   shopee:           { title:'Shopee Sync',          sub:'Sincronização com Shopee Open Platform' },
   'shopee-config':  { title:'Configuração Shopee',  sub:'OAuth e parâmetros de integração' },
+  'contador':       { title:'Contador Digital / Fiscal Inteligente', sub:'Diagnóstico tributário · Apuração automática · DAS · Alertas fiscais' },
 };
 
 function navigate(page) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  // Remove active from all pages and reset display
+  document.querySelectorAll('.page').forEach(p=>{
+    p.classList.remove('active');
+    p.style.display = '';
+  });
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+page)?.classList.add('active');
+  const targetPage = document.getElementById('page-'+page);
+  if (targetPage) {
+    targetPage.style.display = 'flex';
+    targetPage.classList.add('active');
+  }
   document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
   const meta = pagesMeta[page] || pagesMeta2[page] || {};
   document.getElementById('topbar-title').textContent = meta.title || page;
@@ -2689,6 +3477,7 @@ function navigate(page) {
     renderSyncLogs();
   }
   if (page==='shopee-config') renderShopeeConfig();
+  if (page==='contador') loadContadorFiscal();
 }
 
 // ══════════════════════════════════════════════════
@@ -3927,6 +4716,17 @@ const CRM_TABLES = {
   LogsSistema:            [{ name:'acao',type:'STRING'},{name:'entidade',type:'STRING'},{name:'detalhes',type:'STRING'},{name:'usuario',type:'STRING'},{name:'data',type:'DATETIME'}],
   ShopeePedidos:          [{ name:'orderId',type:'STRING'},{name:'status',type:'STRING'},{name:'total',type:'DOUBLE'},{name:'buyerName',type:'STRING'},{name:'items',type:'STRING'},{name:'createdAt',type:'DATETIME'},{name:'syncedAt',type:'DATETIME'}],
   ShopeeConfig:           [{ name:'shopId',type:'STRING'},{name:'accessToken',type:'STRING'},{name:'refreshToken',type:'STRING'},{name:'expiresAt',type:'INT'},{name:'refreshExpiresAt',type:'INT'}],
+  // ── Tabelas Fiscais ──
+  EmpresaFiscal:          [{ name:'razaoSocial',type:'STRING'},{name:'cnpj',type:'STRING'},{name:'regime',type:'STRING'},{name:'cnae',type:'STRING'},{name:'aliquota',type:'DOUBLE'},{name:'estado',type:'STRING'},{name:'cidade',type:'STRING'},{name:'inscricaoEstadual',type:'STRING'},{name:'inscricaoMunicipal',type:'STRING'},{name:'limiteAnual',type:'DOUBLE'}],
+  DASGuias:               [{ name:'competencia',type:'STRING'},{name:'valor',type:'DOUBLE'},{name:'vencimento',type:'STRING'},{name:'status',type:'STRING'},{name:'obs',type:'STRING'},{name:'comprovante',type:'STRING'},{name:'pagoEm',type:'DATETIME'}],
+  MarketplaceTaxas:       [{ name:'marketplace',type:'STRING'},{name:'categoria',type:'STRING'},{name:'comissao',type:'DOUBLE'},{name:'frete',type:'DOUBLE'},{name:'obs',type:'STRING'}],
+  ICMSAliquotas:          [{ name:'estado',type:'STRING'},{name:'aliquota',type:'DOUBLE'},{name:'obs',type:'STRING'}],
+  DocumentosFiscais:      [{ name:'tipo',type:'STRING'},{name:'marketplace',type:'STRING'},{name:'competencia',type:'STRING'},{name:'valor',type:'DOUBLE'},{name:'descricao',type:'STRING'},{name:'url',type:'STRING'},{name:'numero',type:'STRING'},{name:'dataUpload',type:'DATETIME'}],
+  FechamentoMensal:       [{ name:'competencia',type:'STRING'},{name:'faturamentoBruto',type:'DOUBLE'},{name:'faturamentoLiquido',type:'DOUBLE'},{name:'despesas',type:'DOUBLE'},{name:'taxasMarketplace',type:'DOUBLE'},{name:'impostosEstimados',type:'DOUBLE'},{name:'lucroLiquido',type:'DOUBLE'},{name:'travado',type:'BOOLEAN'},{name:'regime',type:'STRING'},{name:'fechadoEm',type:'DATETIME'}],
+  AlertasFiscais:         [{ name:'tipo',type:'STRING'},{name:'titulo',type:'STRING'},{name:'descricao',type:'STRING'},{name:'resolvido',type:'BOOLEAN'},{name:'criadoEm',type:'DATETIME'}],
+  ObsFiscais:             [{ name:'texto',type:'STRING'},{name:'autor',type:'STRING'},{name:'criadoEm',type:'DATETIME'}],
+  AcessoContador:         [{ name:'nome',type:'STRING'},{name:'email',type:'STRING'},{name:'crc',type:'STRING'},{name:'nivel',type:'STRING'},{name:'atualizadoEm',type:'DATETIME'}],
+  ApuracaoMensal:         [{ name:'competencia',type:'STRING'},{name:'faturamentoBruto',type:'DOUBLE'},{name:'totalTaxas',type:'DOUBLE'},{name:'totalCusto',type:'DOUBLE'},{name:'totalImpostos',type:'DOUBLE'},{name:'lucroLiquido',type:'DOUBLE'},{name:'regime',type:'STRING'},{name:'aliquota',type:'DOUBLE'},{name:'geradoEm',type:'DATETIME'}],
 };
 
 async function ensureTable(tableName) {
@@ -5266,6 +6066,16 @@ async function checkAllTables() {
     { name: 'ShopeeProdutos',       desc: 'Produtos sincronizados Shopee',  icon: '🟠', required: false },
     { name: 'ShopeeConfig',         desc: 'Tokens OAuth Shopee',            icon: '🔐', required: false },
     { name: 'ShopeeSyncLogs',       desc: 'Logs de sincronização Shopee',   icon: '🟠', required: false },
+    // Tabelas Fiscais
+    { name: 'EmpresaFiscal',        desc: 'Dados da empresa e regime',       icon: '🏢', required: false },
+    { name: 'DASGuias',             desc: 'Guias DAS / Simples Nacional',    icon: '📋', required: false },
+    { name: 'MarketplaceTaxas',     desc: 'Taxas e comissões marketplace',   icon: '🏪', required: false },
+    { name: 'ICMSAliquotas',        desc: 'Alíquotas ICMS por estado',       icon: '🗺️', required: false },
+    { name: 'DocumentosFiscais',    desc: 'NF, boletos, comprovantes',       icon: '📂', required: false },
+    { name: 'FechamentoMensal',     desc: 'Fechamentos mensais travados',    icon: '📅', required: false },
+    { name: 'ObsFiscais',           desc: 'Observações do contador',         icon: '📝', required: false },
+    { name: 'AcessoContador',       desc: 'Acesso do contador externo',      icon: '👨‍💼', required: false },
+    { name: 'ApuracaoMensal',       desc: 'Apurações mensais salvas',        icon: '💰', required: false },
   ];
 
   const btn = document.getElementById('btn-check-all-tables');
@@ -5384,6 +6194,1024 @@ function renderShopeeConfig() {
 document.addEventListener('DOMContentLoaded', () => {
   // configs carregadas via loadUserConfigs() após login/checkSession
 });
+
+// ══════════════════════════════════════════════════════════════
+//  MÓDULO: CONTADOR DIGITAL / FISCAL INTELIGENTE
+// ══════════════════════════════════════════════════════════════
+
+// ── Estado global fiscal ──
+let fiscalEmpresa = null;
+let allDAS = [];
+let allMPTaxas = [];
+let allICMS = [];
+let allDocumentosFiscais = [];
+let allFechamentos = [];
+let allAlertasFiscais = [];
+let allObsFiscais = [];
+let fiscalLoaded = false;
+
+// ── Constantes ──
+const MEI_LIMITE = 81000;
+const SIMPLES_LIMITE = 4800000;
+const FISCAL_TABLES = [
+  'EmpresaFiscal','DASGuias','MarketplaceTaxas','ICMSAliquotas',
+  'DocumentosFiscais','FechamentoMensal','AlertasFiscais','ObsFiscais','AcessoContador'
+];
+
+// ── Formatar número monetário (reutiliza do CRM) ──
+function fmtMoney(v) { return 'R$ ' + (parseFloat(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtPct(v) { return (parseFloat(v)||0).toFixed(2).replace('.',',') + '%'; }
+
+// ── Switch entre abas fiscais ──
+function switchFiscalTab(tab) {
+  document.querySelectorAll('.fiscal-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.fiscal-tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('ftab-'+tab)?.classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── Carregar módulo fiscal ──
+async function loadContadorFiscal() {
+  if (!fiscalLoaded) {
+    await Promise.all([
+      loadEmpresaFiscal(),
+      loadDASList(),
+      loadMPTaxas(),
+      loadICMSList(),
+      loadDocumentosFiscais(),
+      loadFechamentos(),
+      loadObsFiscais(),
+    ]);
+    fiscalLoaded = true;
+  }
+  // Definir mês padrão
+  const now = new Date();
+  const mesRef = document.getElementById('fiscal-mes-ref');
+  if (mesRef && !mesRef.value) {
+    mesRef.value = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  }
+  updateFiscalDashboard();
+  gerarAlertasFiscais();
+  renderDASList();
+  renderMPTaxas();
+  renderICMSList();
+  renderDocumentos();
+  renderFechamentos();
+  renderObsFiscais();
+  calcApuracaoMensal();
+}
+
+// ── Carregar empresa fiscal do Backendless ──
+async function loadEmpresaFiscal() {
+  try {
+    const data = await blGet('EmpresaFiscal','','',1);
+    fiscalEmpresa = data[0] || null;
+    updateRegimeBadge();
+    preencherFormEmpresa();
+  } catch(e) { console.log('EmpresaFiscal não encontrada, usando padrão'); }
+}
+
+function updateRegimeBadge() {
+  const badge = document.getElementById('fiscal-regime-badge');
+  if (!badge) return;
+  const regime = fiscalEmpresa?.regime || 'MEI';
+  const classMap = {
+    'MEI':'regime-mei', 'Simples Nacional':'regime-simples',
+    'Lucro Presumido':'regime-presumido', 'Lucro Real':'regime-real'
+  };
+  badge.className = 'fiscal-regime-badge ' + (classMap[regime]||'regime-mei');
+  badge.textContent = regime;
+}
+
+function preencherFormEmpresa() {
+  if (!fiscalEmpresa) return;
+  const fields = {
+    'cfg-razao-social': fiscalEmpresa.razaoSocial,
+    'cfg-cnpj': fiscalEmpresa.cnpj,
+    'cfg-regime': fiscalEmpresa.regime,
+    'cfg-cnae': fiscalEmpresa.cnae,
+    'cfg-aliquota': fiscalEmpresa.aliquota,
+    'cfg-estado': fiscalEmpresa.estado,
+    'cfg-cidade': fiscalEmpresa.cidade,
+    'cfg-ie': fiscalEmpresa.inscricaoEstadual,
+    'cfg-im': fiscalEmpresa.inscricaoMunicipal,
+    'cfg-limite': fiscalEmpresa.limiteAnual || MEI_LIMITE,
+  };
+  for (const [id, val] of Object.entries(fields)) {
+    const el = document.getElementById(id);
+    if (el && val != null) el.value = val;
+  }
+}
+
+function openFiscalConfig() {
+  preencherFormEmpresa();
+  openModal('modal-fiscal-config');
+}
+
+async function salvarEmpresaFiscal() {
+  const regime = document.getElementById('cfg-regime')?.value;
+  const obj = {
+    razaoSocial: document.getElementById('cfg-razao-social')?.value,
+    cnpj: document.getElementById('cfg-cnpj')?.value,
+    regime,
+    cnae: document.getElementById('cfg-cnae')?.value,
+    aliquota: parseFloat(document.getElementById('cfg-aliquota')?.value)||0,
+    estado: document.getElementById('cfg-estado')?.value,
+    cidade: document.getElementById('cfg-cidade')?.value,
+    inscricaoEstadual: document.getElementById('cfg-ie')?.value,
+    inscricaoMunicipal: document.getElementById('cfg-im')?.value,
+    limiteAnual: parseFloat(document.getElementById('cfg-limite')?.value)||MEI_LIMITE,
+  };
+  try {
+    if (fiscalEmpresa?.objectId) {
+      await blUpdate('EmpresaFiscal', fiscalEmpresa.objectId, obj);
+    } else {
+      fiscalEmpresa = await blCreate('EmpresaFiscal', obj);
+    }
+    Object.assign(fiscalEmpresa||{}, obj);
+    if (!fiscalEmpresa) fiscalEmpresa = obj;
+    else Object.assign(fiscalEmpresa, obj);
+    closeModal('modal-fiscal-config');
+    toast('Empresa fiscal salva com sucesso!', 'success');
+    updateRegimeBadge();
+    updateFiscalDashboard();
+    gerarAlertasFiscais();
+    await logAction('UPDATE', 'EmpresaFiscal', `Regime: ${regime}`).catch(()=>{});
+  } catch(e) { toast('Erro ao salvar: '+e.message,'error'); }
+}
+
+function updateRegimeUI() {
+  const regime = document.getElementById('cfg-regime')?.value;
+  const limiteRow = document.getElementById('cfg-limite-row');
+  const limiteInput = document.getElementById('cfg-limite');
+  if (regime === 'MEI') { if(limiteInput) limiteInput.value = 81000; }
+  else if (regime === 'Simples Nacional') { if(limiteInput) limiteInput.value = 4800000; }
+  else { if(limiteInput) limiteInput.value = ''; }
+}
+
+// ── Dashboard Fiscal ──
+function updateFiscalDashboard() {
+  const now = new Date();
+  const mesStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+  const mesEnd = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-31`;
+  const vendaMes = allVendas.filter(v=> v.dataVenda >= mesStart && v.dataVenda <= mesEnd && v.statusPedido!=='Cancelado' && v.statusPedido!=='Devolvido');
+
+  const fatBruto = vendaMes.reduce((s,v)=>s+(v.valorVenda||0)*(v.quantidade||1),0);
+  const aliquota = (fiscalEmpresa?.aliquota||0)/100;
+  const imposto = fatBruto * aliquota;
+  const taxasMP = vendaMes.reduce((s,v)=>{
+    const mp = allMPTaxas.find(t=>t.marketplace===v.marketplace) || null;
+    const taxa = mp ? ((v.valorVenda||0)*(v.quantidade||1)*(mp.comissao||0)/100) + (mp.frete||0) : 0;
+    return s + taxa;
+  }, 0);
+  const custoTotal = vendaMes.reduce((s,v)=>s+(v.custo||0)*(v.quantidade||1),0);
+  const lucroLiq = fatBruto - imposto - taxasMP - custoTotal;
+  const margem = fatBruto > 0 ? (lucroLiq/fatBruto)*100 : 0;
+
+  // Calcular DAS previsto (mês atual)
+  const dasRef = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const dasMes = allDAS.find(d=>d.competencia===dasRef) || null;
+  const dasPrevisto = dasMes?.valor || imposto;
+
+  setText('fc-faturamento', fmtMoney(fatBruto));
+  setText('fc-fat-meta', `${vendaMes.length} vendas no mês`);
+  setText('fc-imposto', fmtMoney(imposto));
+  setText('fc-aliquota', `Alíquota efetiva: ${fmtPct(fiscalEmpresa?.aliquota||0)}`);
+  setText('fc-das', fmtMoney(dasPrevisto));
+  setText('fc-das-venc', dasMes ? `Venc: ${dasMes.vencimento||'dia 20'} · ${dasMes.status||'Pendente'}` : 'Vencimento: dia 20 do mês seguinte');
+  setText('fc-lucro', fmtMoney(lucroLiq));
+  setText('fc-margem', `Margem líquida: ${margem.toFixed(1)}%`);
+  setText('fc-taxas', fmtMoney(taxasMP));
+  const docsPend = allDocumentosFiscais.filter(d=>!d.url && d.tipo==='DAS').length;
+  setText('fc-docs-pendentes', docsPend);
+
+  // Barra MEI
+  updateMEIProgress(fatBruto, now.getFullYear());
+}
+
+function updateMEIProgress(fatMes, ano) {
+  // Calcular acumulado anual
+  const anoStart = `${ano}-01-01`;
+  const anoEnd = `${ano}-12-31`;
+  const vendaAno = allVendas.filter(v=> v.dataVenda >= anoStart && v.dataVenda <= anoEnd && v.statusPedido!=='Cancelado' && v.statusPedido!=='Devolvido');
+  const fatAnual = vendaAno.reduce((s,v)=>s+(v.valorVenda||0)*(v.quantidade||1),0);
+  const limite = fiscalEmpresa?.limiteAnual || MEI_LIMITE;
+  const pct = Math.min((fatAnual/limite)*100, 100);
+
+  const fill = document.getElementById('mei-progress-fill');
+  const pctLabel = document.getElementById('mei-pct-label');
+  const usadoLabel = document.getElementById('mei-usado-label');
+  const alertMsg = document.getElementById('mei-alert-msg');
+  const meiSection = document.getElementById('mei-section');
+
+  // Esconder barra MEI se não for MEI ou Simples
+  if (fiscalEmpresa && fiscalEmpresa.regime !== 'MEI' && fiscalEmpresa.regime !== 'Simples Nacional') {
+    if(meiSection) meiSection.style.display='none';
+    return;
+  }
+  if(meiSection) meiSection.style.display='';
+
+  const regimeName = fiscalEmpresa?.regime || 'MEI';
+  if(document.querySelector('#mei-section .chart-sub')) document.querySelector('#mei-section .chart-sub').textContent = `Limite: ${fmtMoney(limite)} / ano · ${regimeName}`;
+
+  if(fill) {
+    fill.style.width = pct+'%';
+    fill.className = 'mei-progress-fill ' + (pct >= 95 ? 'mei-critical' : pct >= 85 ? 'mei-danger' : pct >= 70 ? 'mei-warn' : 'mei-safe');
+  }
+  if(pctLabel) {
+    pctLabel.textContent = pct.toFixed(1)+'%';
+    pctLabel.style.color = pct >= 95 ? 'var(--red2)' : pct >= 85 ? '#f97316' : pct >= 70 ? 'var(--yellow2)' : 'var(--green2)';
+  }
+  if(usadoLabel) usadoLabel.textContent = `${fmtMoney(fatAnual)} utilizados de ${fmtMoney(limite)}`;
+
+  if(alertMsg) {
+    let msg = '';
+    if (pct >= 100) msg = `<div class="alert-fiscal critical"><span class="alert-fiscal-icon">🚨</span><div><div class="alert-fiscal-title">LIMITE ATINGIDO!</div><div class="alert-fiscal-desc">Você atingiu 100% do limite ${regimeName}. Consulte imediatamente seu contador para desenquadramento.</div></div></div>`;
+    else if (pct >= 95) msg = `<div class="alert-fiscal critical"><span class="alert-fiscal-icon">🔴</span><div><div class="alert-fiscal-title">Risco de desenquadramento!</div><div class="alert-fiscal-desc">95% do limite ${regimeName} atingido. Evite novas vendas até regularizar.</div></div></div>`;
+    else if (pct >= 85) msg = `<div class="alert-fiscal warning"><span class="alert-fiscal-icon">🟠</span><div><div class="alert-fiscal-title">Atenção — 85% do limite</div><div class="alert-fiscal-desc">Restam ${fmtMoney(limite - fatAnual)} para o limite anual. Procure seu contador.</div></div></div>`;
+    else if (pct >= 70) msg = `<div class="alert-fiscal warning"><span class="alert-fiscal-icon">🟡</span><div><div class="alert-fiscal-title">70% do limite atingido</div><div class="alert-fiscal-desc">Fique atento ao faturamento anual. Restam ${fmtMoney(limite - fatAnual)}.</div></div></div>`;
+    else msg = `<div class="alert-fiscal success"><span class="alert-fiscal-icon">✅</span><div><div class="alert-fiscal-title">Dentro do limite</div><div class="alert-fiscal-desc">Faturamento anual em dia. ${fmtMoney(limite - fatAnual)} disponíveis.</div></div></div>`;
+    alertMsg.innerHTML = msg;
+  }
+}
+
+// ── Gerar alertas automáticos ──
+function gerarAlertasFiscais() {
+  const container = document.getElementById('fiscal-alertas-container');
+  if (!container) return;
+  const alertas = [];
+  const now = new Date();
+  const hoje = now.toISOString().split('T')[0];
+
+  // DAS vencido
+  allDAS.forEach(d => {
+    if (d.status === 'Pendente' && d.vencimento && d.vencimento < hoje) {
+      alertas.push({ tipo:'critical', icon:'🔴', titulo:`DAS Vencido — ${d.competencia}`, desc:`Guia DAS de ${fmtMoney(d.valor||0)} vencida em ${d.vencimento}. Regularize urgente!` });
+    }
+    // Vencendo em 5 dias
+    const venc = new Date(d.vencimento);
+    const diff = (venc - now) / (1000*60*60*24);
+    if (d.status==='Pendente' && diff >= 0 && diff <= 5) {
+      alertas.push({ tipo:'warning', icon:'🟡', titulo:`DAS vence em ${Math.ceil(diff)} dia(s)`, desc:`Guia ${d.competencia} de ${fmtMoney(d.valor||0)} vence em ${d.vencimento}.` });
+    }
+  });
+
+  // Produto com margem negativa
+  const vendasMes = allVendas.filter(v=>{
+    const m = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    return v.dataVenda?.startsWith(m) && v.statusPedido!=='Cancelado';
+  });
+  const negativas = vendasMes.filter(v=>(v.lucro||0) < 0);
+  if (negativas.length > 0) {
+    alertas.push({ tipo:'warning', icon:'📉', titulo:`${negativas.length} venda(s) com margem negativa`, desc:`Revise os custos e preços desses produtos.` });
+  }
+
+  // Faturamento alto para regime
+  const fatMes = vendasMes.reduce((s,v)=>s+(v.valorVenda||0)*(v.quantidade||1),0);
+  if (fiscalEmpresa?.regime==='MEI' && fatMes > 6750) {
+    alertas.push({ tipo:'warning', icon:'⚡', titulo:'Faturamento mensal alto para MEI', desc:`R$ ${fmtMoney(fatMes)}/mês ultrapassa a média MEI (R$6.750). Analise seu enquadramento.` });
+  }
+
+  // Badge no nav
+  const badge = document.getElementById('badge-fiscal');
+  if (badge) {
+    badge.textContent = alertas.length;
+    badge.classList.toggle('hidden', alertas.length === 0);
+  }
+
+  if (alertas.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  container.innerHTML = alertas.map(a=>
+    `<div class="alert-fiscal ${a.tipo}">
+      <span class="alert-fiscal-icon">${a.icon}</span>
+      <div style="flex:1"><div class="alert-fiscal-title">${a.titulo}</div><div class="alert-fiscal-desc">${a.desc}</div></div>
+      <button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:1rem;padding:0 4px;line-height:1">×</button>
+    </div>`
+  ).join('');
+}
+
+// ── Apuração Mensal ──
+function calcApuracaoMensal() {
+  const mesRef = document.getElementById('fiscal-mes-ref')?.value;
+  const mpFilter = document.getElementById('fiscal-mp-filter')?.value || '';
+  if (!mesRef) return;
+
+  const [ano, mes] = mesRef.split('-');
+  const mesStart = `${ano}-${mes}-01`;
+  const mesEnd   = `${ano}-${mes}-31`;
+
+  let vendas = allVendas.filter(v=>
+    v.dataVenda >= mesStart && v.dataVenda <= mesEnd &&
+    v.statusPedido !== 'Cancelado' && v.statusPedido !== 'Devolvido'
+  );
+  if (mpFilter) vendas = vendas.filter(v=>v.marketplace===mpFilter);
+
+  const aliquota = (fiscalEmpresa?.aliquota||0)/100;
+
+  let fatBruto=0, totalTaxas=0, totalCusto=0, totalImposto=0;
+
+  const rows = vendas.map(v => {
+    const valorBruto = (v.valorVenda||0)*(v.quantidade||1);
+    const mp = allMPTaxas.find(t=>t.marketplace===v.marketplace)||null;
+    const taxaMP = mp ? (valorBruto*(mp.comissao||0)/100)+((mp.frete||0)*(v.quantidade||1)) : (v.taxaMarketplace||0);
+    const custo = (v.custo||0)*(v.quantidade||1);
+    const imposto = valorBruto * aliquota;
+    const lucroLiq = valorBruto - taxaMP - custo - imposto;
+    fatBruto += valorBruto;
+    totalTaxas += taxaMP;
+    totalCusto += custo;
+    totalImposto += imposto;
+    return { v, valorBruto, taxaMP, custo, imposto, lucroLiq };
+  });
+
+  const lucroBruto = fatBruto - totalCusto;
+  const lucroAntesImp = lucroBruto - totalTaxas;
+  const lucroLiq = fatBruto - totalTaxas - totalCusto - totalImposto;
+
+  // DRE
+  const dreEl = document.getElementById('fiscal-dre');
+  if (dreEl) {
+    dreEl.innerHTML = `
+      <div class="tax-line"><span>Faturamento Bruto</span><span class="tax-positive">${fmtMoney(fatBruto)}</span></div>
+      <div class="tax-line"><span style="color:var(--text2)">(-) Custo dos Produtos</span><span class="tax-negative">-${fmtMoney(totalCusto)}</span></div>
+      <div class="tax-line"><span class="font-semibold">= Lucro Bruto</span><span class="tax-positive font-semibold">${fmtMoney(lucroBruto)}</span></div>
+      <div class="tax-line"><span style="color:var(--text2)">(-) Taxas Marketplace</span><span class="tax-negative">-${fmtMoney(totalTaxas)}</span></div>
+      <div class="tax-line"><span class="font-semibold">= Lucro Antes dos Impostos</span><span class="tax-positive font-semibold">${fmtMoney(lucroAntesImp)}</span></div>
+      <div class="tax-line"><span style="color:var(--text2)">(-) Impostos Estimados (${fmtPct(fiscalEmpresa?.aliquota||0)})</span><span class="tax-negative">-${fmtMoney(totalImposto)}</span></div>
+      <div class="tax-line" style="border-top:2px solid var(--border2);margin-top:4px;padding-top:10px"><span class="font-semibold" style="color:var(--text)">= LUCRO LÍQUIDO</span><span class="${lucroLiq>=0?'tax-positive':'tax-negative'} font-semibold" style="font-size:1rem">${fmtMoney(lucroLiq)}</span></div>
+    `;
+  }
+
+  // Por marketplace
+  const mpBreakEl = document.getElementById('fiscal-mp-breakdown');
+  if (mpBreakEl) {
+    const mpMap = {};
+    rows.forEach(({v, valorBruto, taxaMP, imposto, lucroLiq}) => {
+      const k = v.marketplace||'Manual';
+      if (!mpMap[k]) mpMap[k] = {fat:0, taxa:0, imp:0, lucro:0, qtd:0};
+      mpMap[k].fat += valorBruto;
+      mpMap[k].taxa += taxaMP;
+      mpMap[k].imp += imposto;
+      mpMap[k].lucro += lucroLiq;
+      mpMap[k].qtd++;
+    });
+    if (Object.keys(mpMap).length === 0) {
+      mpBreakEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text3);font-size:0.84rem">Sem vendas no período</div>';
+    } else {
+      mpBreakEl.innerHTML = Object.entries(mpMap).map(([mp,d])=>`
+        <div style="padding:12px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-weight:700;font-size:0.88rem">${mp}</span>
+            <span style="font-size:0.72rem;color:var(--text3)">${d.qtd} venda(s)</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.78rem">
+            <div><span style="color:var(--text3)">Faturamento:</span> <span style="color:var(--green2);font-weight:600">${fmtMoney(d.fat)}</span></div>
+            <div><span style="color:var(--text3)">Taxa MP:</span> <span style="color:var(--red2);font-weight:600">-${fmtMoney(d.taxa)}</span></div>
+            <div><span style="color:var(--text3)">Imposto:</span> <span style="color:var(--yellow2);font-weight:600">-${fmtMoney(d.imp)}</span></div>
+            <div><span style="color:var(--text3)">Lucro Liq.:</span> <span style="color:${d.lucro>=0?'var(--green2)':'var(--red2)'};font-weight:700">${fmtMoney(d.lucro)}</span></div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  // Tabela de vendas
+  const tbody = document.getElementById('fiscal-vendas-tbody');
+  if (tbody) {
+    if (rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:30px">Sem vendas no período selecionado</td></tr>';
+    } else {
+      tbody.innerHTML = rows.map(({v, valorBruto, taxaMP, custo, imposto, lucroLiq})=>`
+        <tr>
+          <td style="font-size:0.78rem;color:var(--text3)">${v.dataVenda||'--'}</td>
+          <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.produto||v.sku||'--'}</td>
+          <td><span class="badge ${v.marketplace==='Shopee'?'badge-shopee':v.marketplace==='Mercado Livre'?'badge-ml':'badge-blue'}">${v.marketplace||'--'}</span></td>
+          <td style="color:var(--green2);font-weight:600">${fmtMoney(valorBruto)}</td>
+          <td style="color:var(--red2)">-${fmtMoney(taxaMP)}</td>
+          <td style="color:var(--text2)">-${fmtMoney(custo)}</td>
+          <td style="color:var(--yellow2)">-${fmtMoney(imposto)}</td>
+          <td style="font-weight:700;color:${lucroLiq>=0?'var(--green2)':'var(--red2)'}">${fmtMoney(lucroLiq)}</td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  return { fatBruto, totalTaxas, totalCusto, totalImposto, lucroLiq };
+}
+
+async function salvarApuracao() {
+  const res = calcApuracaoMensal();
+  if (!res) { toast('Calcule a apuração primeiro','warning'); return; }
+  const mesRef = document.getElementById('fiscal-mes-ref')?.value;
+  const obj = {
+    competencia: mesRef,
+    faturamentoBruto: res.fatBruto,
+    totalTaxas: res.totalTaxas,
+    totalCusto: res.totalCusto,
+    totalImpostos: res.totalImposto,
+    lucroLiquido: res.lucroLiq,
+    regime: fiscalEmpresa?.regime||'MEI',
+    aliquota: fiscalEmpresa?.aliquota||0,
+    geradoEm: new Date().toISOString(),
+  };
+  try {
+    await blCreate('ApuracaoMensal', obj);
+    toast(`Apuração ${mesRef} salva no Backendless!`, 'success');
+    await logAction('CREATE','ApuracaoMensal',`Competência ${mesRef}`).catch(()=>{});
+  } catch(e) { toast('Erro: '+e.message,'error'); }
+}
+
+function exportarApuracaoCSV() {
+  const mesRef = document.getElementById('fiscal-mes-ref')?.value || 'apuracao';
+  const rows = [['Data','Produto','Marketplace','Vl.Bruto','Taxa MP','Custo','Imposto','Lucro Liquido']];
+  const [ano,mes] = (mesRef||'').split('-');
+  const mesStart = `${ano}-${mes}-01`, mesEnd = `${ano}-${mes}-31`;
+  const vendas = allVendas.filter(v=>v.dataVenda>=mesStart&&v.dataVenda<=mesEnd&&v.statusPedido!=='Cancelado');
+  const aliq = (fiscalEmpresa?.aliquota||0)/100;
+  vendas.forEach(v=>{
+    const vb = (v.valorVenda||0)*(v.quantidade||1);
+    const mp = allMPTaxas.find(t=>t.marketplace===v.marketplace)||null;
+    const taxa = mp ? (vb*(mp.comissao||0)/100)+((mp.frete||0)*(v.quantidade||1)) : (v.taxaMarketplace||0);
+    const custo = (v.custo||0)*(v.quantidade||1);
+    const imp = vb*aliq;
+    const lucro = vb-taxa-custo-imp;
+    rows.push([v.dataVenda,v.produto||v.sku,v.marketplace,vb.toFixed(2),taxa.toFixed(2),custo.toFixed(2),imp.toFixed(2),lucro.toFixed(2)]);
+  });
+  const csv = rows.map(r=>r.join(';')).join('\n');
+  const blob = new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `apuracao_${mesRef}.csv`;
+  a.click();
+  toast('CSV exportado!','success');
+}
+
+// ── DAS ──
+async function loadDASList() {
+  try { allDAS = await blGet('DASGuias','','',100); } catch(e) { allDAS = []; }
+}
+
+function renderDASList() {
+  const el = document.getElementById('das-list');
+  if (!el) return;
+  if (!allDAS.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);font-size:0.84rem">Nenhuma guia DAS cadastrada.</div>';
+    return;
+  }
+  const sorted = [...allDAS].sort((a,b)=>(b.competencia||'').localeCompare(a.competencia||''));
+  el.innerHTML = sorted.map(d=>{
+    const statusCls = d.status==='Pago'?'das-pago':d.status==='Vencido'?'das-vencido':'das-pendente';
+    const badgeCls = d.status==='Pago'?'badge-green':d.status==='Vencido'?'badge-red':'badge-yellow';
+    return `
+      <div class="das-card">
+        <div class="das-status-dot ${statusCls}"></div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font-family:var(--font-display);font-weight:700;font-size:0.9rem">DAS ${d.competencia||'--'}</span>
+            <span class="badge ${badgeCls}">${d.status||'Pendente'}</span>
+            ${d.comprovante?'<span class="badge badge-blue" title="Comprovante anexado">📎 Comprovante</span>':''}
+          </div>
+          <div style="font-size:0.78rem;color:var(--text2);margin-top:3px">Vencimento: ${d.vencimento||'--'} · ${d.obs||''}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;color:${d.status==='Pago'?'var(--green2)':d.status==='Vencido'?'var(--red2)':'var(--yellow2)'}">${fmtMoney(d.valor||0)}</div>
+          <div style="display:flex;gap:6px;margin-top:6px;justify-content:flex-end">
+            ${d.status!=='Pago'?`<button class="btn btn-success btn-sm" onclick="marcarDASpago('${d.objectId}')">✅ Marcar Pago</button>`:''}
+            <button class="btn btn-danger btn-sm" onclick="deletarDAS('${d.objectId}')">🗑</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function gerarNovoDAS() {
+  const now = new Date();
+  // auto-preencher competência e vencimento
+  const comp = document.getElementById('das-competencia');
+  if (comp) comp.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const venc = document.getElementById('das-vencimento');
+  // Vencimento = dia 20 do mês seguinte
+  const nextMonth = new Date(now.getFullYear(), now.getMonth()+1, 20);
+  if (venc) venc.value = nextMonth.toISOString().split('T')[0];
+  // Pré-calcular valor
+  const res = calcApuracaoMensal();
+  const dasVal = document.getElementById('das-valor');
+  if (dasVal && res) dasVal.value = res.totalImposto.toFixed(2);
+  openModal('modal-das');
+}
+
+async function salvarDAS() {
+  const obj = {
+    competencia: document.getElementById('das-competencia')?.value,
+    valor: parseFloat(document.getElementById('das-valor')?.value)||0,
+    vencimento: document.getElementById('das-vencimento')?.value,
+    status: document.getElementById('das-status')?.value||'Pendente',
+    obs: document.getElementById('das-obs')?.value||'',
+    comprovante: document.getElementById('das-comprovante')?.value||'',
+  };
+  if (!obj.competencia || !obj.valor) { toast('Preencha competência e valor','warning'); return; }
+  try {
+    const saved = await blCreate('DASGuias', obj);
+    allDAS.push(saved||obj);
+    renderDASList();
+    closeModal('modal-das');
+    toast('DAS salvo!','success');
+    gerarAlertasFiscais();
+    await logAction('CREATE','DASGuias',`Competência ${obj.competencia}`).catch(()=>{});
+  } catch(e) { toast('Erro: '+e.message,'error'); }
+}
+
+async function marcarDASpago(id) {
+  try {
+    await blUpdate('DASGuias', id, { status:'Pago', pagoEm: new Date().toISOString() });
+    const i = allDAS.findIndex(d=>d.objectId===id);
+    if (i>=0) allDAS[i].status = 'Pago';
+    renderDASList();
+    toast('DAS marcado como pago!','success');
+    gerarAlertasFiscais();
+  } catch(e) { toast('Erro: '+e.message,'error'); }
+}
+
+async function deletarDAS(id) {
+  confirm2('Excluir guia DAS?','Esta ação não pode ser desfeita.',async()=>{
+    try {
+      await blDelete('DASGuias',id);
+      allDAS = allDAS.filter(d=>d.objectId!==id);
+      renderDASList();
+      toast('DAS excluído.','info');
+    } catch(e) { toast('Erro: '+e.message,'error'); }
+  });
+}
+
+// ── Taxas Marketplace ──
+async function loadMPTaxas() {
+  try { allMPTaxas = await blGet('MarketplaceTaxas','','',100); } catch(e) { allMPTaxas = []; }
+}
+
+function renderMPTaxas() {
+  const el = document.getElementById('mp-taxas-list');
+  if (!el) return;
+  if (!allMPTaxas.length) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text3);font-size:0.84rem">Nenhuma taxa configurada. Adicione as comissões do seu marketplace.</div>';
+    return;
+  }
+  el.innerHTML = allMPTaxas.map(t=>`
+    <div class="marketplace-tax-row">
+      <span class="badge ${t.marketplace==='Shopee'?'badge-shopee':t.marketplace==='Mercado Livre'?'badge-ml':'badge-blue'}">${t.marketplace}</span>
+      <span style="font-size:0.83rem;color:var(--text2)">${t.categoria||'Geral'}</span>
+      <span style="font-weight:700;color:var(--yellow2)">${(t.comissao||0).toFixed(2)}%</span>
+      <span style="color:var(--text2)">${fmtMoney(t.frete||0)}</span>
+      <button class="btn btn-danger btn-sm" onclick="deletarTaxaMP('${t.objectId}')">🗑</button>
+    </div>
+  `).join('');
+}
+
+function openModalTaxaMP() { openModal('modal-taxa-mp'); }
+
+async function salvarTaxaMP() {
+  const obj = {
+    marketplace: document.getElementById('taxa-mp-nome')?.value,
+    categoria: document.getElementById('taxa-mp-categoria')?.value||'Geral',
+    comissao: parseFloat(document.getElementById('taxa-mp-comissao')?.value)||0,
+    frete: parseFloat(document.getElementById('taxa-mp-frete')?.value)||0,
+    obs: document.getElementById('taxa-mp-obs')?.value||'',
+  };
+  try {
+    const saved = await blCreate('MarketplaceTaxas', obj);
+    allMPTaxas.push(saved||obj);
+    renderMPTaxas();
+    closeModal('modal-taxa-mp');
+    toast('Taxa de marketplace salva!','success');
+  } catch(e) { toast('Erro: '+e.message,'error'); }
+}
+
+async function deletarTaxaMP(id) {
+  confirm2('Excluir taxa?','', async()=>{
+    try {
+      await blDelete('MarketplaceTaxas',id);
+      allMPTaxas = allMPTaxas.filter(t=>t.objectId!==id);
+      renderMPTaxas();
+    } catch(e) { toast('Erro: '+e.message,'error'); }
+  });
+}
+
+// ── ICMS ──
+async function loadICMSList() {
+  try { allICMS = await blGet('ICMSAliquotas','','',100); } catch(e) { allICMS = []; }
+}
+
+function renderICMSList() {
+  const el = document.getElementById('icms-list');
+  if (!el) return;
+  if (!allICMS.length) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text3);font-size:0.84rem">Nenhuma alíquota estadual configurada.</div>';
+    return;
+  }
+  el.innerHTML = allICMS.map(i=>`
+    <div class="aliquota-row">
+      <span style="font-family:var(--font-display);font-weight:800;font-size:1rem;min-width:36px;color:var(--fiscal2)">${i.estado}</span>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:0.84rem">ICMS Interestadual: <span style="color:var(--yellow2)">${(i.aliquota||0).toFixed(2)}%</span></div>
+        ${i.obs?`<div style="font-size:0.76rem;color:var(--text3)">${i.obs}</div>`:''}
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="deletarICMS('${i.objectId}')">🗑</button>
+    </div>
+  `).join('');
+}
+
+function openModalICMS() { openModal('modal-icms'); }
+
+async function salvarICMS() {
+  const obj = {
+    estado: document.getElementById('icms-estado')?.value,
+    aliquota: parseFloat(document.getElementById('icms-aliquota')?.value)||0,
+    obs: document.getElementById('icms-obs')?.value||'',
+  };
+  try {
+    const saved = await blCreate('ICMSAliquotas', obj);
+    allICMS.push(saved||obj);
+    renderICMSList();
+    closeModal('modal-icms');
+    toast('Alíquota ICMS salva!','success');
+  } catch(e) { toast('Erro: '+e.message,'error'); }
+}
+
+async function deletarICMS(id) {
+  confirm2('Excluir alíquota?','',async()=>{
+    try {
+      await blDelete('ICMSAliquotas',id);
+      allICMS = allICMS.filter(i=>i.objectId!==id);
+      renderICMSList();
+    } catch(e) { toast('Erro: '+e.message,'error'); }
+  });
+}
+
+// ── Documentos Fiscais ──
+async function loadDocumentosFiscais() {
+  try { allDocumentosFiscais = await blGet('DocumentosFiscais','','',200); } catch(e) { allDocumentosFiscais = []; }
+}
+
+function renderDocumentos() {
+  const el = document.getElementById('documentos-list');
+  if (!el) return;
+  const search = document.getElementById('doc-search')?.value?.toLowerCase()||'';
+  const tipo = document.getElementById('doc-filter-tipo')?.value||'';
+  const mp = document.getElementById('doc-filter-mp')?.value||'';
+  let docs = allDocumentosFiscais;
+  if (search) docs = docs.filter(d=>(d.descricao||'').toLowerCase().includes(search)||(d.numero||'').includes(search));
+  if (tipo) docs = docs.filter(d=>d.tipo===tipo);
+  if (mp) docs = docs.filter(d=>d.marketplace===mp);
+  if (!docs.length) {
+    el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3);font-size:0.84rem">Nenhum documento encontrado.</div>';
+    return;
+  }
+  const tipoIcons = {NF:'📄',DAS:'📋',Boleto:'💳',Comprovante:'🧾',XML:'💾',Recibo:'📃',Outro:'📂'};
+  el.innerHTML = docs.map(d=>`
+    <div class="doc-upload-item" onclick="${d.url?`window.open('${d.url}','_blank')`:'void(0)'}">
+      <div class="doc-icon" style="background:rgba(14,165,233,0.12)">${tipoIcons[d.tipo]||'📂'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:0.84rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.descricao||'Sem descrição'}</div>
+        <div style="font-size:0.73rem;color:var(--text3);margin-top:2px">${d.tipo} · ${d.marketplace||'Geral'} · ${d.competencia||'--'}</div>
+        ${d.valor?`<div style="font-size:0.78rem;font-weight:700;color:var(--green2);margin-top:2px">${fmtMoney(d.valor)}</div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+        ${d.url?'<span style="font-size:0.7rem;color:var(--fiscal2)">📎 Anexado</span>':'<span style="font-size:0.7rem;color:var(--text3)">Sem arquivo</span>'}
+        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deletarDocumento('${d.objectId}')">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterDocumentos() { renderDocumentos(); }
+function openModalUploadDoc() {
+  const now = new Date();
+  const comp = document.getElementById('doc-competencia');
+  if (comp) comp.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  openModal('modal-upload-doc');
+}
+
+async function salvarDocumentoFiscal() {
+  const obj = {
+    tipo: document.getElementById('doc-tipo')?.value,
+    marketplace: document.getElementById('doc-marketplace')?.value||'Geral',
+    competencia: document.getElementById('doc-competencia')?.value,
+    valor: parseFloat(document.getElementById('doc-valor')?.value)||0,
+    descricao: document.getElementById('doc-descricao')?.value||'',
+    url: document.getElementById('doc-url')?.value||'',
+    numero: document.getElementById('doc-numero')?.value||'',
+    dataUpload: new Date().toISOString(),
+  };
+  try {
+    const saved = await blCreate('DocumentosFiscais', obj);
+    allDocumentosFiscais.unshift(saved||obj);
+    renderDocumentos();
+    updateFiscalDashboard();
+    closeModal('modal-upload-doc');
+    toast('Documento fiscal salvo!','success');
+    await logAction('CREATE','DocumentosFiscais',obj.descricao).catch(()=>{});
+  } catch(e) { toast('Erro: '+e.message,'error'); }
+}
+
+async function deletarDocumento(id) {
+  confirm2('Excluir documento?','',async()=>{
+    try {
+      await blDelete('DocumentosFiscais',id);
+      allDocumentosFiscais = allDocumentosFiscais.filter(d=>d.objectId!==id);
+      renderDocumentos();
+    } catch(e) { toast('Erro: '+e.message,'error'); }
+  });
+}
+
+// ── Fechamento Mensal ──
+async function loadFechamentos() {
+  try { allFechamentos = await blGet('FechamentoMensal','','',50); } catch(e) { allFechamentos = []; }
+}
+
+async function gerarFechamentoMes() {
+  const now = new Date();
+  const mesRef = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  // Verificar se já existe
+  if (allFechamentos.find(f=>f.competencia===mesRef && f.travado)) {
+    toast('Mês já está fechado e travado!','warning'); return;
+  }
+  const res = calcApuracaoMensal();
+  const despTotal = allVendas
+    .filter(v=>v.dataVenda?.startsWith(mesRef.replace('-','-'))&&v.statusPedido!=='Cancelado')
+    .reduce((s,v)=>s+(v.custo||0)*(v.quantidade||1),0);
+
+  const obj = {
+    competencia: mesRef,
+    faturamentoBruto: res?.fatBruto||0,
+    faturamentoLiquido: (res?.fatBruto||0)-(res?.totalTaxas||0),
+    despesas: despTotal,
+    taxasMarketplace: res?.totalTaxas||0,
+    impostosEstimados: res?.totalImposto||0,
+    lucroLiquido: res?.lucroLiq||0,
+    travado: false,
+    regime: fiscalEmpresa?.regime||'MEI',
+    fechadoEm: new Date().toISOString(),
+  };
+  try {
+    const saved = await blCreate('FechamentoMensal', obj);
+    allFechamentos.unshift(saved||obj);
+    renderFechamentos();
+    toast(`Fechamento ${mesRef} gerado com sucesso!`,'success');
+    await logAction('CREATE','FechamentoMensal',`Competência ${mesRef}`).catch(()=>{});
+  } catch(e) { toast('Erro: '+e.message,'error'); }
+}
+
+function renderFechamentos() {
+  const el = document.getElementById('fechamentos-list');
+  if (!el) return;
+  if (!allFechamentos.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);font-size:0.84rem">Nenhum fechamento gerado.</div>';
+    return;
+  }
+  const sorted = [...allFechamentos].sort((a,b)=>(b.competencia||'').localeCompare(a.competencia||''));
+  el.innerHTML = sorted.map(f=>`
+    <div class="card p-4">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-family:var(--font-display);font-size:1rem;font-weight:800">${f.competencia||'--'}</span>
+          <span class="badge ${f.travado?'badge-red':'badge-green'}">${f.travado?'🔒 Travado':'✅ Aberto'}</span>
+          <span class="badge badge-gray">${f.regime||'--'}</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${!f.travado?`<button class="btn btn-secondary btn-sm" onclick="travarFechamento('${f.objectId}')">🔒 Travar</button>`:`<button class="btn btn-secondary btn-sm" onclick="reabrirFechamento('${f.objectId}')">🔓 Reabrir</button>`}
+          <button class="btn btn-secondary btn-sm" onclick="exportFechamentoPDF('${f.objectId}')">📄 PDF</button>
+          <button class="btn btn-secondary btn-sm" onclick="exportFechamentoCSV('${f.objectId}')">📊 CSV</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
+        <div style="padding:10px;border-radius:10px;background:var(--surface);border:1px solid var(--border)">
+          <div style="font-size:0.7rem;color:var(--text3);text-transform:uppercase;font-weight:700">Faturamento Bruto</div>
+          <div style="font-family:var(--font-display);font-weight:800;color:var(--green2);font-size:1rem;margin-top:4px">${fmtMoney(f.faturamentoBruto||0)}</div>
+        </div>
+        <div style="padding:10px;border-radius:10px;background:var(--surface);border:1px solid var(--border)">
+          <div style="font-size:0.7rem;color:var(--text3);text-transform:uppercase;font-weight:700">Taxas MP</div>
+          <div style="font-family:var(--font-display);font-weight:800;color:var(--red2);font-size:1rem;margin-top:4px">-${fmtMoney(f.taxasMarketplace||0)}</div>
+        </div>
+        <div style="padding:10px;border-radius:10px;background:var(--surface);border:1px solid var(--border)">
+          <div style="font-size:0.7rem;color:var(--text3);text-transform:uppercase;font-weight:700">Impostos Est.</div>
+          <div style="font-family:var(--font-display);font-weight:800;color:var(--yellow2);font-size:1rem;margin-top:4px">-${fmtMoney(f.impostosEstimados||0)}</div>
+        </div>
+        <div style="padding:10px;border-radius:10px;background:var(--surface);border:1px solid rgba(16,185,129,0.3)">
+          <div style="font-size:0.7rem;color:var(--text3);text-transform:uppercase;font-weight:700">Lucro Líquido</div>
+          <div style="font-family:var(--font-display);font-weight:800;color:${(f.lucroLiquido||0)>=0?'var(--green2)':'var(--red2)'};font-size:1rem;margin-top:4px">${fmtMoney(f.lucroLiquido||0)}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function travarFechamento(id) {
+  confirm2('Travar fechamento?','Mês travado só pode ser reaberto por admin.',async()=>{
+    try {
+      await blUpdate('FechamentoMensal',id,{travado:true,travadoEm:new Date().toISOString()});
+      const f = allFechamentos.find(f=>f.objectId===id);
+      if(f) f.travado=true;
+      renderFechamentos();
+      toast('Mês travado!','success');
+    } catch(e) { toast('Erro: '+e.message,'error'); }
+  });
+}
+
+async function reabrirFechamento(id) {
+  const perfil = currentUser?.perfil||'';
+  if (perfil !== 'admin' && perfil !== 'Admin') {
+    toast('Apenas administradores podem reabrir meses fechados.','error'); return;
+  }
+  try {
+    await blUpdate('FechamentoMensal',id,{travado:false,reabertoEm:new Date().toISOString()});
+    const f = allFechamentos.find(f=>f.objectId===id);
+    if(f) f.travado=false;
+    renderFechamentos();
+    toast('Mês reaberto!','info');
+  } catch(e) { toast('Erro: '+e.message,'error'); }
+}
+
+function exportFechamentoPDF(id) {
+  const f = allFechamentos.find(f=>f.objectId===id||f.competencia===id);
+  if (!f) { toast('Fechamento não encontrado','error'); return; }
+  // Gerar HTML simples para print
+  const html = `
+    <html><head><title>Fechamento ${f.competencia}</title>
+    <style>body{font-family:sans-serif;padding:30px;color:#111}h1{font-size:1.4rem}table{width:100%;border-collapse:collapse;margin-top:20px}td,th{padding:10px;border:1px solid #ccc;text-align:left}th{background:#f0f0f0}.valor{font-weight:bold;font-size:1.1rem}</style>
+    </head><body>
+    <h1>Fechamento Mensal — ${f.competencia}</h1>
+    <p>Regime: ${f.regime} | Gerado em: ${new Date(f.fechadoEm||'').toLocaleDateString('pt-BR')}</p>
+    <table>
+      <tr><th>Item</th><th>Valor</th></tr>
+      <tr><td>Faturamento Bruto</td><td class="valor">${fmtMoney(f.faturamentoBruto)}</td></tr>
+      <tr><td>Faturamento Líquido</td><td class="valor">${fmtMoney(f.faturamentoLiquido)}</td></tr>
+      <tr><td>Taxas Marketplace</td><td class="valor" style="color:red">-${fmtMoney(f.taxasMarketplace)}</td></tr>
+      <tr><td>Impostos Estimados</td><td class="valor" style="color:orange">-${fmtMoney(f.impostosEstimados)}</td></tr>
+      <tr style="font-weight:bold;background:#e8f5e9"><td>LUCRO LÍQUIDO</td><td class="valor" style="color:green">${fmtMoney(f.lucroLiquido)}</td></tr>
+    </table>
+    <p style="margin-top:30px;color:#666;font-size:0.85rem">CRM Marketplace Pro · Contador Digital Fiscal Inteligente</p>
+    </body></html>
+  `;
+  const w = window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+  w.print();
+}
+
+function exportFechamentoCSV(id) {
+  const f = allFechamentos.find(f=>f.objectId===id||f.competencia===id);
+  if (!f) return;
+  const rows = [
+    ['Item','Valor'],
+    ['Competência',f.competencia],
+    ['Regime',f.regime],
+    ['Faturamento Bruto',f.faturamentoBruto],
+    ['Faturamento Líquido',f.faturamentoLiquido],
+    ['Taxas Marketplace',f.taxasMarketplace],
+    ['Impostos Estimados',f.impostosEstimados],
+    ['Lucro Líquido',f.lucroLiquido],
+  ];
+  const csv = rows.map(r=>r.join(';')).join('\n');
+  const blob = new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `fechamento_${f.competencia}.csv`;
+  a.click();
+  toast('CSV exportado!','success');
+}
+
+// ── Observações Fiscais ──
+async function loadObsFiscais() {
+  try { allObsFiscais = await blGet('ObsFiscais','','',100); } catch(e) { allObsFiscais = []; }
+}
+
+function renderObsFiscais() {
+  const el = document.getElementById('obs-fiscais-list');
+  if (!el) return;
+  if (!allObsFiscais.length) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:0.84rem">Nenhuma observação adicionada.</div>';
+    return;
+  }
+  const sorted = [...allObsFiscais].sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||''));
+  el.innerHTML = sorted.map(o=>`
+    <div style="padding:12px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;gap:10px;align-items:flex-start">
+      <span style="font-size:1rem;margin-top:1px">📝</span>
+      <div style="flex:1">
+        <div style="font-size:0.84rem;color:var(--text)">${o.texto||''}</div>
+        <div style="font-size:0.72rem;color:var(--text3);margin-top:4px">${o.autor||'Admin'} · ${new Date(o.criadoEm||'').toLocaleDateString('pt-BR')}</div>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="deletarObs('${o.objectId}')">🗑</button>
+    </div>
+  `).join('');
+}
+
+async function adicionarObsFiscal() {
+  const texto = document.getElementById('nova-obs-fiscal')?.value?.trim();
+  if (!texto) { toast('Digite uma observação','warning'); return; }
+  const obj = {
+    texto, autor: currentUser?.name||currentUser?.email||'Admin',
+    criadoEm: new Date().toISOString(),
+  };
+  try {
+    const saved = await blCreate('ObsFiscais', obj);
+    allObsFiscais.unshift(saved||obj);
+    renderObsFiscais();
+    document.getElementById('nova-obs-fiscal').value = '';
+    toast('Observação adicionada!','success');
+  } catch(e) { toast('Erro: '+e.message,'error'); }
+}
+
+async function deletarObs(id) {
+  try {
+    await blDelete('ObsFiscais',id);
+    allObsFiscais = allObsFiscais.filter(o=>o.objectId!==id);
+    renderObsFiscais();
+  } catch(e) { toast('Erro: '+e.message,'error'); }
+}
+
+// ── Acesso Contador ──
+async function salvarAcessoContador() {
+  const obj = {
+    nome: document.getElementById('contador-nome')?.value,
+    email: document.getElementById('contador-email')?.value,
+    crc: document.getElementById('contador-crc')?.value,
+    nivel: document.getElementById('contador-nivel')?.value,
+    atualizadoEm: new Date().toISOString(),
+  };
+  try {
+    const existing = await blGet('AcessoContador','','',1).catch(()=>[]);
+    if (existing[0]) {
+      await blUpdate('AcessoContador',existing[0].objectId,obj);
+    } else {
+      await blCreate('AcessoContador',obj);
+    }
+    toast('Acesso do contador salvo!','success');
+    await logAction('UPDATE','AcessoContador',`Contador: ${obj.nome}`).catch(()=>{});
+  } catch(e) { toast('Erro: '+e.message,'error'); }
+}
+
+async function exportarParaContador() {
+  toast('Gerando pacote fiscal para o contador...','info');
+  const mesRef = document.getElementById('fiscal-mes-ref')?.value || new Date().toISOString().slice(0,7);
+  // Exportar CSV consolidado
+  const rows = [
+    ['Relatório Fiscal - '+mesRef],
+    ['Empresa',fiscalEmpresa?.razaoSocial||'--','CNPJ',fiscalEmpresa?.cnpj||'--'],
+    ['Regime',fiscalEmpresa?.regime||'--','Alíquota',fiscalEmpresa?.aliquota||0],
+    [],
+    ['=== APURAÇÃO ==='],
+    ['Item','Valor'],
+  ];
+  const res = calcApuracaoMensal();
+  if (res) {
+    rows.push(['Faturamento Bruto',res.fatBruto.toFixed(2)]);
+    rows.push(['Total Taxas MP',res.totalTaxas.toFixed(2)]);
+    rows.push(['Total Custo',res.totalCusto.toFixed(2)]);
+    rows.push(['Total Impostos',res.totalImposto.toFixed(2)]);
+    rows.push(['Lucro Líquido',res.lucroLiq.toFixed(2)]);
+  }
+  rows.push([]);
+  rows.push(['=== DAS ===','Competência','Valor','Status','Vencimento']);
+  allDAS.forEach(d=>rows.push(['',d.competencia,d.valor,d.status,d.vencimento]));
+  rows.push([]);
+  rows.push(['=== DOCUMENTOS ===','Tipo','Descrição','Marketplace','Competência','Valor']);
+  allDocumentosFiscais.forEach(d=>rows.push(['',d.tipo,d.descricao,d.marketplace,d.competencia,d.valor]));
+
+  const csv = rows.map(r=>r.join(';')).join('\n');
+  const blob = new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `pacote_fiscal_contador_${mesRef}.csv`;
+  a.click();
+  setTimeout(()=>toast('Pacote fiscal exportado!','success'),300);
+}
+
+function exportFiscalRelatorio() {
+  exportarApuracaoCSV();
+}
+
+// ── Verificar tabelas fiscais ──
+async function checkFiscalTables() {
+  const results = await Promise.all(FISCAL_TABLES.map(async t=>{
+    try { await blGet(t,'','',1); return {name:t,ok:true}; }
+    catch { return {name:t,ok:false}; }
+  }));
+  return results;
+}
+
+// ── Integração com checkAllTables existente ──
+const _origCheckAllTables = typeof checkAllTables !== 'undefined' ? checkAllTables : null;
+async function checkAllTablesExtended() {
+  if (_origCheckAllTables) await _origCheckAllTables();
+  // Também checar tabelas fiscais
+  const fiscalResults = await checkFiscalTables();
+  const missing = fiscalResults.filter(r=>!r.ok).map(r=>r.name);
+  if (missing.length > 0) {
+    toast(`⚠️ ${missing.length} tabela(s) fiscal(is) pendente(s): ${missing.join(', ')}`, 'warning', 6000);
+  }
+}
+
 
 </script>
 </body>

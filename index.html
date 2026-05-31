@@ -37,6 +37,8 @@
   --shopee: #ee4d2d;
   --ml: #ffe600;
   --ml-dark: #b8a000;
+  --shein: #00bfa6;
+  --amazon: #ff9900;
   --radius: 14px;
   --radius2: 20px;
   --shadow: 0 4px 24px rgba(0,0,0,0.4);
@@ -189,6 +191,8 @@ textarea.input{resize:vertical;min-height:80px}
 }
 .badge-shopee{background:rgba(238,77,45,0.15);color:#ff6b47;border:1px solid rgba(238,77,45,0.25)}
 .badge-ml{background:rgba(255,230,0,0.12);color:#e0c000;border:1px solid rgba(255,230,0,0.2)}
+.badge-shein{background:rgba(0,191,166,0.13);color:#00bfa6;border:1px solid rgba(0,191,166,0.25)}
+.badge-amazon{background:rgba(255,153,0,0.13);color:#ff9900;border:1px solid rgba(255,153,0,0.25)}
 .badge-green{background:rgba(16,185,129,0.12);color:var(--green2);border:1px solid rgba(16,185,129,0.2)}
 .badge-red{background:rgba(239,68,68,0.12);color:var(--red2);border:1px solid rgba(239,68,68,0.2)}
 .badge-yellow{background:rgba(245,158,11,0.12);color:var(--yellow2);border:1px solid rgba(245,158,11,0.2)}
@@ -1084,6 +1088,12 @@ tbody tr{transition:background 0.15s}
         <span class="nav-item-label" style="font-weight:700">Contador Fiscal</span>
         <span class="nav-badge hidden" id="badge-fiscal" style="background:rgba(14,165,233,0.2);color:var(--fiscal2)">0</span>
       </div>
+      <div class="nav-section-title" style="color:var(--green2)">Assinaturas</div>
+      <div class="nav-item" onclick="navigate('planos')" data-page="planos" style="position:relative">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <span class="nav-item-label" style="font-weight:700">Planos</span>
+        <span class="nav-badge hidden" id="badge-planos" style="background:rgba(16,185,129,0.2);color:var(--green2)">0</span>
+      </div>
       <div class="nav-section-title">Sistema</div>
       <div class="nav-item" onclick="navigate('avisos')" data-page="avisos">
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
@@ -1240,7 +1250,7 @@ tbody tr{transition:background 0.15s}
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Exportar CSV
           </button>
-          <button class="btn btn-primary" onclick="openModal('modal-produto')">
+          <button class="btn btn-primary" onclick="clearProdutoForm();populatePlanosSelect();openModal('modal-produto')">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Novo Produto
           </button>
@@ -1255,12 +1265,23 @@ tbody tr{transition:background 0.15s}
           <option value="">Todos os Marketplaces</option>
           <option value="Shopee">Shopee</option>
           <option value="Mercado Livre">Mercado Livre</option>
+          <option value="Shein">Shein</option>
+          <option value="Amazon">Amazon</option>
           <option value="Ambos">Ambos</option>
+          <option value="Outros">Outros</option>
         </select>
         <select class="input" id="prod-filter-status" onchange="filterProdutos()" style="width:130px">
           <option value="">Todos os Status</option>
           <option value="Ativo">Ativo</option>
           <option value="Inativo">Inativo</option>
+        </select>
+        <select class="input" id="prod-filter-plano" onchange="filterProdutos()" style="width:160px">
+          <option value="">Todos os Planos</option>
+          <option value="Básico">⭐ Básico</option>
+          <option value="Intermediário">🚀 Intermediário</option>
+          <option value="Profissional">💎 Profissional</option>
+          <option value="Serviço Avulso">🔧 Serviço Avulso</option>
+          <option value="Sem plano">Sem plano</option>
         </select>
         <select class="input" id="prod-filter-estoque" onchange="filterProdutos()" style="width:150px">
           <option value="">Todo Estoque</option>
@@ -1273,7 +1294,7 @@ tbody tr{transition:background 0.15s}
           <thead>
             <tr>
               <th>Produto</th><th>SKU</th><th>Categoria</th><th>Marketplace</th>
-              <th>Custo</th><th>Preço</th><th>Margem</th><th>Estoque</th><th>Status</th><th>Ações</th>
+              <th>Plano</th><th>Custo</th><th>Preço</th><th>Margem</th><th>Estoque</th><th>Status</th><th>Ações</th>
             </tr>
           </thead>
           <tbody id="produtos-tbody"></tbody>
@@ -1314,6 +1335,9 @@ tbody tr{transition:background 0.15s}
           <option value="">Todos os Marketplaces</option>
           <option value="Shopee">Shopee</option>
           <option value="Mercado Livre">Mercado Livre</option>
+          <option value="Shein">Shein</option>
+          <option value="Amazon">Amazon</option>
+          <option value="Outros">Outros</option>
         </select>
         <select class="input" id="venda-filter-status" onchange="filterVendas()" style="width:140px">
           <option value="">Todos os Status</option>
@@ -1426,6 +1450,9 @@ tbody tr{transition:background 0.15s}
           <option value="">Todos os Marketplaces</option>
           <option value="Shopee">Shopee</option>
           <option value="Mercado Livre">Mercado Livre</option>
+          <option value="Shein">Shein</option>
+          <option value="Amazon">Amazon</option>
+          <option value="Outros">Outros</option>
         </select>
       </div>
       <div class="table-wrap">
@@ -1459,6 +1486,9 @@ tbody tr{transition:background 0.15s}
           <option value="">Todos</option>
           <option value="Shopee">Shopee</option>
           <option value="Mercado Livre">Mercado Livre</option>
+          <option value="Shein">Shein</option>
+          <option value="Amazon">Amazon</option>
+          <option value="Outros">Outros</option>
         </select>
         <button class="btn btn-primary btn-sm" onclick="loadRelatorios()">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -1574,6 +1604,14 @@ tbody tr{transition:background 0.15s}
             <input type="number" class="input" id="cfg-comissao-ml" placeholder="11" value="11"/>
           </div>
           <div class="input-group">
+            <label class="label">Comissão Shein (%)</label>
+            <input type="number" class="input" id="cfg-comissao-shein" placeholder="10" value="10"/>
+          </div>
+          <div class="input-group">
+            <label class="label">Comissão Amazon (%)</label>
+            <input type="number" class="input" id="cfg-comissao-amazon" placeholder="15" value="15"/>
+          </div>
+          <div class="input-group">
             <label class="label">Alerta Estoque Mínimo</label>
             <input type="number" class="input" id="cfg-estoque-alerta" placeholder="5" value="5"/>
           </div>
@@ -1610,6 +1648,9 @@ tbody tr{transition:background 0.15s}
         <option value="">Todos os Marketplaces</option>
         <option value="Shopee">Shopee</option>
         <option value="Mercado Livre">Mercado Livre</option>
+        <option value="Shein">Shein</option>
+        <option value="Amazon">Amazon</option>
+        <option value="Outros">Outros</option>
       </select>
       <input type="date" class="input" id="kb-filter-data" onchange="renderKanban()" style="width:150px" placeholder="Filtrar por data"/>
       <div class="input-icon" style="width:200px">
@@ -2695,8 +2736,10 @@ tbody tr{transition:background 0.15s}
           <select class="input" id="taxa-mp-nome">
             <option value="Shopee">Shopee</option>
             <option value="Mercado Livre">Mercado Livre</option>
+            <option value="Shein">Shein</option>
+            <option value="Amazon">Amazon</option>
             <option value="Loja Própria">Loja Própria</option>
-            <option value="Outro">Outro</option>
+            <option value="Outros">Outros</option>
           </select>
         </div>
         <div class="input-group">
@@ -2791,7 +2834,10 @@ tbody tr{transition:background 0.15s}
             <option value="Geral">Geral</option>
             <option value="Shopee">Shopee</option>
             <option value="Mercado Livre">Mercado Livre</option>
+            <option value="Shein">Shein</option>
+            <option value="Amazon">Amazon</option>
             <option value="Loja Própria">Loja Própria</option>
+            <option value="Outros">Outros</option>
           </select>
         </div>
         <div class="input-group">
@@ -2861,12 +2907,25 @@ tbody tr{transition:background 0.15s}
           <select class="input" id="p-marketplace">
             <option value="Shopee">Shopee</option>
             <option value="Mercado Livre">Mercado Livre</option>
+            <option value="Shein">Shein</option>
+            <option value="Amazon">Amazon</option>
             <option value="Ambos">Ambos</option>
+            <option value="Outros">Outros</option>
           </select>
         </div>
         <div class="input-group">
           <label class="label">Custo (R$) *</label>
           <input type="number" class="input" id="p-custo" step="0.01" placeholder="0,00" oninput="calcMargem()"/>
+        </div>
+        <div class="input-group">
+          <label class="label">Plano Vinculado</label>
+          <select class="input" id="p-plano">
+            <option value="">Nenhum</option>
+            <option value="Básico">⭐ Básico — R$ 247,00/mês</option>
+            <option value="Intermediário">🚀 Intermediário — R$ 497,00/mês</option>
+            <option value="Profissional">💎 Profissional — R$ 897,00/mês</option>
+            <option value="Serviço Avulso">🔧 Serviço Avulso — R$ 250,00</option>
+          </select>
         </div>
         <div class="input-group">
           <label class="label">Preço de Venda (R$) *</label>
@@ -2937,6 +2996,9 @@ tbody tr{transition:background 0.15s}
           <select class="input" id="v-marketplace">
             <option value="Shopee">Shopee</option>
             <option value="Mercado Livre">Mercado Livre</option>
+            <option value="Shein">Shein</option>
+            <option value="Amazon">Amazon</option>
+            <option value="Outros">Outros</option>
           </select>
         </div>
         <div class="input-group span-2">
@@ -3105,7 +3167,9 @@ tbody tr{transition:background 0.15s}
           <select class="input" id="c-marketplace">
             <option value="Shopee">Shopee</option>
             <option value="Mercado Livre">Mercado Livre</option>
-            <option value="Outro">Outro</option>
+            <option value="Shein">Shein</option>
+            <option value="Amazon">Amazon</option>
+            <option value="Outros">Outros</option>
           </select>
         </div>
       </div>
@@ -3224,6 +3288,292 @@ tbody tr{transition:background 0.15s}
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-fornecedor')">Cancelar</button>
       <button class="btn btn-primary" onclick="saveFornecedor()">Salvar Fornecedor</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- PLANOS PAGE                                              -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="page" id="page-planos">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <div class="page-title" style="display:flex;align-items:center;gap:10px">
+        <span style="background:linear-gradient(135deg,var(--green),var(--green2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Planos &amp; Assinaturas</span>
+      </div>
+      <div class="page-sub">Gerencie clientes, planos, pagamentos e faturamento recorrente</div>
+    </div>
+    <div class="page-actions">
+      <button class="btn btn-secondary btn-sm" onclick="navigate('planos-admin')" style="gap:6px">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.34 19.66l-1.41 1.41M20 12h2M2 12h2M19.07 19.07l-1.41-1.41M4.34 4.34L2.93 2.93M12 20v2M12 2v2"/></svg>
+        Admin Planos
+      </button>
+      <button class="btn btn-primary" onclick="openModal('modal-plano-cliente')" id="btn-novo-cliente-plano">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Cliente
+      </button>
+    </div>
+  </div>
+
+  <!-- Notificações de vencimento -->
+  <div id="planos-alertas" style="display:flex;flex-direction:column;gap:8px;margin-bottom:4px"></div>
+
+  <!-- Cards KPI -->
+  <div class="stats-grid" id="planos-kpi-grid">
+    <div class="stat-card" style="--stat-color:var(--green)">
+      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--green2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+      <div class="stat-label">Clientes Ativos</div>
+      <div class="stat-value" id="pl-ativos" style="color:var(--green2)">0</div>
+      <div class="stat-meta" id="pl-ativos-meta">com plano ativo</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--accent)">
+      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--accent2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+      <div class="stat-label">MRR</div>
+      <div class="stat-value" id="pl-mrr" style="color:var(--accent2)">R$ 0</div>
+      <div class="stat-meta">Receita Mensal Recorrente</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--blue)">
+      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--blue2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+      <div class="stat-label">ARR (Projetado)</div>
+      <div class="stat-value" id="pl-arr" style="color:var(--blue2)">R$ 0</div>
+      <div class="stat-meta">Receita Anual Projetada</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--yellow)">
+      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--yellow2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div class="stat-label">Ticket Médio</div>
+      <div class="stat-value" id="pl-ticket" style="color:var(--yellow2)">R$ 0</div>
+      <div class="stat-meta">por cliente ativo</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--red)">
+      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--red2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      <div class="stat-label">Inadimplentes</div>
+      <div class="stat-value" id="pl-inadimplentes" style="color:var(--red2)">0</div>
+      <div class="stat-meta" id="pl-inadimplentes-val">R$ 0 em atraso</div>
+    </div>
+    <div class="stat-card" style="--stat-color:#a855f7">
+      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+      <div class="stat-label">Avulsos (mês)</div>
+      <div class="stat-value" id="pl-avulsos" style="color:#c084fc">0</div>
+      <div class="stat-meta" id="pl-avulsos-val">serviços avulsos</div>
+    </div>
+  </div>
+
+  <!-- Meta Mensal -->
+  <div class="card p-4" id="planos-meta-card">
+    <div class="flex items-center justify-between mb-2" style="flex-wrap:wrap;gap:10px">
+      <div>
+        <div class="font-display font-bold text-lg">🎯 Meta Mensal de Receita</div>
+        <div class="text-sm text-muted mt-1">Acompanhe o progresso do faturamento recorrente</div>
+      </div>
+      <div class="flex gap-2 items-center">
+        <input type="number" class="input" id="pl-meta-input" placeholder="Meta R$" style="width:160px" oninput="atualizarMetaPlanos()"/>
+        <button class="btn btn-primary btn-sm" onclick="salvarMetaPlanos()">Salvar</button>
+      </div>
+    </div>
+    <div class="flex gap-4 items-center" style="flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <div class="progress-bar" style="height:12px;margin-bottom:8px">
+          <div class="progress-fill" id="pl-meta-bar" style="width:0%;background:linear-gradient(90deg,var(--green),var(--green2))"></div>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-muted">Realizado: <span id="pl-meta-realizado" class="font-bold text-green">R$ 0</span></span>
+          <span class="text-muted">Meta: <span id="pl-meta-valor" class="font-bold">R$ 0</span></span>
+        </div>
+      </div>
+      <div style="text-align:center;min-width:100px">
+        <div class="font-display font-bold" id="pl-meta-pct" style="font-size:2rem;color:var(--green2)">0%</div>
+        <div class="text-xs text-muted">atingido</div>
+      </div>
+      <div style="text-align:center;min-width:100px">
+        <div class="font-display font-bold" id="pl-meta-faltante" style="font-size:1.2rem;color:var(--yellow2)">R$ 0</div>
+        <div class="text-xs text-muted">faltam para a meta</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráficos -->
+  <div class="grid" style="grid-template-columns:2fr 1fr;gap:16px">
+    <div class="card chart-card">
+      <div class="chart-title font-display">Receita por Mês</div>
+      <div class="chart-sub">Faturamento recorrente nos últimos 6 meses</div>
+      <div class="chart-wrap"><canvas id="chart-planos-mrr"></canvas></div>
+    </div>
+    <div class="card chart-card">
+      <div class="chart-title font-display">Clientes por Plano</div>
+      <div class="chart-sub">Distribuição atual</div>
+      <div class="chart-wrap"><canvas id="chart-planos-dist"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Filtros e tabela -->
+  <div class="card p-4">
+    <div class="flex items-center justify-between mb-3" style="flex-wrap:wrap;gap:10px">
+      <div class="font-display font-bold text-lg">Clientes / Assinaturas</div>
+      <div class="flex gap-2" style="flex-wrap:wrap">
+        <div class="input-icon" style="min-width:200px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="input" id="pl-search" placeholder="Buscar cliente..." oninput="filtrarPlanos()"/>
+        </div>
+        <select class="input" id="pl-filter-plano" style="width:auto" onchange="filtrarPlanos()">
+          <option value="">Todos os Planos</option>
+          <option value="Básico">Básico</option>
+          <option value="Intermediário">Intermediário</option>
+          <option value="Profissional">Profissional</option>
+          <option value="Serviço Avulso">Serviço Avulso</option>
+        </select>
+        <select class="input" id="pl-filter-status" style="width:auto" onchange="filtrarPlanos()">
+          <option value="">Todos os Status</option>
+          <option value="Pago">Pago</option>
+          <option value="Vence Hoje">Vence Hoje</option>
+          <option value="Vence em 7 dias">Vence em 7 dias</option>
+          <option value="Atrasado">Atrasado</option>
+        </select>
+        <div class="flex gap-1">
+          <button class="btn btn-secondary btn-sm" onclick="exportarPlanosCSV()" title="Exportar CSV">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            CSV
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="exportarPlanosPDF()" title="Exportar PDF">PDF</button>
+          <button class="btn btn-secondary btn-sm" onclick="exportarPlanosExcel()" title="Exportar Excel">XLS</button>
+        </div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Cliente</th><th>Empresa</th><th>Plano</th><th>Valor</th>
+          <th>Pagamento</th><th>Vencimento</th><th>Status</th><th>Forma</th><th>Ações</th>
+        </tr></thead>
+        <tbody id="planos-tbody"></tbody>
+      </table>
+    </div>
+    <div class="flex items-center justify-between mt-3" style="flex-wrap:wrap;gap:10px">
+      <div class="text-sm text-muted" id="planos-count">0 clientes</div>
+      <div class="pagination" id="planos-pagination"></div>
+    </div>
+  </div>
+
+  <!-- Tabela de Pagamentos -->
+  <div class="card p-4">
+    <div class="flex items-center justify-between mb-3" style="flex-wrap:wrap;gap:10px">
+      <div class="font-display font-bold text-lg">💳 Histórico de Pagamentos</div>
+      <div class="flex gap-2" style="flex-wrap:wrap">
+        <select class="input" id="pl-pag-periodo" style="width:auto" onchange="filtrarPagamentos()">
+          <option value="mes">Este Mês</option>
+          <option value="semana">Esta Semana</option>
+          <option value="hoje">Hoje</option>
+          <option value="ano">Este Ano</option>
+          <option value="todos">Todos</option>
+        </select>
+      </div>
+    </div>
+    <!-- Faturamento sub-cards -->
+    <div class="grid" style="grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+      <div class="fin-card"><div class="fin-card-label">Receita (filtro)</div><div class="fin-card-value" id="pl-fat-total" style="color:var(--green2)">R$ 0</div></div>
+      <div class="fin-card"><div class="fin-card-label">Qtd Pagamentos</div><div class="fin-card-value" id="pl-fat-qtd">0</div></div>
+      <div class="fin-card"><div class="fin-card-label">Ticket Médio</div><div class="fin-card-value" id="pl-fat-ticket" style="color:var(--accent2)">R$ 0</div></div>
+      <div class="fin-card"><div class="fin-card-label">Crescimento</div><div class="fin-card-value" id="pl-fat-crescimento" style="color:var(--yellow2)">0%</div></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Cliente</th><th>Plano</th><th>Valor</th><th>Pagamento</th><th>Competência</th><th>Status</th><th>Forma</th></tr></thead>
+        <tbody id="pagamentos-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ PLANOS ADMIN PAGE ══════════════════════ -->
+<section class="page" id="page-planos-admin">
+  <div class="page-header">
+    <div>
+      <div class="page-title">⚙️ Administração de Planos</div>
+      <div class="page-sub">Crie, edite e gerencie os planos disponíveis</div>
+    </div>
+    <div class="page-actions">
+      <button class="btn btn-secondary btn-sm" onclick="navigate('planos')">← Voltar</button>
+      <button class="btn btn-primary" onclick="openModal('modal-editar-plano')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Plano
+      </button>
+    </div>
+  </div>
+  <div id="admin-planos-grid" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+    <!-- rendered by JS -->
+  </div>
+</section>
+
+<!-- Modais Planos -->
+<!-- Modal Novo/Editar Cliente Plano -->
+<div class="modal-overlay hidden" id="modal-plano-cliente">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-plano-cli-title">➕ Novo Cliente</div>
+      <div class="modal-close" onclick="closeModal('modal-plano-cliente')">×</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="input-group"><label class="label">Nome *</label><input type="text" class="input" id="plcli-nome" placeholder="Nome completo"/></div>
+        <div class="input-group"><label class="label">Empresa</label><input type="text" class="input" id="plcli-empresa" placeholder="Empresa/Razão Social"/></div>
+        <div class="input-group"><label class="label">WhatsApp</label><input type="tel" class="input" id="plcli-tel" placeholder="(11) 99999-9999"/></div>
+        <div class="input-group"><label class="label">E-mail</label><input type="email" class="input" id="plcli-email" placeholder="cliente@email.com"/></div>
+        <div class="input-group"><label class="label">Plano Contratado *</label>
+          <select class="input" id="plcli-plano" onchange="preencherValorPlano()">
+            <option value="">Selecione o plano...</option>
+          </select>
+        </div>
+        <div class="input-group"><label class="label">Valor (R$)</label><input type="number" class="input" id="plcli-valor" placeholder="0,00" step="0.01"/></div>
+        <div class="input-group"><label class="label">Data Pagamento</label><input type="date" class="input" id="plcli-datapag"/></div>
+        <div class="input-group"><label class="label">Data Vencimento</label><input type="date" class="input" id="plcli-datavenc"/></div>
+        <div class="input-group"><label class="label">Forma Pagamento</label>
+          <select class="input" id="plcli-forma">
+            <option value="PIX">PIX</option>
+            <option value="Cartão de Crédito">Cartão de Crédito</option>
+            <option value="Boleto">Boleto</option>
+            <option value="Transferência">Transferência</option>
+            <option value="Dinheiro">Dinheiro</option>
+          </select>
+        </div>
+        <div class="input-group"><label class="label">Status Pagamento</label>
+          <select class="input" id="plcli-statuspag">
+            <option value="Pago">Pago</option>
+            <option value="Pendente">Pendente</option>
+            <option value="Atrasado">Atrasado</option>
+          </select>
+        </div>
+        <div class="input-group span-2"><label class="label">Observações</label><textarea class="input" id="plcli-obs" placeholder="Informações adicionais..."></textarea></div>
+      </div>
+      <input type="hidden" id="plcli-id"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-plano-cliente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarClientePlano()">Salvar Cliente</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar/Criar Plano -->
+<div class="modal-overlay hidden" id="modal-editar-plano">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-edit-plano-title">Novo Plano</div>
+      <div class="modal-close" onclick="closeModal('modal-editar-plano')">×</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="input-group"><label class="label">Nome do Plano *</label><input type="text" class="input" id="ep-nome" placeholder="Ex: Profissional"/></div>
+        <div class="input-group"><label class="label">Valor (R$) *</label><input type="number" class="input" id="ep-valor" placeholder="0,00" step="0.01"/></div>
+        <div class="input-group"><label class="label">Cor (hex)</label><input type="color" class="input" id="ep-cor" value="#6366f1" style="height:42px;padding:4px"/></div>
+        <div class="input-group"><label class="label">Ícone (emoji)</label><input type="text" class="input" id="ep-icone" placeholder="⭐" maxlength="4"/></div>
+        <div class="input-group span-2"><label class="label">Benefícios (um por linha)</label><textarea class="input" id="ep-beneficios" placeholder="Suporte 24h&#10;Relatórios mensais&#10;Acesso completo" style="min-height:100px"></textarea></div>
+        <div class="input-group span-2"><label class="label">Descrição</label><input type="text" class="input" id="ep-desc" placeholder="Descrição breve do plano"/></div>
+      </div>
+      <input type="hidden" id="ep-id"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-editar-plano')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPlanoAdmin()">Salvar Plano</button>
     </div>
   </div>
 </div>
@@ -3453,6 +3803,8 @@ const pagesMeta2 = {
   shopee:           { title:'Shopee Sync',          sub:'Sincronização com Shopee Open Platform' },
   'shopee-config':  { title:'Configuração Shopee',  sub:'OAuth e parâmetros de integração' },
   'contador':       { title:'Contador Digital / Fiscal Inteligente', sub:'Diagnóstico tributário · Apuração automática · DAS · Alertas fiscais' },
+  'planos':         { title:'Planos & Assinaturas', sub:'Gerencie clientes, planos e faturamento recorrente' },
+  'planos-admin':   { title:'Administração de Planos', sub:'Criar, editar e gerenciar planos disponíveis' },
 };
 
 function navigate(page) {
@@ -3502,6 +3854,8 @@ function navigate(page) {
   }
   if (page==='shopee-config') renderShopeeConfig();
   if (page==='contador') loadContadorFiscal();
+  if (page==='planos') loadPlanos();
+  if (page==='planos-admin') loadPlanosAdmin();
 }
 
 // ══════════════════════════════════════════════════
@@ -3652,12 +4006,15 @@ function filterProdutos() {
   const mp = document.getElementById('prod-filter-mp')?.value||'';
   const st = document.getElementById('prod-filter-status')?.value||'';
   const est = document.getElementById('prod-filter-estoque')?.value||'';
+  const pl = document.getElementById('prod-filter-plano')?.value||'';
   filtProdutos = allProdutos.filter(p=>{
     if (q && !(p.nome||'').toLowerCase().includes(q) && !(p.sku||'').toLowerCase().includes(q)) return false;
     if (mp && p.marketplace !== mp) return false;
     if (st && p.status !== st) return false;
     if (est==='low' && !(p.estoqueAtual <= p.estoqueMinimo && p.estoqueAtual > 0)) return false;
     if (est==='zero' && p.estoqueAtual > 0) return false;
+    if (pl === 'Sem plano' && p.plano) return false;
+    if (pl && pl !== 'Sem plano' && p.plano !== pl) return false;
     return true;
   });
   pag.produtos = 1;
@@ -3674,11 +4031,17 @@ function _renderProdutos() {
   const page  = filtProdutos.slice(start, start+PAGE_SIZE);
   const tb = document.getElementById('produtos-tbody');
   if (!filtProdutos.length) {
-    tb.innerHTML='<tr><td colspan="10" style="padding:40px;text-align:center;color:var(--text3)">Nenhum produto encontrado</td></tr>';
+    tb.innerHTML='<tr><td colspan="11" style="padding:40px;text-align:center;color:var(--text3)">Nenhum produto encontrado</td></tr>';
     setText('produtos-count','0 produtos');
     renderPagination('produtos-pagination', 0, 'produtos');
     return;
   }
+  const planoBadge = p => {
+    const cores = {'Básico':'#10b981','Intermediário':'#3b82f6','Profissional':'#a855f7','Serviço Avulso':'#f59e0b'};
+    if (!p.plano) return '<span class="badge badge-gray" style="font-size:0.68rem">Sem plano</span>';
+    const cor = cores[p.plano] || 'var(--accent)';
+    return `<span class="badge" style="background:${cor}22;color:${cor};border:1px solid ${cor}44;font-size:0.68rem">${p.plano}</span>`;
+  };
   tb.innerHTML = page.map(p=>{
     const margem = p.precoVenda && p.custo ? (((p.precoVenda-p.custo)/p.precoVenda)*100).toFixed(1)+'%' : '--';
     const estClass = p.estoqueAtual<=0?'stock-zero':(p.estoqueAtual<=p.estoqueMinimo?'stock-low':'stock-ok');
@@ -3692,6 +4055,7 @@ function _renderProdutos() {
       <td><span class="text-xs font-medium text-muted">${p.sku||'--'}</span></td>
       <td class="text-sm">${p.categoria||'--'}</td>
       <td>${mpBadge(p.marketplace)}</td>
+      <td>${planoBadge(p)}</td>
       <td class="text-sm">${formatMoney(p.custo||0)}</td>
       <td class="text-sm font-semibold">${formatMoney(p.precoVenda||0)}</td>
       <td class="text-sm ${parseFloat(margem)>20?'text-green':parseFloat(margem)>10?'text-yellow':'text-red'}">${margem}</td>
@@ -3738,8 +4102,9 @@ function editProduto(id) {
   setVal('p-marketplace',p.marketplace); setVal('p-custo',p.custo);
   setVal('p-preco',p.precoVenda); setVal('p-estoque',p.estoqueAtual);
   setVal('p-estoque-min',p.estoqueMinimo); setVal('p-imagem',p.imagem);
-  setVal('p-status',p.status); calcMargem();
+  setVal('p-plano',p.plano||''); setVal('p-status',p.status); calcMargem();
   resetImgDropZone();
+  populatePlanosSelect();
   if (p.imagem) {
     const preview = document.getElementById('p-img-preview');
     const label = document.getElementById('p-img-drop-label');
@@ -3763,6 +4128,7 @@ async function saveProduto() {
     marca: document.getElementById('p-marca').value,
     fornecedor: document.getElementById('p-fornecedor').value,
     marketplace: document.getElementById('p-marketplace').value,
+    plano: document.getElementById('p-plano').value || '',
     custo, precoVenda: preco,
     estoqueAtual: parseInt(document.getElementById('p-estoque').value)||0,
     estoqueMinimo: parseInt(document.getElementById('p-estoque-min').value)||0,
@@ -3801,7 +4167,7 @@ async function saveProduto() {
 
 function clearProdutoForm() {
   ['p-id','p-nome','p-sku','p-barras','p-categoria','p-marca','p-fornecedor','p-custo','p-preco','p-estoque','p-estoque-min','p-imagem','p-margem'].forEach(id=>setVal(id,''));
-  setVal('p-marketplace','Shopee'); setVal('p-status','Ativo');
+  setVal('p-marketplace','Shopee'); setVal('p-plano',''); setVal('p-status','Ativo');
   document.getElementById('modal-produto-title').textContent='Novo Produto';
   resetImgDropZone();
 }
@@ -3909,8 +4275,8 @@ function deleteProduto(id) {
 }
 
 function exportProdutosCSV() {
-  const rows = [['Nome','SKU','Categoria','Marca','Fornecedor','Custo','Preço','Estoque','Mínimo','Marketplace','Status']];
-  (filtProdutos.length?filtProdutos:allProdutos).forEach(p=>rows.push([p.nome,p.sku,p.categoria,p.marca,p.fornecedor,p.custo,p.precoVenda,p.estoqueAtual,p.estoqueMinimo,p.marketplace,p.status]));
+  const rows = [['Nome','SKU','Categoria','Marca','Fornecedor','Custo','Preço','Estoque','Mínimo','Marketplace','Plano','Status']];
+  (filtProdutos.length?filtProdutos:allProdutos).forEach(p=>rows.push([p.nome,p.sku,p.categoria,p.marca,p.fornecedor,p.custo,p.precoVenda,p.estoqueAtual,p.estoqueMinimo,p.marketplace,p.plano||'',p.status]));
   downloadCSV(rows,'produtos');
 }
 
@@ -3986,7 +4352,13 @@ function onVendaProdutoChange() {
   setVal('v-custo', opt.dataset.custo);
   setVal('v-valor', opt.dataset.preco);
   const mp = document.getElementById('v-marketplace').value;
-  setVal('v-comissao', mp==='Shopee'?'12':'11');
+  const comissoes = {
+    'Shopee':       String(currentUser?.crm_comissao_shopee ?? 12),
+    'Mercado Livre':String(currentUser?.crm_comissao_ml     ?? 11),
+    'Shein':        String(currentUser?.crm_comissao_shein  ?? 10),
+    'Amazon':       String(currentUser?.crm_comissao_amazon ?? 15),
+  };
+  setVal('v-comissao', comissoes[mp] || '12');
   calcVendaLucro();
 }
 
@@ -4531,6 +4903,8 @@ async function loadUserConfigs() {
   const meta     = currentUser.crm_meta      || localStorage.getItem('crm-meta')            || '';
   const cShopee  = currentUser.crm_comissao_shopee != null ? String(currentUser.crm_comissao_shopee) : (localStorage.getItem('crm-comissao-shopee') || '12');
   const cML      = currentUser.crm_comissao_ml     != null ? String(currentUser.crm_comissao_ml)     : (localStorage.getItem('crm-comissao-ml')     || '14');
+  const cShein   = currentUser.crm_comissao_shein  != null ? String(currentUser.crm_comissao_shein)  : (localStorage.getItem('crm-comissao-shein')   || '10');
+  const cAmazon  = currentUser.crm_comissao_amazon != null ? String(currentUser.crm_comissao_amazon) : (localStorage.getItem('crm-comissao-amazon')  || '15');
   const blUrl    = currentUser.shopee_bl_url  || localStorage.getItem('shopee_bl_url')       || '';
   const shopeeCfg = (() => {
     try { return JSON.parse(currentUser.shopee_config || localStorage.getItem('shopee_config') || '{}'); } catch { return {}; }
@@ -4547,6 +4921,8 @@ async function loadUserConfigs() {
   setIfExists('cfg-meta',            meta);
   setIfExists('cfg-comissao-shopee', cShopee);
   setIfExists('cfg-comissao-ml',     cML);
+  setIfExists('cfg-comissao-shein',  cShein);
+  setIfExists('cfg-comissao-amazon', cAmazon);
   setIfExists('cfg-bl-url',          blUrl);
   if (shopeeCfg.daysBack)     setIfExists('cfg-days-back',   shopeeCfg.daysBack);
   if (shopeeCfg.orderStatus)  setIfExists('cfg-order-status', shopeeCfg.orderStatus);
@@ -4557,6 +4933,8 @@ async function loadUserConfigs() {
     localStorage.removeItem('crm-meta');
     localStorage.removeItem('crm-comissao-shopee');
     localStorage.removeItem('crm-comissao-ml');
+    localStorage.removeItem('crm-comissao-shein');
+    localStorage.removeItem('crm-comissao-amazon');
     localStorage.removeItem('shopee_bl_url');
     localStorage.removeItem('shopee_config');
   }
@@ -4566,15 +4944,21 @@ async function saveConfigs() {
   const meta    = document.getElementById('cfg-meta')?.value || '';
   const cShopee = document.getElementById('cfg-comissao-shopee')?.value || '12';
   const cML     = document.getElementById('cfg-comissao-ml')?.value || '14';
+  const cShein  = document.getElementById('cfg-comissao-shein')?.value || '10';
+  const cAmazon = document.getElementById('cfg-comissao-amazon')?.value || '15';
   try {
     await blUpdate('Users', currentUser.objectId, {
       crm_meta: meta,
       crm_comissao_shopee: parseFloat(cShopee) || 0,
       crm_comissao_ml:     parseFloat(cML)     || 0,
+      crm_comissao_shein:  parseFloat(cShein)  || 0,
+      crm_comissao_amazon: parseFloat(cAmazon) || 0,
     });
     currentUser.crm_meta = meta;
     currentUser.crm_comissao_shopee = parseFloat(cShopee) || 0;
     currentUser.crm_comissao_ml     = parseFloat(cML)     || 0;
+    currentUser.crm_comissao_shein  = parseFloat(cShein)  || 0;
+    currentUser.crm_comissao_amazon = parseFloat(cAmazon) || 0;
     localStorage.setItem('bl_user', JSON.stringify(currentUser));
     toast('Configurações salvas!', 'success');
   } catch(e) {
@@ -4583,12 +4967,13 @@ async function saveConfigs() {
 }
 
 function loadConfigs() {
-  // Chamado ao navegar para a página de config — dados já foram carregados em loadUserConfigs()
   if (!currentUser) return;
   const setIfExists = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
   setIfExists('cfg-meta',            currentUser.crm_meta            || localStorage.getItem('crm-meta') || '');
   setIfExists('cfg-comissao-shopee', currentUser.crm_comissao_shopee != null ? String(currentUser.crm_comissao_shopee) : (localStorage.getItem('crm-comissao-shopee') || '12'));
   setIfExists('cfg-comissao-ml',     currentUser.crm_comissao_ml     != null ? String(currentUser.crm_comissao_ml)     : (localStorage.getItem('crm-comissao-ml')     || '14'));
+  setIfExists('cfg-comissao-shein',  currentUser.crm_comissao_shein  != null ? String(currentUser.crm_comissao_shein)  : (localStorage.getItem('crm-comissao-shein')   || '10'));
+  setIfExists('cfg-comissao-amazon', currentUser.crm_comissao_amazon != null ? String(currentUser.crm_comissao_amazon) : (localStorage.getItem('crm-comissao-amazon')  || '15'));
 }
 
 // ══════════════════════════════════════════════════
@@ -4624,9 +5009,12 @@ function setText(id,v){ const el=document.getElementById(id); if(el) el.textCont
 function setVal(id,v){ const el=document.getElementById(id); if(el) el.value=v??''; }
 
 function mpBadge(mp) {
-  if(mp==='Shopee') return '<span class="badge badge-shopee">Shopee</span>';
-  if(mp==='Mercado Livre') return '<span class="badge badge-ml">Mercado Livre</span>';
+  if(mp==='Shopee') return '<span class="badge badge-shopee">🛒 Shopee</span>';
+  if(mp==='Mercado Livre') return '<span class="badge badge-ml">🛍 Mercado Livre</span>';
+  if(mp==='Shein') return '<span class="badge badge-shein">👗 Shein</span>';
+  if(mp==='Amazon') return '<span class="badge badge-amazon">📦 Amazon</span>';
   if(mp==='Ambos') return '<span class="badge badge-blue">Ambos</span>';
+  if(mp==='Outros') return '<span class="badge badge-gray">Outros</span>';
   return `<span class="badge badge-gray">${mp||'--'}</span>`;
 }
 
@@ -4724,6 +5112,12 @@ let filtLogs = [];
 let pagLogs = 1;
 let importData = null;
 let importHeaders = [];
+// ── Planos stores ──
+let allPlanosClientes = [];
+let allPlanosConfig = [];
+let allPagamentosPlanos = [];
+let filtPlanosClientes = [];
+let pagPlanos = 1;
 
 // ══════════════════════════════════════════════════
 //  EXTENDED loadAllData — com auto-criação de tabelas
@@ -4751,6 +5145,10 @@ const CRM_TABLES = {
   ObsFiscais:             [{ name:'texto',type:'STRING'},{name:'autor',type:'STRING'},{name:'criadoEm',type:'DATETIME'}],
   AcessoContador:         [{ name:'nome',type:'STRING'},{name:'email',type:'STRING'},{name:'crc',type:'STRING'},{name:'nivel',type:'STRING'},{name:'atualizadoEm',type:'DATETIME'}],
   ApuracaoMensal:         [{ name:'competencia',type:'STRING'},{name:'faturamentoBruto',type:'DOUBLE'},{name:'totalTaxas',type:'DOUBLE'},{name:'totalCusto',type:'DOUBLE'},{name:'totalImpostos',type:'DOUBLE'},{name:'lucroLiquido',type:'DOUBLE'},{name:'regime',type:'STRING'},{name:'aliquota',type:'DOUBLE'},{name:'geradoEm',type:'DATETIME'}],
+  // ── Tabelas Planos ──
+  Planos:                 [{ name:'nomeCliente',type:'STRING'},{name:'telefone',type:'STRING'},{name:'email',type:'STRING'},{name:'empresa',type:'STRING'},{name:'plano',type:'STRING'},{name:'valor',type:'DOUBLE'},{name:'statusPagamento',type:'STRING'},{name:'dataPagamento',type:'DATETIME'},{name:'dataVencimento',type:'DATETIME'},{name:'formaPagamento',type:'STRING'},{name:'observacoes',type:'STRING'},{name:'criadoEm',type:'DATETIME'},{name:'atualizadoEm',type:'DATETIME'}],
+  PlanosConfig:           [{ name:'nome',type:'STRING'},{name:'valor',type:'DOUBLE'},{name:'cor',type:'STRING'},{name:'icone',type:'STRING'},{name:'beneficios',type:'STRING'},{name:'descricao',type:'STRING'},{name:'ativo',type:'BOOLEAN'},{name:'criadoEm',type:'DATETIME'}],
+  PagamentosPlanos:       [{ name:'cliente',type:'STRING'},{name:'plano',type:'STRING'},{name:'valor',type:'DOUBLE'},{name:'dataPagamento',type:'DATETIME'},{name:'competencia',type:'STRING'},{name:'status',type:'STRING'},{name:'formaPagamento',type:'STRING'},{name:'clienteId',type:'STRING'}],
 };
 
 async function ensureTable(tableName) {
@@ -4809,6 +5207,14 @@ async function loadAllData() {
       loadTable('Compras'),
     ]);
     allLogs = await loadTable('LogsSistema');
+    // ── Planos ──
+    [allPlanosClientes, allPlanosConfig, allPagamentosPlanos] = await Promise.all([
+      loadTable('Planos'),
+      loadTable('PlanosConfig'),
+      loadTable('PagamentosPlanos'),
+    ]);
+    // Criar planos padrão se não existir nenhum
+    if (allPlanosConfig.length === 0) await criarPlanosDefault();
 
     console.log(`✅ Dados carregados — Produtos: ${allProdutos.length}, Vendas: ${allVendas.length}, Clientes: ${allClientes.length}`);
 
@@ -6612,7 +7018,7 @@ function calcApuracaoMensal() {
         <tr>
           <td style="font-size:0.78rem;color:var(--text3)">${v.dataVenda||'--'}</td>
           <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.produto||v.sku||'--'}</td>
-          <td><span class="badge ${v.marketplace==='Shopee'?'badge-shopee':v.marketplace==='Mercado Livre'?'badge-ml':'badge-blue'}">${v.marketplace||'--'}</span></td>
+          <td><span class="badge ${v.marketplace==='Shopee'?'badge-shopee':v.marketplace==='Mercado Livre'?'badge-ml':v.marketplace==='Shein'?'badge-shein':v.marketplace==='Amazon'?'badge-amazon':'badge-blue'}">${v.marketplace||'--'}</span></td>
           <td style="color:var(--green2);font-weight:600">${fmtMoney(valorBruto)}</td>
           <td style="color:var(--red2)">-${fmtMoney(taxaMP)}</td>
           <td style="color:var(--text2)">-${fmtMoney(custo)}</td>
@@ -6784,7 +7190,7 @@ function renderMPTaxas() {
   }
   el.innerHTML = allMPTaxas.map(t=>`
     <div class="marketplace-tax-row">
-      <span class="badge ${t.marketplace==='Shopee'?'badge-shopee':t.marketplace==='Mercado Livre'?'badge-ml':'badge-blue'}">${t.marketplace}</span>
+      <span class="badge ${t.marketplace==='Shopee'?'badge-shopee':t.marketplace==='Mercado Livre'?'badge-ml':t.marketplace==='Shein'?'badge-shein':t.marketplace==='Amazon'?'badge-amazon':'badge-blue'}">${t.marketplace}</span>
       <span style="font-size:0.83rem;color:var(--text2)">${t.categoria||'Geral'}</span>
       <span style="font-weight:700;color:var(--yellow2)">${(t.comissao||0).toFixed(2)}%</span>
       <span style="color:var(--text2)">${fmtMoney(t.frete||0)}</span>
@@ -7236,6 +7642,462 @@ async function checkAllTablesExtended() {
     toast(`⚠️ ${missing.length} tabela(s) fiscal(is) pendente(s): ${missing.join(', ')}`, 'warning', 6000);
   }
 }
+
+// ══════════════════════════════════════════════════════════════════
+//  MÓDULO DE PLANOS & ASSINATURAS — BACKENDLESS INTEGRADO
+// ══════════════════════════════════════════════════════════════════
+
+const PLANOS_DEFAULT = [
+  { nome:'Básico',         valor:247, cor:'#3b82f6', icone:'🌱', descricao:'Ideal para começar',            beneficios:'Suporte por e-mail\nAcesso básico\n1 usuário' },
+  { nome:'Intermediário',  valor:497, cor:'#8b5cf6', icone:'⚡', descricao:'Para negócios em crescimento',  beneficios:'Suporte prioritário\nAcesso completo\n3 usuários\nRelatórios mensais' },
+  { nome:'Profissional',   valor:897, cor:'#f59e0b', icone:'👑', descricao:'Para negócios avançados',       beneficios:'Suporte 24/7\nTodos os recursos\nUsuários ilimitados\nRelatórios avançados\nAPI de integração' },
+  { nome:'Serviço Avulso', valor:250, cor:'#10b981', icone:'🔧', descricao:'Serviço pontual sem recorrência',beneficios:'Execução única\nSem recorrência' },
+];
+
+async function criarPlanosDefault() {
+  try {
+    for (const p of PLANOS_DEFAULT) {
+      const created = await blCreate('PlanosConfig', { ...p, ativo:true, criadoEm:new Date().toISOString() }).catch(()=>null);
+      if (created) allPlanosConfig.push(created);
+    }
+  } catch(e) { console.warn('Planos default:', e.message); }
+}
+
+function calcStatusPlano(dataVencimento, statusPagamento) {
+  if (statusPagamento === 'Pago') return 'Pago';
+  if (statusPagamento === 'Cancelado') return 'Cancelado';
+  if (!dataVencimento) return statusPagamento || 'Pendente';
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const venc = new Date(dataVencimento); venc.setHours(0,0,0,0);
+  const diff = Math.round((venc - hoje)/(1000*60*60*24));
+  if (diff < 0)   return 'Atrasado';
+  if (diff === 0) return 'Vence Hoje';
+  if (diff <= 7)  return 'Vence em 7 dias';
+  return statusPagamento || 'Pendente';
+}
+
+function badgePlanoStatus(status) {
+  const map = {
+    'Pago':           'background:rgba(16,185,129,0.15);color:var(--green2);border:1px solid rgba(16,185,129,0.25)',
+    'Vence Hoje':     'background:rgba(245,158,11,0.15);color:var(--yellow2);border:1px solid rgba(245,158,11,0.25)',
+    'Vence em 7 dias':'background:rgba(249,115,22,0.15);color:#fb923c;border:1px solid rgba(249,115,22,0.25)',
+    'Atrasado':       'background:rgba(239,68,68,0.15);color:var(--red2);border:1px solid rgba(239,68,68,0.25)',
+    'Pendente':       'background:var(--surface2);color:var(--text2);border:1px solid var(--border)',
+    'Cancelado':      'background:rgba(100,116,139,0.15);color:#94a3b8;border:1px solid rgba(100,116,139,0.25)',
+  };
+  const icons = { 'Pago':'🟢','Vence Hoje':'🟡','Vence em 7 dias':'🟠','Atrasado':'🔴','Pendente':'⚪','Cancelado':'⛔' };
+  const style = map[status] || map['Pendente'];
+  return `<span class="badge" style="${style}">${icons[status]||'•'} ${status}</span>`;
+}
+
+async function loadPlanos() {
+  try {
+    [allPlanosClientes, allPlanosConfig, allPagamentosPlanos] = await Promise.all([
+      blGetOwned('Planos','','',200).catch(()=>[]),
+      blGetOwned('PlanosConfig','','',50).catch(()=>[]),
+      blGetOwned('PagamentosPlanos','','',200).catch(()=>[]),
+    ]);
+    if (allPlanosConfig.length===0) await criarPlanosDefault();
+  } catch(e) { console.warn('Planos load:', e); }
+  filtPlanosClientes = [...allPlanosClientes];
+  renderKPIPlanos();
+  renderAlertasPlanos();
+  renderTabelaPlanos();
+  renderGraficosPlanos();
+  renderTabelaPagamentos();
+  atualizarMetaPlanos();
+  _updateBadgesPlanos();
+}
+
+function renderKPIPlanos() {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const mesStart = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+  const ativos = allPlanosClientes.filter(c=>c.statusPagamento!=='Cancelado');
+  const inadimplentes = allPlanosClientes.filter(c=>calcStatusPlano(c.dataVencimento,c.statusPagamento)==='Atrasado');
+  const avulsos = allPlanosClientes.filter(c=>c.plano==='Serviço Avulso' && new Date(c.criadoEm||0)>=mesStart);
+  const recorrentes = ativos.filter(c=>c.plano!=='Serviço Avulso');
+  const mrr = recorrentes.reduce((s,c)=>s+(c.valor||0),0);
+  const ticket = recorrentes.length ? mrr/recorrentes.length : 0;
+  const inadVal = inadimplentes.reduce((s,c)=>s+(c.valor||0),0);
+  setText('pl-ativos', ativos.length);
+  setText('pl-ativos-meta', `${ativos.length} com plano ativo`);
+  setText('pl-mrr', formatMoney(mrr));
+  setText('pl-arr', formatMoney(mrr*12));
+  setText('pl-ticket', formatMoney(ticket));
+  setText('pl-inadimplentes', inadimplentes.length);
+  setText('pl-inadimplentes-val', `${formatMoney(inadVal)} em atraso`);
+  setText('pl-avulsos', avulsos.length);
+  setText('pl-avulsos-val', `${formatMoney(avulsos.reduce((s,c)=>s+(c.valor||0),0))} no mês`);
+}
+
+function renderAlertasPlanos() {
+  const el = document.getElementById('planos-alertas');
+  if (!el) return;
+  const alertas = [];
+  allPlanosClientes.forEach(c=>{
+    const s = calcStatusPlano(c.dataVencimento,c.statusPagamento);
+    if (s==='Atrasado')         alertas.push({tipo:'error',   msg:`🔴 <b>${c.nomeCliente||'--'}</b> — pagamento em atraso desde ${fmtDate(c.dataVencimento)}`});
+    else if(s==='Vence Hoje')   alertas.push({tipo:'warning', msg:`🟡 <b>${c.nomeCliente||'--'}</b> — vence HOJE!`});
+    else if(s==='Vence em 7 dias') alertas.push({tipo:'info', msg:`🟠 <b>${c.nomeCliente||'--'}</b> — vence em breve (${fmtDate(c.dataVencimento)})`});
+  });
+  if (!alertas.length) { el.innerHTML=''; return; }
+  el.innerHTML = alertas.slice(0,6).map(a=>`
+    <div style="padding:10px 16px;border-radius:10px;font-size:0.84rem;
+      ${a.tipo==='error'?'background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:var(--red2)':
+        a.tipo==='warning'?'background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);color:var(--yellow2)':
+        'background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.2);color:#fb923c'}">${a.msg}</div>
+  `).join('');
+  // Inject to main notification center
+  alertas.forEach(a=>{
+    try {
+      const dd=document.getElementById('notif-dropdown'); if(!dd) return;
+      const plain=a.msg.replace(/<[^>]+>/g,'');
+      const exists=[...dd.querySelectorAll('.notif-title')].some(e=>e.textContent.includes(plain.slice(0,25)));
+      if(exists) return;
+      const item=document.createElement('div');
+      item.className=`notif-item ${a.tipo==='error'?'error':'warning'}`;
+      item.innerHTML=`<div class="notif-type">${a.tipo==='error'?'PLANOS – INADIMPLENTE':'PLANOS – VENCIMENTO'}</div><div class="notif-title">${plain}</div>`;
+      dd.insertBefore(item,dd.querySelector('.notif-item')||null);
+      const cnt=dd.querySelectorAll('.notif-item').length;
+      const dot=document.getElementById('notif-count');
+      if(dot){dot.textContent=cnt;dot.classList.remove('hidden');}
+    } catch{}
+  });
+}
+
+function filtrarPlanos() {
+  const q  = (document.getElementById('pl-search')?.value||'').toLowerCase();
+  const pl = document.getElementById('pl-filter-plano')?.value||'';
+  const st = document.getElementById('pl-filter-status')?.value||'';
+  filtPlanosClientes = allPlanosClientes.filter(c=>{
+    if (q && !(c.nomeCliente||'').toLowerCase().includes(q) && !(c.empresa||'').toLowerCase().includes(q) && !(c.email||'').toLowerCase().includes(q)) return false;
+    if (pl && c.plano!==pl) return false;
+    if (st && calcStatusPlano(c.dataVencimento,c.statusPagamento)!==st) return false;
+    return true;
+  });
+  pagPlanos=1;
+  renderTabelaPlanos();
+}
+
+function renderTabelaPlanos() {
+  const tb=document.getElementById('planos-tbody');
+  const PAGE=15;
+  const start=(pagPlanos-1)*PAGE;
+  const page=filtPlanosClientes.slice(start,start+PAGE);
+  setText('planos-count',`${filtPlanosClientes.length} cliente${filtPlanosClientes.length!==1?'s':''}`);
+  if (!filtPlanosClientes.length) {
+    tb.innerHTML='<tr><td colspan="9" style="padding:40px;text-align:center;color:var(--text3)">Nenhum cliente cadastrado. Clique em <b>Novo Cliente</b> para começar.</td></tr>';
+    const pp=document.getElementById('planos-pagination'); if(pp) pp.innerHTML=''; return;
+  }
+  tb.innerHTML=page.map(c=>{
+    const status=calcStatusPlano(c.dataVencimento,c.statusPagamento);
+    const cfg=allPlanosConfig.find(p=>p.nome===c.plano);
+    const cor=cfg?.cor||'var(--accent)';
+    return `<tr>
+      <td><div class="flex items-center gap-2">
+        <div style="width:32px;height:32px;border-radius:9px;background:${cor}22;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">${cfg?.icone||'👤'}</div>
+        <div><div class="font-medium text-sm">${c.nomeCliente||'--'}</div><div class="text-xs text-muted">${c.email||c.telefone||''}</div></div>
+      </div></td>
+      <td class="text-sm text-muted">${c.empresa||'--'}</td>
+      <td><span class="badge" style="background:${cor}22;color:${cor};border:1px solid ${cor}44">${c.plano||'--'}</span></td>
+      <td class="font-semibold text-sm">${formatMoney(c.valor||0)}</td>
+      <td class="text-sm text-muted">${fmtDate(c.dataPagamento)}</td>
+      <td class="text-sm text-muted">${fmtDate(c.dataVencimento)}</td>
+      <td>${badgePlanoStatus(status)}</td>
+      <td class="text-sm text-muted">${c.formaPagamento||'--'}</td>
+      <td><div class="flex gap-1">
+        <button class="btn btn-icon btn-sm" onclick="editarClientePlano('${c.objectId}')" title="Editar">✏️</button>
+        <button class="btn btn-success btn-sm" onclick="registrarPagamento('${c.objectId}')" title="Pago">💳</button>
+        <button class="btn btn-danger btn-sm" onclick="deletarClientePlano('${c.objectId}')">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  // Pagination
+  const paginationEl=document.getElementById('planos-pagination');
+  const total=Math.ceil(filtPlanosClientes.length/PAGE);
+  if (!paginationEl||total<=1){if(paginationEl)paginationEl.innerHTML='';return;}
+  let btns='';
+  for(let i=1;i<=Math.min(total,7);i++) btns+=`<div class="page-btn ${i===pagPlanos?'active':''}" onclick="pagPlanos=${i};renderTabelaPlanos()">${i}</div>`;
+  paginationEl.innerHTML=btns;
+}
+
+function populatePlanosSelect() {
+  const sel=document.getElementById('plcli-plano'); if(sel) {
+    sel.innerHTML='<option value="">Selecione o plano...</option>'+
+      allPlanosConfig.filter(p=>p.ativo!==false).map(p=>`<option value="${p.nome}">${p.icone||''} ${p.nome} — ${formatMoney(p.valor)}</option>`).join('');
+  }
+  // Também popula o select de plano no modal de produto
+  const psel = document.getElementById('p-plano'); if(psel) {
+    const current = psel.value;
+    psel.innerHTML='<option value="">Nenhum</option>'+
+      allPlanosConfig.filter(p=>p.ativo!==false).map(p=>`<option value="${p.nome}">${p.icone||''} ${p.nome} — ${formatMoney(p.valor)}${p.nome!=='Serviço Avulso'?'/mês':''}</option>`).join('');
+    if(current) psel.value = current;
+  }
+}
+
+function preencherValorPlano() {
+  const nome=document.getElementById('plcli-plano')?.value;
+  const cfg=allPlanosConfig.find(p=>p.nome===nome);
+  if(cfg){const v=document.getElementById('plcli-valor');if(v)v.value=cfg.valor;}
+}
+
+function editarClientePlano(id) {
+  const c=allPlanosClientes.find(x=>x.objectId===id); if(!c) return;
+  populatePlanosSelect();
+  setVal('plcli-id',id); setVal('plcli-nome',c.nomeCliente); setVal('plcli-empresa',c.empresa);
+  setVal('plcli-tel',c.telefone); setVal('plcli-email',c.email); setVal('plcli-plano',c.plano);
+  setVal('plcli-valor',c.valor); setVal('plcli-datapag',c.dataPagamento?.split('T')[0]);
+  setVal('plcli-datavenc',c.dataVencimento?.split('T')[0]); setVal('plcli-forma',c.formaPagamento);
+  setVal('plcli-statuspag',c.statusPagamento); setVal('plcli-obs',c.observacoes);
+  document.getElementById('modal-plano-cli-title').textContent='✏️ Editar Cliente';
+  openModal('modal-plano-cliente');
+}
+
+async function salvarClientePlano() {
+  const nome=document.getElementById('plcli-nome')?.value?.trim();
+  const plano=document.getElementById('plcli-plano')?.value;
+  if(!nome){toast('Nome é obrigatório','warning');return;}
+  if(!plano){toast('Selecione um plano','warning');return;}
+  const id=document.getElementById('plcli-id')?.value;
+  const obj={
+    nomeCliente:nome, empresa:document.getElementById('plcli-empresa')?.value||'',
+    telefone:document.getElementById('plcli-tel')?.value||'', email:document.getElementById('plcli-email')?.value||'',
+    plano, valor:parseFloat(document.getElementById('plcli-valor')?.value)||0,
+    dataPagamento:document.getElementById('plcli-datapag')?.value||null,
+    dataVencimento:document.getElementById('plcli-datavenc')?.value||null,
+    formaPagamento:document.getElementById('plcli-forma')?.value||'PIX',
+    statusPagamento:document.getElementById('plcli-statuspag')?.value||'Pago',
+    observacoes:document.getElementById('plcli-obs')?.value||'',
+    atualizadoEm:new Date().toISOString(),
+  };
+  try {
+    if(id){
+      await blUpdate('Planos',id,obj);
+      const idx=allPlanosClientes.findIndex(x=>x.objectId===id);
+      if(idx>=0) allPlanosClientes[idx]={...allPlanosClientes[idx],...obj};
+      toast('Cliente atualizado!','success');
+    } else {
+      obj.criadoEm=new Date().toISOString();
+      const saved=await blCreate('Planos',obj);
+      allPlanosClientes.unshift(saved||obj);
+      if(obj.statusPagamento==='Pago'&&obj.dataPagamento){
+        await blCreate('PagamentosPlanos',{
+          cliente:nome,plano,valor:obj.valor,dataPagamento:obj.dataPagamento,
+          competencia:obj.dataPagamento?.slice(0,7)||new Date().toISOString().slice(0,7),
+          status:'Pago',formaPagamento:obj.formaPagamento,clienteId:(saved||obj).objectId||'',
+        }).catch(()=>{});
+      }
+      toast('Cliente cadastrado!','success');
+    }
+    closeModal('modal-plano-cliente');
+    filtPlanosClientes=[...allPlanosClientes];
+    renderKPIPlanos();renderTabelaPlanos();renderGraficosPlanos();renderAlertasPlanos();_updateBadgesPlanos();
+  } catch(e){toast('Erro: '+e.message,'error');}
+}
+
+async function deletarClientePlano(id){
+  confirm2('Excluir cliente?','Esta ação não pode ser desfeita.',async()=>{
+    try{
+      await blDelete('Planos',id);
+      allPlanosClientes=allPlanosClientes.filter(x=>x.objectId!==id);
+      filtPlanosClientes=[...allPlanosClientes];
+      renderKPIPlanos();renderTabelaPlanos();renderGraficosPlanos();_updateBadgesPlanos();
+      toast('Cliente removido.','success');
+    }catch(e){toast('Erro: '+e.message,'error');}
+  });
+}
+
+async function registrarPagamento(id){
+  const c=allPlanosClientes.find(x=>x.objectId===id); if(!c) return;
+  const hoje=new Date().toISOString().split('T')[0];
+  const d30=new Date(); d30.setDate(d30.getDate()+30);
+  const updates={statusPagamento:'Pago',dataPagamento:hoje,dataVencimento:d30.toISOString().split('T')[0],atualizadoEm:new Date().toISOString()};
+  try{
+    await blUpdate('Planos',id,updates); Object.assign(c,updates);
+    await blCreate('PagamentosPlanos',{
+      cliente:c.nomeCliente,plano:c.plano,valor:c.valor||0,dataPagamento:hoje,
+      competencia:hoje.slice(0,7),status:'Pago',formaPagamento:c.formaPagamento||'PIX',clienteId:id,
+    }).catch(()=>{});
+    toast(`✅ Pagamento de ${c.nomeCliente} registrado!`,'success');
+    filtPlanosClientes=[...allPlanosClientes];
+    renderKPIPlanos();renderTabelaPlanos();renderAlertasPlanos();_updateBadgesPlanos();
+  }catch(e){toast('Erro: '+e.message,'error');}
+}
+
+let chartsPlanos={};
+function renderGraficosPlanos(){
+  const ctx1=document.getElementById('chart-planos-mrr');
+  if(ctx1){
+    if(chartsPlanos.mrr)chartsPlanos.mrr.destroy();
+    const months=[];
+    for(let i=5;i>=0;i--){const d=new Date();d.setMonth(d.getMonth()-i);months.push({label:d.toLocaleString('pt-BR',{month:'short',year:'2-digit'}),y:d.getFullYear(),m:d.getMonth()+1});}
+    const data=months.map(m=>allPlanosClientes.filter(c=>{const dp=c.dataPagamento||c.criadoEm||'';const d=new Date(dp);return d.getFullYear()===m.y&&d.getMonth()+1===m.m;}).reduce((s,c)=>s+(c.valor||0),0));
+    chartsPlanos.mrr=new Chart(ctx1,{type:'bar',data:{labels:months.map(m=>m.label),datasets:[{label:'Receita',data,backgroundColor:'rgba(99,102,241,0.7)',borderRadius:6,borderSkipped:false}]},options:{...chartOpts({prefix:'R$ '}),plugins:{...chartOpts().plugins,legend:{display:false}}}});
+  }
+  const ctx2=document.getElementById('chart-planos-dist');
+  if(ctx2){
+    if(chartsPlanos.dist)chartsPlanos.dist.destroy();
+    const dist={};
+    allPlanosClientes.forEach(c=>{dist[c.plano||'Outros']=(dist[c.plano||'Outros']||0)+1;});
+    const labels=Object.keys(dist),vals=Object.values(dist);
+    const colors=labels.map(l=>allPlanosConfig.find(p=>p.nome===l)?.cor||'#6366f1');
+    chartsPlanos.dist=new Chart(ctx2,{type:'doughnut',data:{labels,datasets:[{data:vals,backgroundColor:colors.map(c=>c+'cc'),borderColor:colors,borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'bottom',labels:{color:'#8b9cc8',boxWidth:12,padding:12}}}}});
+  }
+}
+
+function filtrarPagamentos(){renderTabelaPagamentos();}
+function renderTabelaPagamentos(){
+  const periodo=document.getElementById('pl-pag-periodo')?.value||'mes';
+  const agora=new Date();
+  let filtrados=allPagamentosPlanos.filter(p=>{
+    const d=new Date(p.dataPagamento||p.criadoEm||0);
+    if(periodo==='hoje') return d.toDateString()===agora.toDateString();
+    if(periodo==='semana'){const s=new Date(agora);s.setDate(s.getDate()-7);return d>=s;}
+    if(periodo==='mes') return d.getFullYear()===agora.getFullYear()&&d.getMonth()===agora.getMonth();
+    if(periodo==='ano') return d.getFullYear()===agora.getFullYear();
+    return true;
+  });
+  filtrados.sort((a,b)=>new Date(b.dataPagamento||0)-new Date(a.dataPagamento||0));
+  const total=filtrados.reduce((s,p)=>s+(p.valor||0),0);
+  const ticket=filtrados.length?total/filtrados.length:0;
+  setText('pl-fat-total',formatMoney(total));setText('pl-fat-qtd',filtrados.length);setText('pl-fat-ticket',formatMoney(ticket));
+  const tb=document.getElementById('pagamentos-tbody'); if(!tb)return;
+  if(!filtrados.length){tb.innerHTML='<tr><td colspan="7" style="padding:32px;text-align:center;color:var(--text3)">Nenhum pagamento no período selecionado</td></tr>';return;}
+  const color=nome=>allPlanosConfig.find(p=>p.nome===nome)?.cor||'var(--accent)';
+  tb.innerHTML=filtrados.slice(0,50).map(p=>`<tr>
+    <td class="font-medium text-sm">${p.cliente||'--'}</td>
+    <td><span class="badge" style="background:${color(p.plano)}22;color:${color(p.plano)};border:1px solid ${color(p.plano)}44">${p.plano||'--'}</span></td>
+    <td class="font-semibold text-green">${formatMoney(p.valor||0)}</td>
+    <td class="text-sm text-muted">${fmtDate(p.dataPagamento)}</td>
+    <td class="text-sm text-muted">${p.competencia||'--'}</td>
+    <td>${badgePlanoStatus(p.status||'Pago')}</td>
+    <td class="text-sm text-muted">${p.formaPagamento||'--'}</td>
+  </tr>`).join('');
+}
+
+function atualizarMetaPlanos(){
+  const meta=parseFloat(document.getElementById('pl-meta-input')?.value)||parseFloat(localStorage.getItem('planos-meta')||'0');
+  const mrr=allPlanosClientes.filter(c=>c.plano!=='Serviço Avulso').reduce((s,c)=>s+(c.valor||0),0);
+  const pct=meta>0?Math.min(mrr/meta*100,100):0;
+  setText('pl-meta-realizado',formatMoney(mrr));setText('pl-meta-valor',formatMoney(meta));
+  setText('pl-meta-pct',pct.toFixed(0)+'%');setText('pl-meta-faltante',formatMoney(Math.max(meta-mrr,0)));
+  const bar=document.getElementById('pl-meta-bar');if(bar)bar.style.width=pct+'%';
+}
+function salvarMetaPlanos(){
+  localStorage.setItem('planos-meta',document.getElementById('pl-meta-input')?.value||'0');
+  atualizarMetaPlanos();toast('Meta salva!','success');
+}
+
+function exportarPlanosCSV(){
+  const rows=[['Nome','Empresa','WhatsApp','Email','Plano','Valor','Pagamento','Vencimento','Status','Forma','Obs']];
+  filtPlanosClientes.forEach(c=>{const s=calcStatusPlano(c.dataVencimento,c.statusPagamento);rows.push([c.nomeCliente,c.empresa,c.telefone,c.email,c.plano,c.valor,fmtDate(c.dataPagamento),fmtDate(c.dataVencimento),s,c.formaPagamento,c.observacoes||'']);});
+  const csv=rows.map(r=>r.map(x=>`"${(x||'').toString().replace(/"/g,'""')}"`).join(';')).join('\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`planos_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+  toast('CSV exportado!','success');
+}
+function exportarPlanosPDF(){
+  const mrr=allPlanosClientes.filter(c=>c.plano!=='Serviço Avulso').reduce((s,c)=>s+(c.valor||0),0);
+  const html=`<html><head><title>Planos</title><style>body{font-family:sans-serif;padding:30px;color:#111}h1{font-size:1.4rem}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{padding:8px 12px;border:1px solid #ccc;font-size:0.82rem;text-align:left}th{background:#f0f0f0}</style></head><body><h1>📋 Relatório de Planos — ${new Date().toLocaleDateString('pt-BR')}</h1><p>Clientes: <b>${filtPlanosClientes.length}</b> · MRR: <b>${formatMoney(mrr)}</b></p><table><thead><tr><th>Cliente</th><th>Plano</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Forma</th></tr></thead><tbody>${filtPlanosClientes.map(c=>{const s=calcStatusPlano(c.dataVencimento,c.statusPagamento);return`<tr><td>${c.nomeCliente||''}</td><td>${c.plano||''}</td><td>${formatMoney(c.valor||0)}</td><td>${fmtDate(c.dataVencimento)}</td><td>${s}</td><td>${c.formaPagamento||''}</td></tr>`;}).join('')}</tbody></table></body></html>`;
+  const w=window.open('','_blank');w.document.write(html);w.document.close();w.print();
+}
+function exportarPlanosExcel(){
+  const rows=[['Nome','Empresa','WhatsApp','Email','Plano','Valor','Data Pagamento','Data Vencimento','Status','Forma','Obs']];
+  filtPlanosClientes.forEach(c=>{const s=calcStatusPlano(c.dataVencimento,c.statusPagamento);rows.push([c.nomeCliente,c.empresa,c.telefone,c.email,c.plano,c.valor,fmtDate(c.dataPagamento),fmtDate(c.dataVencimento),s,c.formaPagamento,c.observacoes||'']);});
+  const csv=rows.map(r=>r.join('\t')).join('\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'application/vnd.ms-excel;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`planos_${new Date().toISOString().slice(0,10)}.xls`;a.click();
+  toast('Excel exportado!','success');
+}
+
+async function loadPlanosAdmin(){
+  try{allPlanosConfig=await blGetOwned('PlanosConfig','','',50).catch(()=>[]);}catch(e){console.warn(e);}
+  renderAdminPlanos();
+}
+function renderAdminPlanos(){
+  const grid=document.getElementById('admin-planos-grid');if(!grid)return;
+  if(!allPlanosConfig.length){grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--text3)">Nenhum plano cadastrado.</div>';return;}
+  grid.innerHTML=allPlanosConfig.map(p=>`
+    <div class="card p-4" style="border-top:4px solid ${p.cor||'var(--accent)'};position:relative">
+      <div class="flex items-center gap-3 mb-3">
+        <div style="width:44px;height:44px;border-radius:12px;background:${p.cor||'var(--accent)'}22;display:flex;align-items:center;justify-content:center;font-size:1.5rem">${p.icone||'⭐'}</div>
+        <div>
+          <div class="font-display font-bold text-lg">${p.nome||'--'}</div>
+          <div class="font-display font-bold" style="color:${p.cor||'var(--accent)'};font-size:1.3rem">${formatMoney(p.valor||0)}<span style="font-size:0.75rem;color:var(--text3);font-family:var(--font)">/mês</span></div>
+        </div>
+      </div>
+      ${p.descricao?`<div class="text-sm text-muted mb-3">${p.descricao}</div>`:''}
+      <div class="flex flex-col gap-1 mb-3">${(p.beneficios||'').split('\n').filter(Boolean).map(b=>`<div style="font-size:0.82rem;display:flex;gap:6px"><span style="color:${p.cor||'var(--accent)'}">✓</span><span>${b}</span></div>`).join('')}</div>
+      <div style="position:absolute;top:10px;right:10px" class="flex gap-1">
+        <button class="btn btn-icon btn-sm" onclick="abrirEditarPlanoAdmin('${p.objectId}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deletarPlanoAdmin('${p.objectId}')">🗑</button>
+      </div>
+      <div class="text-xs text-muted" style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px">${allPlanosClientes.filter(c=>c.plano===p.nome).length} clientes ativos</div>
+    </div>
+  `).join('');
+}
+
+function abrirEditarPlanoAdmin(id){
+  const p=allPlanosConfig.find(x=>x.objectId===id);
+  document.getElementById('ep-id').value=id||'';
+  document.getElementById('modal-edit-plano-title').textContent=p?'Editar Plano':'Novo Plano';
+  if(p){setVal('ep-nome',p.nome);setVal('ep-valor',p.valor);setVal('ep-cor',p.cor||'#6366f1');setVal('ep-icone',p.icone);setVal('ep-beneficios',p.beneficios);setVal('ep-desc',p.descricao);}
+  else{['ep-nome','ep-valor','ep-icone','ep-beneficios','ep-desc'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});document.getElementById('ep-cor').value='#6366f1';}
+  openModal('modal-editar-plano');
+}
+
+async function salvarPlanoAdmin(){
+  const nome=document.getElementById('ep-nome')?.value?.trim();
+  if(!nome){toast('Nome obrigatório','warning');return;}
+  const id=document.getElementById('ep-id')?.value;
+  const obj={nome,valor:parseFloat(document.getElementById('ep-valor')?.value)||0,cor:document.getElementById('ep-cor')?.value||'#6366f1',icone:document.getElementById('ep-icone')?.value||'⭐',beneficios:document.getElementById('ep-beneficios')?.value||'',descricao:document.getElementById('ep-desc')?.value||'',ativo:true};
+  try{
+    if(id){await blUpdate('PlanosConfig',id,obj);const idx=allPlanosConfig.findIndex(x=>x.objectId===id);if(idx>=0)allPlanosConfig[idx]={...allPlanosConfig[idx],...obj};toast('Plano atualizado!','success');}
+    else{obj.criadoEm=new Date().toISOString();const saved=await blCreate('PlanosConfig',obj);allPlanosConfig.push(saved||obj);toast('Plano criado!','success');}
+    closeModal('modal-editar-plano');renderAdminPlanos();
+  }catch(e){toast('Erro: '+e.message,'error');}
+}
+
+async function deletarPlanoAdmin(id){
+  const p=allPlanosConfig.find(x=>x.objectId===id);
+  const emUso=allPlanosClientes.filter(c=>c.plano===p?.nome).length;
+  if(emUso>0){toast(`⚠️ Plano tem ${emUso} cliente(s). Remova-os primeiro.`,'warning');return;}
+  confirm2('Excluir plano?','Esta ação não pode ser desfeita.',async()=>{
+    try{await blDelete('PlanosConfig',id);allPlanosConfig=allPlanosConfig.filter(x=>x.objectId!==id);renderAdminPlanos();toast('Plano excluído.','success');}
+    catch(e){toast('Erro: '+e.message,'error');}
+  });
+}
+
+function _updateBadgesPlanos(){
+  const n=allPlanosClientes.filter(c=>calcStatusPlano(c.dataVencimento,c.statusPagamento)==='Atrasado').length;
+  const b=document.getElementById('badge-planos');
+  if(b){b.textContent=n;b.classList.toggle('hidden',n===0);}
+}
+
+// Intercept btn novo cliente to populate select
+document.addEventListener('DOMContentLoaded',()=>{
+  const btn=document.getElementById('btn-novo-cliente-plano');
+  if(btn) btn.onclick=()=>{
+    document.getElementById('plcli-id').value='';
+    document.getElementById('modal-plano-cli-title').textContent='➕ Novo Cliente';
+    ['plcli-nome','plcli-empresa','plcli-tel','plcli-email','plcli-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    document.getElementById('plcli-valor').value='';
+    document.getElementById('plcli-datapag').value=new Date().toISOString().split('T')[0];
+    const d30=new Date();d30.setDate(d30.getDate()+30);document.getElementById('plcli-datavenc').value=d30.toISOString().split('T')[0];
+    setVal('plcli-statuspag','Pago');populatePlanosSelect();openModal('modal-plano-cliente');
+  };
+  const btnAdmin=document.querySelector('#page-planos-admin .btn-primary');
+  if(btnAdmin) btnAdmin.onclick=()=>abrirEditarPlanoAdmin('');
+});
+
+// CSS extra para Planos
+(()=>{const s=document.createElement('style');s.textContent=`
+#page-planos .stats-grid{grid-template-columns:repeat(3,1fr)}
+@media(max-width:900px){#page-planos .stats-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){#page-planos .stats-grid{grid-template-columns:1fr}}
+`;document.head.appendChild(s);})();
+
+
 
 
 </script>

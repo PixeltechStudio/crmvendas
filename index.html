@@ -2617,6 +2617,219 @@ tbody tr{transition:background 0.15s}
 
 </section><!-- end page-contador -->
 
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- PLANOS PAGE                                              -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="page" id="page-planos">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <div class="page-title" style="display:flex;align-items:center;gap:10px">
+        <span style="background:linear-gradient(135deg,var(--green),var(--green2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Planos &amp; Assinaturas</span>
+      </div>
+      <div class="page-sub">Gerencie clientes, planos, pagamentos e faturamento recorrente</div>
+    </div>
+    <div class="page-actions">
+      <button class="btn btn-secondary btn-sm" onclick="navigate('planos-admin')" style="gap:6px">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.34 19.66l-1.41 1.41M20 12h2M2 12h2M19.07 19.07l-1.41-1.41M4.34 4.34L2.93 2.93M12 20v2M12 2v2"/></svg>
+        Admin Planos
+      </button>
+      <button class="btn btn-primary" onclick="openModal('modal-plano-cliente')" id="btn-novo-cliente-plano">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Cliente
+      </button>
+    </div>
+  </div>
+
+  <!-- Notificações de vencimento -->
+  <div id="planos-alertas" style="display:flex;flex-direction:column;gap:8px;margin-bottom:4px"></div>
+
+  <!-- Cards KPI -->
+  <div class="stats-grid" id="planos-kpi-grid">
+    <div class="stat-card" style="--stat-color:var(--green)">
+      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--green2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+      <div class="stat-label">Clientes Ativos</div>
+      <div class="stat-value" id="pl-ativos" style="color:var(--green2)">0</div>
+      <div class="stat-meta" id="pl-ativos-meta">com plano ativo</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--accent)">
+      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--accent2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+      <div class="stat-label">MRR</div>
+      <div class="stat-value" id="pl-mrr" style="color:var(--accent2)">R$ 0</div>
+      <div class="stat-meta">Receita Mensal Recorrente</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--blue)">
+      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--blue2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+      <div class="stat-label">ARR (Projetado)</div>
+      <div class="stat-value" id="pl-arr" style="color:var(--blue2)">R$ 0</div>
+      <div class="stat-meta">Receita Anual Projetada</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--yellow)">
+      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--yellow2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div class="stat-label">Ticket Médio</div>
+      <div class="stat-value" id="pl-ticket" style="color:var(--yellow2)">R$ 0</div>
+      <div class="stat-meta">por cliente ativo</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--red)">
+      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--red2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      <div class="stat-label">Inadimplentes</div>
+      <div class="stat-value" id="pl-inadimplentes" style="color:var(--red2)">0</div>
+      <div class="stat-meta" id="pl-inadimplentes-val">R$ 0 em atraso</div>
+    </div>
+    <div class="stat-card" style="--stat-color:#a855f7">
+      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+      <div class="stat-label">Avulsos (mês)</div>
+      <div class="stat-value" id="pl-avulsos" style="color:#c084fc">0</div>
+      <div class="stat-meta" id="pl-avulsos-val">serviços avulsos</div>
+    </div>
+  </div>
+
+  <!-- Meta Mensal -->
+  <div class="card p-4" id="planos-meta-card">
+    <div class="flex items-center justify-between mb-2" style="flex-wrap:wrap;gap:10px">
+      <div>
+        <div class="font-display font-bold text-lg">🎯 Meta Mensal de Receita</div>
+        <div class="text-sm text-muted mt-1">Acompanhe o progresso do faturamento recorrente</div>
+      </div>
+      <div class="flex gap-2 items-center">
+        <input type="number" class="input" id="pl-meta-input" placeholder="Meta R$" style="width:160px" oninput="atualizarMetaPlanos()"/>
+        <button class="btn btn-primary btn-sm" onclick="salvarMetaPlanos()">Salvar</button>
+      </div>
+    </div>
+    <div class="flex gap-4 items-center" style="flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <div class="progress-bar" style="height:12px;margin-bottom:8px">
+          <div class="progress-fill" id="pl-meta-bar" style="width:0%;background:linear-gradient(90deg,var(--green),var(--green2))"></div>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-muted">Realizado: <span id="pl-meta-realizado" class="font-bold text-green">R$ 0</span></span>
+          <span class="text-muted">Meta: <span id="pl-meta-valor" class="font-bold">R$ 0</span></span>
+        </div>
+      </div>
+      <div style="text-align:center;min-width:100px">
+        <div class="font-display font-bold" id="pl-meta-pct" style="font-size:2rem;color:var(--green2)">0%</div>
+        <div class="text-xs text-muted">atingido</div>
+      </div>
+      <div style="text-align:center;min-width:100px">
+        <div class="font-display font-bold" id="pl-meta-faltante" style="font-size:1.2rem;color:var(--yellow2)">R$ 0</div>
+        <div class="text-xs text-muted">faltam para a meta</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráficos -->
+  <div class="grid" style="grid-template-columns:2fr 1fr;gap:16px">
+    <div class="card chart-card">
+      <div class="chart-title font-display">Receita por Mês</div>
+      <div class="chart-sub">Faturamento recorrente nos últimos 6 meses</div>
+      <div class="chart-wrap"><canvas id="chart-planos-mrr"></canvas></div>
+    </div>
+    <div class="card chart-card">
+      <div class="chart-title font-display">Clientes por Plano</div>
+      <div class="chart-sub">Distribuição atual</div>
+      <div class="chart-wrap"><canvas id="chart-planos-dist"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Filtros e tabela -->
+  <div class="card p-4">
+    <div class="flex items-center justify-between mb-3" style="flex-wrap:wrap;gap:10px">
+      <div class="font-display font-bold text-lg">Clientes / Assinaturas</div>
+      <div class="flex gap-2" style="flex-wrap:wrap">
+        <div class="input-icon" style="min-width:200px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="input" id="pl-search" placeholder="Buscar cliente..." oninput="filtrarPlanos()"/>
+        </div>
+        <select class="input" id="pl-filter-plano" style="width:auto" onchange="filtrarPlanos()">
+          <option value="">Todos os Planos</option>
+          <option value="Básico">Básico</option>
+          <option value="Intermediário">Intermediário</option>
+          <option value="Profissional">Profissional</option>
+          <option value="Serviço Avulso">Serviço Avulso</option>
+        </select>
+        <select class="input" id="pl-filter-status" style="width:auto" onchange="filtrarPlanos()">
+          <option value="">Todos os Status</option>
+          <option value="Pago">Pago</option>
+          <option value="Vence Hoje">Vence Hoje</option>
+          <option value="Vence em 7 dias">Vence em 7 dias</option>
+          <option value="Atrasado">Atrasado</option>
+        </select>
+        <div class="flex gap-1">
+          <button class="btn btn-secondary btn-sm" onclick="exportarPlanosCSV()" title="Exportar CSV">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            CSV
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="exportarPlanosPDF()" title="Exportar PDF">PDF</button>
+          <button class="btn btn-secondary btn-sm" onclick="exportarPlanosExcel()" title="Exportar Excel">XLS</button>
+        </div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Cliente</th><th>Empresa</th><th>Plano</th><th>Valor</th>
+          <th>Pagamento</th><th>Vencimento</th><th>Status</th><th>Forma</th><th>Ações</th>
+        </tr></thead>
+        <tbody id="planos-tbody"></tbody>
+      </table>
+    </div>
+    <div class="flex items-center justify-between mt-3" style="flex-wrap:wrap;gap:10px">
+      <div class="text-sm text-muted" id="planos-count">0 clientes</div>
+      <div class="pagination" id="planos-pagination"></div>
+    </div>
+  </div>
+
+  <!-- Tabela de Pagamentos -->
+  <div class="card p-4">
+    <div class="flex items-center justify-between mb-3" style="flex-wrap:wrap;gap:10px">
+      <div class="font-display font-bold text-lg">💳 Histórico de Pagamentos</div>
+      <div class="flex gap-2" style="flex-wrap:wrap">
+        <select class="input" id="pl-pag-periodo" style="width:auto" onchange="filtrarPagamentos()">
+          <option value="mes">Este Mês</option>
+          <option value="semana">Esta Semana</option>
+          <option value="hoje">Hoje</option>
+          <option value="ano">Este Ano</option>
+          <option value="todos">Todos</option>
+        </select>
+      </div>
+    </div>
+    <!-- Faturamento sub-cards -->
+    <div class="grid" style="grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+      <div class="fin-card"><div class="fin-card-label">Receita (filtro)</div><div class="fin-card-value" id="pl-fat-total" style="color:var(--green2)">R$ 0</div></div>
+      <div class="fin-card"><div class="fin-card-label">Qtd Pagamentos</div><div class="fin-card-value" id="pl-fat-qtd">0</div></div>
+      <div class="fin-card"><div class="fin-card-label">Ticket Médio</div><div class="fin-card-value" id="pl-fat-ticket" style="color:var(--accent2)">R$ 0</div></div>
+      <div class="fin-card"><div class="fin-card-label">Crescimento</div><div class="fin-card-value" id="pl-fat-crescimento" style="color:var(--yellow2)">0%</div></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Cliente</th><th>Plano</th><th>Valor</th><th>Pagamento</th><th>Competência</th><th>Status</th><th>Forma</th></tr></thead>
+        <tbody id="pagamentos-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ PLANOS ADMIN PAGE ══════════════════════ -->
+<section class="page" id="page-planos-admin">
+  <div class="page-header">
+    <div>
+      <div class="page-title">⚙️ Administração de Planos</div>
+      <div class="page-sub">Crie, edite e gerencie os planos disponíveis</div>
+    </div>
+    <div class="page-actions">
+      <button class="btn btn-secondary btn-sm" onclick="navigate('planos')">← Voltar</button>
+      <button class="btn btn-primary" onclick="openModal('modal-editar-plano')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Plano
+      </button>
+    </div>
+  </div>
+  <div id="admin-planos-grid" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+    <!-- rendered by JS -->
+  </div>
+</section>
+
     </main>
   </div>
 </div>
@@ -3316,217 +3529,7 @@ tbody tr{transition:background 0.15s}
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════ -->
-<!-- PLANOS PAGE                                              -->
-<!-- ══════════════════════════════════════════════════════════ -->
-<section class="page" id="page-planos">
-  <!-- Header -->
-  <div class="page-header">
-    <div>
-      <div class="page-title" style="display:flex;align-items:center;gap:10px">
-        <span style="background:linear-gradient(135deg,var(--green),var(--green2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Planos &amp; Assinaturas</span>
-      </div>
-      <div class="page-sub">Gerencie clientes, planos, pagamentos e faturamento recorrente</div>
-    </div>
-    <div class="page-actions">
-      <button class="btn btn-secondary btn-sm" onclick="navigate('planos-admin')" style="gap:6px">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.34 19.66l-1.41 1.41M20 12h2M2 12h2M19.07 19.07l-1.41-1.41M4.34 4.34L2.93 2.93M12 20v2M12 2v2"/></svg>
-        Admin Planos
-      </button>
-      <button class="btn btn-primary" onclick="openModal('modal-plano-cliente')" id="btn-novo-cliente-plano">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Novo Cliente
-      </button>
-    </div>
-  </div>
 
-  <!-- Notificações de vencimento -->
-  <div id="planos-alertas" style="display:flex;flex-direction:column;gap:8px;margin-bottom:4px"></div>
-
-  <!-- Cards KPI -->
-  <div class="stats-grid" id="planos-kpi-grid">
-    <div class="stat-card" style="--stat-color:var(--green)">
-      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--green2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
-      <div class="stat-label">Clientes Ativos</div>
-      <div class="stat-value" id="pl-ativos" style="color:var(--green2)">0</div>
-      <div class="stat-meta" id="pl-ativos-meta">com plano ativo</div>
-    </div>
-    <div class="stat-card" style="--stat-color:var(--accent)">
-      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--accent2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
-      <div class="stat-label">MRR</div>
-      <div class="stat-value" id="pl-mrr" style="color:var(--accent2)">R$ 0</div>
-      <div class="stat-meta">Receita Mensal Recorrente</div>
-    </div>
-    <div class="stat-card" style="--stat-color:var(--blue)">
-      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--blue2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
-      <div class="stat-label">ARR (Projetado)</div>
-      <div class="stat-value" id="pl-arr" style="color:var(--blue2)">R$ 0</div>
-      <div class="stat-meta">Receita Anual Projetada</div>
-    </div>
-    <div class="stat-card" style="--stat-color:var(--yellow)">
-      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--yellow2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-      <div class="stat-label">Ticket Médio</div>
-      <div class="stat-value" id="pl-ticket" style="color:var(--yellow2)">R$ 0</div>
-      <div class="stat-meta">por cliente ativo</div>
-    </div>
-    <div class="stat-card" style="--stat-color:var(--red)">
-      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--red2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-      <div class="stat-label">Inadimplentes</div>
-      <div class="stat-value" id="pl-inadimplentes" style="color:var(--red2)">0</div>
-      <div class="stat-meta" id="pl-inadimplentes-val">R$ 0 em atraso</div>
-    </div>
-    <div class="stat-card" style="--stat-color:#a855f7">
-      <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
-      <div class="stat-label">Avulsos (mês)</div>
-      <div class="stat-value" id="pl-avulsos" style="color:#c084fc">0</div>
-      <div class="stat-meta" id="pl-avulsos-val">serviços avulsos</div>
-    </div>
-  </div>
-
-  <!-- Meta Mensal -->
-  <div class="card p-4" id="planos-meta-card">
-    <div class="flex items-center justify-between mb-2" style="flex-wrap:wrap;gap:10px">
-      <div>
-        <div class="font-display font-bold text-lg">🎯 Meta Mensal de Receita</div>
-        <div class="text-sm text-muted mt-1">Acompanhe o progresso do faturamento recorrente</div>
-      </div>
-      <div class="flex gap-2 items-center">
-        <input type="number" class="input" id="pl-meta-input" placeholder="Meta R$" style="width:160px" oninput="atualizarMetaPlanos()"/>
-        <button class="btn btn-primary btn-sm" onclick="salvarMetaPlanos()">Salvar</button>
-      </div>
-    </div>
-    <div class="flex gap-4 items-center" style="flex-wrap:wrap">
-      <div style="flex:1;min-width:200px">
-        <div class="progress-bar" style="height:12px;margin-bottom:8px">
-          <div class="progress-fill" id="pl-meta-bar" style="width:0%;background:linear-gradient(90deg,var(--green),var(--green2))"></div>
-        </div>
-        <div class="flex justify-between text-sm">
-          <span class="text-muted">Realizado: <span id="pl-meta-realizado" class="font-bold text-green">R$ 0</span></span>
-          <span class="text-muted">Meta: <span id="pl-meta-valor" class="font-bold">R$ 0</span></span>
-        </div>
-      </div>
-      <div style="text-align:center;min-width:100px">
-        <div class="font-display font-bold" id="pl-meta-pct" style="font-size:2rem;color:var(--green2)">0%</div>
-        <div class="text-xs text-muted">atingido</div>
-      </div>
-      <div style="text-align:center;min-width:100px">
-        <div class="font-display font-bold" id="pl-meta-faltante" style="font-size:1.2rem;color:var(--yellow2)">R$ 0</div>
-        <div class="text-xs text-muted">faltam para a meta</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Gráficos -->
-  <div class="grid" style="grid-template-columns:2fr 1fr;gap:16px">
-    <div class="card chart-card">
-      <div class="chart-title font-display">Receita por Mês</div>
-      <div class="chart-sub">Faturamento recorrente nos últimos 6 meses</div>
-      <div class="chart-wrap"><canvas id="chart-planos-mrr"></canvas></div>
-    </div>
-    <div class="card chart-card">
-      <div class="chart-title font-display">Clientes por Plano</div>
-      <div class="chart-sub">Distribuição atual</div>
-      <div class="chart-wrap"><canvas id="chart-planos-dist"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Filtros e tabela -->
-  <div class="card p-4">
-    <div class="flex items-center justify-between mb-3" style="flex-wrap:wrap;gap:10px">
-      <div class="font-display font-bold text-lg">Clientes / Assinaturas</div>
-      <div class="flex gap-2" style="flex-wrap:wrap">
-        <div class="input-icon" style="min-width:200px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" class="input" id="pl-search" placeholder="Buscar cliente..." oninput="filtrarPlanos()"/>
-        </div>
-        <select class="input" id="pl-filter-plano" style="width:auto" onchange="filtrarPlanos()">
-          <option value="">Todos os Planos</option>
-          <option value="Básico">Básico</option>
-          <option value="Intermediário">Intermediário</option>
-          <option value="Profissional">Profissional</option>
-          <option value="Serviço Avulso">Serviço Avulso</option>
-        </select>
-        <select class="input" id="pl-filter-status" style="width:auto" onchange="filtrarPlanos()">
-          <option value="">Todos os Status</option>
-          <option value="Pago">Pago</option>
-          <option value="Vence Hoje">Vence Hoje</option>
-          <option value="Vence em 7 dias">Vence em 7 dias</option>
-          <option value="Atrasado">Atrasado</option>
-        </select>
-        <div class="flex gap-1">
-          <button class="btn btn-secondary btn-sm" onclick="exportarPlanosCSV()" title="Exportar CSV">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            CSV
-          </button>
-          <button class="btn btn-secondary btn-sm" onclick="exportarPlanosPDF()" title="Exportar PDF">PDF</button>
-          <button class="btn btn-secondary btn-sm" onclick="exportarPlanosExcel()" title="Exportar Excel">XLS</button>
-        </div>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th>Cliente</th><th>Empresa</th><th>Plano</th><th>Valor</th>
-          <th>Pagamento</th><th>Vencimento</th><th>Status</th><th>Forma</th><th>Ações</th>
-        </tr></thead>
-        <tbody id="planos-tbody"></tbody>
-      </table>
-    </div>
-    <div class="flex items-center justify-between mt-3" style="flex-wrap:wrap;gap:10px">
-      <div class="text-sm text-muted" id="planos-count">0 clientes</div>
-      <div class="pagination" id="planos-pagination"></div>
-    </div>
-  </div>
-
-  <!-- Tabela de Pagamentos -->
-  <div class="card p-4">
-    <div class="flex items-center justify-between mb-3" style="flex-wrap:wrap;gap:10px">
-      <div class="font-display font-bold text-lg">💳 Histórico de Pagamentos</div>
-      <div class="flex gap-2" style="flex-wrap:wrap">
-        <select class="input" id="pl-pag-periodo" style="width:auto" onchange="filtrarPagamentos()">
-          <option value="mes">Este Mês</option>
-          <option value="semana">Esta Semana</option>
-          <option value="hoje">Hoje</option>
-          <option value="ano">Este Ano</option>
-          <option value="todos">Todos</option>
-        </select>
-      </div>
-    </div>
-    <!-- Faturamento sub-cards -->
-    <div class="grid" style="grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
-      <div class="fin-card"><div class="fin-card-label">Receita (filtro)</div><div class="fin-card-value" id="pl-fat-total" style="color:var(--green2)">R$ 0</div></div>
-      <div class="fin-card"><div class="fin-card-label">Qtd Pagamentos</div><div class="fin-card-value" id="pl-fat-qtd">0</div></div>
-      <div class="fin-card"><div class="fin-card-label">Ticket Médio</div><div class="fin-card-value" id="pl-fat-ticket" style="color:var(--accent2)">R$ 0</div></div>
-      <div class="fin-card"><div class="fin-card-label">Crescimento</div><div class="fin-card-value" id="pl-fat-crescimento" style="color:var(--yellow2)">0%</div></div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Cliente</th><th>Plano</th><th>Valor</th><th>Pagamento</th><th>Competência</th><th>Status</th><th>Forma</th></tr></thead>
-        <tbody id="pagamentos-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════ PLANOS ADMIN PAGE ══════════════════════ -->
-<section class="page" id="page-planos-admin">
-  <div class="page-header">
-    <div>
-      <div class="page-title">⚙️ Administração de Planos</div>
-      <div class="page-sub">Crie, edite e gerencie os planos disponíveis</div>
-    </div>
-    <div class="page-actions">
-      <button class="btn btn-secondary btn-sm" onclick="navigate('planos')">← Voltar</button>
-      <button class="btn btn-primary" onclick="openModal('modal-editar-plano')">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Novo Plano
-      </button>
-    </div>
-  </div>
-  <div id="admin-planos-grid" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
-    <!-- rendered by JS -->
-  </div>
-</section>
 
 <!-- Modais Planos -->
 <!-- Modal Novo/Editar Cliente Plano -->

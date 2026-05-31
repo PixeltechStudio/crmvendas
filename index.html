@@ -1195,6 +1195,30 @@ tbody tr{transition:background 0.15s}
           <div class="stat-value" id="d-ml">R$ 0,00</div>
           <div class="stat-meta" id="d-ml-meta">0 vendas</div>
         </div>
+        <div class="stat-card" style="--stat-color:var(--shein)">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="var(--shein)" stroke-width="2"/><text x="12" y="16" text-anchor="middle" font-size="9" fill="var(--shein)" font-weight="bold">SHN</text></svg>
+          </div>
+          <div class="stat-label">Shein (mês)</div>
+          <div class="stat-value" id="d-shein">R$ 0,00</div>
+          <div class="stat-meta" id="d-shein-meta">0 vendas</div>
+        </div>
+        <div class="stat-card" style="--stat-color:var(--amazon)">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="var(--amazon)" stroke-width="2"/><text x="12" y="16" text-anchor="middle" font-size="9" fill="var(--amazon)" font-weight="bold">AMZ</text></svg>
+          </div>
+          <div class="stat-label">Amazon (mês)</div>
+          <div class="stat-value" id="d-amazon">R$ 0,00</div>
+          <div class="stat-meta" id="d-amazon-meta">0 vendas</div>
+        </div>
+        <div class="stat-card" style="--stat-color:#64748b">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#64748b" stroke-width="2"/><text x="12" y="16" text-anchor="middle" font-size="9" fill="#64748b" font-weight="bold">OUT</text></svg>
+          </div>
+          <div class="stat-label">Outros (mês)</div>
+          <div class="stat-value" id="d-outros">R$ 0,00</div>
+          <div class="stat-meta" id="d-outros-meta">0 vendas</div>
+        </div>
         <div class="stat-card" style="--stat-color:var(--accent)">
           <div class="stat-icon"><svg width="20" height="20" fill="none" stroke="var(--accent2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div>
           <div class="stat-label">Total Produtos</div>
@@ -3872,10 +3896,16 @@ function loadDashboard() {
   const fatHoje = vendaHoje.reduce((s,v)=>s+(v.valorVenda||0)*( v.quantidade||1),0);
   const fatMes  = vendaMes.reduce((s,v)=>s+(v.valorVenda||0)*(v.quantidade||1),0);
   const lucroMes = vendaMes.reduce((s,v)=>s+(v.lucro||0),0);
-  const shopeeVendas = vendaMes.filter(v=>v.marketplace==='Shopee');
-  const mlVendas     = vendaMes.filter(v=>v.marketplace==='Mercado Livre');
-  const shopeeFat = shopeeVendas.reduce((s,v)=>s+(v.valorVenda||0)*(v.quantidade||1),0);
-  const mlFat     = mlVendas.reduce((s,v)=>s+(v.valorVenda||0)*(v.quantidade||1),0);
+  const shopeeVendas  = vendaMes.filter(v=>v.marketplace==='Shopee');
+  const mlVendas      = vendaMes.filter(v=>v.marketplace==='Mercado Livre');
+  const sheinVendas   = vendaMes.filter(v=>v.marketplace==='Shein');
+  const amazonVendas  = vendaMes.filter(v=>v.marketplace==='Amazon');
+  const outrosVendas  = vendaMes.filter(v=>!['Shopee','Mercado Livre','Shein','Amazon'].includes(v.marketplace));
+  const shopeeFat  = shopeeVendas.reduce((s,v)=>s+(v.valorVenda||0)*(v.quantidade||1),0);
+  const mlFat      = mlVendas.reduce((s,v)=>s+(v.valorVenda||0)*(v.quantidade||1),0);
+  const sheinFat   = sheinVendas.reduce((s,v)=>s+(v.valorVenda||0)*(v.quantidade||1),0);
+  const amazonFat  = amazonVendas.reduce((s,v)=>s+(v.valorVenda||0)*(v.quantidade||1),0);
+  const outrosFat  = outrosVendas.reduce((s,v)=>s+(v.valorVenda||0)*(v.quantidade||1),0);
 
   const estoquesCriticos = allProdutos.filter(p=>p.estoqueAtual!=null && p.estoqueMinimo!=null && p.estoqueAtual <= p.estoqueMinimo && p.status==='Ativo');
 
@@ -3891,10 +3921,16 @@ function loadDashboard() {
   setText('d-shopee-meta', `${shopeeVendas.length} vendas`);
   setText('d-ml', formatMoney(mlFat));
   setText('d-ml-meta', `${mlVendas.length} vendas`);
+  setText('d-shein', formatMoney(sheinFat));
+  setText('d-shein-meta', `${sheinVendas.length} vendas`);
+  setText('d-amazon', formatMoney(amazonFat));
+  setText('d-amazon-meta', `${amazonVendas.length} vendas`);
+  setText('d-outros', formatMoney(outrosFat));
+  setText('d-outros-meta', `${outrosVendas.length} vendas`);
   setText('d-produtos', allProdutos.length);
 
   buildChartFaturamento(vendaMes);
-  buildChartMarketplace(shopeeFat, mlFat);
+  buildChartMarketplace(shopeeFat, mlFat, sheinFat, amazonFat, outrosFat);
   renderTopProdutos(vendaMes);
   renderCriticalStock(estoquesCriticos);
   renderDashVendasRecentes();
@@ -3925,17 +3961,41 @@ function buildChartFaturamento(vendas) {
   });
 }
 
-function buildChartMarketplace(shopee, ml) {
+function buildChartMarketplace(shopee, ml, shein, amazon, outros) {
   const ctx = document.getElementById('chart-marketplace');
   if (!ctx) return;
   if (charts.mp) charts.mp.destroy();
+  const all = [
+    { label:'Shopee',        val:shopee||0,  color:'#ee4d2d' },
+    { label:'Mercado Livre', val:ml||0,      color:'#e0c000' },
+    { label:'Shein',         val:shein||0,   color:'#00bfa6' },
+    { label:'Amazon',        val:amazon||0,  color:'#ff9900' },
+    { label:'Outros',        val:outros||0,  color:'#64748b' },
+  ];
+  // Mostra todos com valor; se nenhum tiver venda, exibe todos com valor simbólico
+  const active = all.filter(m=>m.val>0);
+  const display = active.length ? active : all.map(m=>({...m,val:0.01}));
   charts.mp = new Chart(ctx, {
     type:'doughnut',
     data:{
-      labels:['Shopee','Mercado Livre'],
-      datasets:[{ data:[shopee||0.01, ml||0.01], backgroundColor:['#ee4d2d','#ffe600'], borderColor:['transparent','transparent'], borderWidth:0, hoverOffset:8 }]
+      labels: display.map(m=>m.label),
+      datasets:[{
+        data: display.map(m=>m.val),
+        backgroundColor: display.map(m=>m.color),
+        borderColor: 'transparent',
+        borderWidth: 0,
+        hoverOffset: 8
+      }]
     },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ color:'#8b9cc8', boxWidth:12, padding:16 } }, tooltip:{ callbacks:{ label:c=>' '+formatMoney(c.raw) } } }, cutout:'68%' }
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{ position:'bottom', labels:{ color:'#8b9cc8', boxWidth:12, padding:12, font:{size:11} } },
+        tooltip:{ callbacks:{ label: c => ` ${c.label}: ${formatMoney(c.raw)}` } }
+      },
+      cutout:'62%'
+    }
   });
 }
 
